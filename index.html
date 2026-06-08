@@ -105,19 +105,19 @@
         /* ── Layout ── */
         .main-grid {
             display: grid;
-            grid-template-columns: 370px 1fr;
-            gap: 20px;
+            grid-template-columns: 260px 1fr;
+            gap: 16px;
             align-items: start;
         }
-        @media (max-width: 960px) {
+        @media (max-width: 700px) {
             .main-grid { grid-template-columns: 1fr; }
             .chart-row { grid-template-columns: 1fr; }
             .balance-box { order: -1; display: flex; flex-direction: row; align-items: center; gap: 20px; padding: 16px 20px; }
-            .balance-amount { font-size: 32px; }
+            .balance-amount { font-size: 28px; }
             .lower-row { grid-template-columns: 1fr; }
             .tr-section-header { flex-direction: column; }
             .tr-note { max-width: 100%; }
-            .right-panel { gap: 14px; }
+            .right-panel { gap: 12px; }
         }
 
         @media (max-width: 640px) {
@@ -133,16 +133,16 @@
             background: var(--card);
             border: 1px solid var(--border);
             border-radius: 18px;
-            padding: 22px;
+            padding: 14px;
         }
 
         .section-label {
-            font-size: 10px;
+            font-size: 9px;
             font-weight: 800;
             letter-spacing: 0.12em;
             text-transform: uppercase;
             color: var(--muted);
-            margin: 18px 0 12px;
+            margin: 12px 0 8px;
             display: flex;
             align-items: center;
             gap: 8px;
@@ -157,37 +157,34 @@
 
         /* ── Sliders ── */
         .lever {
-            margin-bottom: 16px;
+            margin-bottom: 10px;
         }
         .lever-header {
             display: flex;
             justify-content: space-between;
             align-items: baseline;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }
         .lever-name {
-            font-size: 13px;
-            font-weight: 500;
+            font-size: 11px;
+            font-weight: 600;
         }
         .lever-value {
-            font-size: 13px;
+            font-size: 11px;
             font-weight: 700;
             color: var(--accent2);
             font-variant-numeric: tabular-nums;
         }
         .lever-desc {
-            font-size: 11px;
-            color: var(--muted);
-            margin-bottom: 8px;
-            line-height: 1.5;
+            display: none;
         }
 
         /* ── Slider wrapper ── */
         .slider-wrap {
             position: relative;
-            padding-top: 32px;    /* space for bubble */
-            padding-bottom: 22px; /* space for ref mark */
-            --thumb: 20px;        /* thumb diameter */
+            padding-top: 26px;    /* space for bubble */
+            padding-bottom: 18px; /* space for ref mark */
+            --thumb: 16px;        /* thumb diameter */
             --pct: 0;             /* updated by JS: 0→1 */
             --ref: 0;             /* default position: 0→1 */
         }
@@ -196,19 +193,18 @@
         .slider-bubble {
             position: absolute;
             top: 2px;
-            /* left = pct × (100% − thumb) + thumb/2, then centre with -50% */
             left: calc(var(--pct) * (100% - var(--thumb)) + var(--thumb) / 2);
             transform: translateX(-50%);
             background: var(--accent);
             color: #fff;
-            font-size: 12px;
+            font-size: 10px;
             font-weight: 700;
-            padding: 3px 9px;
-            border-radius: 7px;
+            padding: 2px 6px;
+            border-radius: 5px;
             white-space: nowrap;
             pointer-events: none;
             z-index: 10;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.5);
         }
         .slider-bubble::after {
             content: '';
@@ -258,7 +254,7 @@
         }
         input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
-            width: 20px; height: 20px;
+            width: 16px; height: 16px;
             border-radius: 50%;
             background: var(--accent);
             cursor: grab;
@@ -280,9 +276,9 @@
             background: var(--card2);
             border: 1px solid var(--border);
             color: var(--text);
-            padding: 9px 12px;
-            border-radius: 10px;
-            font-size: 13px;
+            padding: 6px 8px;
+            border-radius: 8px;
+            font-size: 11px;
             cursor: pointer;
             outline: none;
             transition: border-color 0.2s;
@@ -802,7 +798,7 @@
                             </div>
                         </div>
                     </div>
-                    <div style="position:relative;width:100%;height:260px;"><canvas id="chart"></canvas></div>
+                    <div style="position:relative;width:100%;height:200px;"><canvas id="chart"></canvas></div>
                 </div>
 
                 <!-- Big balance at 10 years -->
