@@ -1,1 +1,1421 @@
-<!-- placeholder -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulateur Retraites — COR 2025</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+    <style>
+        :root {
+            --bg: #080c18;
+            --card: #0f172a;
+            --card2: #1a2234;
+            --accent: #6366f1;
+            --accent2: #818cf8;
+            --green: #10b981;
+            --red: #ef4444;
+            --orange: #f59e0b;
+            --text: #e2e8f0;
+            --muted: #64748b;
+            --border: #1e293b;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Ambient glow */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -300px; left: -200px;
+            width: 700px; height: 700px;
+            background: radial-gradient(circle, rgba(99,102,241,0.12) 0%, transparent 65%);
+            pointer-events: none; z-index: 0;
+        }
+        body::after {
+            content: '';
+            position: fixed;
+            bottom: -200px; right: -100px;
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(16,185,129,0.08) 0%, transparent 65%);
+            pointer-events: none; z-index: 0;
+        }
+
+        .container {
+            position: relative; z-index: 1;
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 28px 24px 40px;
+        }
+
+        /* ── Header ── */
+        header {
+            text-align: center;
+            margin-bottom: 36px;
+        }
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(99,102,241,0.15);
+            border: 1px solid rgba(99,102,241,0.35);
+            color: var(--accent2);
+            padding: 5px 14px;
+            border-radius: 99px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+            margin-bottom: 14px;
+        }
+        .badge::before {
+            content: '';
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: var(--accent);
+            animation: blink 2s infinite;
+        }
+        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+        h1 {
+            font-size: clamp(26px, 4vw, 46px);
+            font-weight: 900;
+            background: linear-gradient(130deg, #f1f5f9 0%, var(--accent2) 60%, #c7d2fe 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            letter-spacing: -0.02em;
+        }
+        header p {
+            color: var(--muted);
+            font-size: 15px;
+            max-width: 560px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* ── Layout ── */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 370px 1fr;
+            gap: 20px;
+            align-items: start;
+        }
+        @media (max-width: 960px) {
+            .main-grid { grid-template-columns: 1fr; }
+            .chart-row { grid-template-columns: 1fr; }
+            .balance-box { order: -1; display: flex; flex-direction: row; align-items: center; gap: 20px; padding: 16px 20px; }
+            .balance-amount { font-size: 32px; }
+            .lower-row { grid-template-columns: 1fr; }
+            .tr-section-header { flex-direction: column; }
+            .tr-note { max-width: 100%; }
+            .right-panel { gap: 14px; }
+        }
+
+        @media (max-width: 640px) {
+            .kpi-row { grid-template-columns: 1fr 1fr; }
+            .kpi:last-child { grid-column: span 2; }
+            .tr-stat-row { grid-template-columns: 1fr; }
+            .status-banner { font-size: 12px; }
+            .container { padding: 16px 14px 32px; }
+        }
+
+        /* ── Cards ── */
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 22px;
+        }
+
+        .section-label {
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin: 18px 0 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .section-label::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+        .section-label:first-child { margin-top: 0; }
+
+        /* ── Sliders ── */
+        .lever {
+            margin-bottom: 16px;
+        }
+        .lever-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 4px;
+        }
+        .lever-name {
+            font-size: 13px;
+            font-weight: 500;
+        }
+        .lever-value {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--accent2);
+            font-variant-numeric: tabular-nums;
+        }
+        .lever-desc {
+            font-size: 11px;
+            color: var(--muted);
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+
+        /* ── Slider wrapper ── */
+        .slider-wrap {
+            position: relative;
+            padding-top: 32px;    /* space for bubble */
+            padding-bottom: 22px; /* space for ref mark */
+            --thumb: 20px;        /* thumb diameter */
+            --pct: 0;             /* updated by JS: 0→1 */
+            --ref: 0;             /* default position: 0→1 */
+        }
+
+        /* Valeur courante — bulle toujours visible au-dessus du pouce */
+        .slider-bubble {
+            position: absolute;
+            top: 2px;
+            /* left = pct × (100% − thumb) + thumb/2, then centre with -50% */
+            left: calc(var(--pct) * (100% - var(--thumb)) + var(--thumb) / 2);
+            transform: translateX(-50%);
+            background: var(--accent);
+            color: #fff;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 3px 9px;
+            border-radius: 7px;
+            white-space: nowrap;
+            pointer-events: none;
+            z-index: 10;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+        .slider-bubble::after {
+            content: '';
+            position: absolute;
+            top: 100%; left: 50%;
+            transform: translateX(-50%);
+            border: 5px solid transparent;
+            border-top-color: var(--accent);
+        }
+
+        /* Marque de référence COR (orange, en dessous de la piste) */
+        .ref-mark {
+            position: absolute;
+            bottom: 0;
+            left: calc(var(--ref) * (100% - var(--thumb)) + var(--thumb) / 2);
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            pointer-events: none;
+        }
+        .ref-line {
+            width: 2px;
+            height: 8px;
+            background: var(--orange);
+            border-radius: 1px;
+        }
+        .ref-label {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--orange);
+            white-space: nowrap;
+            margin-top: 2px;
+            letter-spacing: 0.02em;
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 5px;
+            border-radius: 3px;
+            background: var(--border);
+            outline: none;
+            cursor: pointer;
+            display: block;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px; height: 20px;
+            border-radius: 50%;
+            background: var(--accent);
+            cursor: grab;
+            box-shadow: 0 0 0 3px rgba(99,102,241,0.25);
+            transition: box-shadow 0.15s, transform 0.15s;
+        }
+        input[type="range"]:hover::-webkit-slider-thumb,
+        input[type="range"]:active::-webkit-slider-thumb {
+            box-shadow: 0 0 0 6px rgba(99,102,241,0.35);
+            transform: scale(1.1);
+            cursor: grabbing;
+        }
+        input[type="range"]::-webkit-slider-runnable-track {
+            border-radius: 3px;
+        }
+
+        select {
+            width: 100%;
+            background: var(--card2);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 9px 12px;
+            border-radius: 10px;
+            font-size: 13px;
+            cursor: pointer;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        select:focus { border-color: var(--accent); }
+
+        .reset-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--muted);
+            padding: 9px 0;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+            margin-top: 10px;
+            letter-spacing: 0.02em;
+        }
+        .reset-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent2);
+            background: rgba(99,102,241,0.05);
+        }
+
+        /* ── Right panel ── */
+        .right-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        /* ── Status banner ── */
+        .status-banner {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 13px 18px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.4s ease;
+        }
+        .status-dot {
+            width: 9px; height: 9px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        /* ── KPIs ── */
+        .kpi-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+        .kpi {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-top: 2px solid var(--border);
+            border-radius: 14px;
+            padding: 16px;
+            transition: border-top-color 0.4s, border-color 0.4s;
+        }
+        .kpi.green  { border-top-color: var(--green); }
+        .kpi.orange { border-top-color: var(--orange); }
+        .kpi.red    { border-top-color: var(--red); }
+
+        .kpi-label {
+            font-size: 10px;
+            color: var(--muted);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            margin-bottom: 10px;
+        }
+        .kpi-value {
+            font-size: 28px;
+            font-weight: 900;
+            line-height: 1;
+            font-variant-numeric: tabular-nums;
+            transition: color 0.4s;
+        }
+        .kpi.green  .kpi-value { color: var(--green); }
+        .kpi.orange .kpi-value { color: var(--orange); }
+        .kpi.red    .kpi-value { color: var(--red); }
+        .kpi-sub {
+            font-size: 11px;
+            color: var(--muted);
+            margin-top: 4px;
+        }
+
+        /* ── Lower row ── */
+        .lower-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 16px;
+        }
+        @media (max-width: 700px) {
+            .lower-row { grid-template-columns: 1fr; }
+            .kpi-row   { grid-template-columns: 1fr 1fr; }
+        }
+
+        /* ── Chart row ── */
+        .chart-row {
+            display: grid;
+            grid-template-columns: 1fr 180px;
+            gap: 16px;
+            align-items: stretch;
+        }
+        @media (max-width: 800px) {
+            .chart-row { grid-template-columns: 1fr; }
+        }
+
+        /* ── Balance box ── */
+        .balance-box {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 20px 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            transition: border-color 0.4s, background 0.4s;
+        }
+        .balance-box.deficit {
+            border-color: rgba(239,68,68,0.4);
+            background: rgba(239,68,68,0.05);
+        }
+        .balance-box.surplus {
+            border-color: rgba(16,185,129,0.4);
+            background: rgba(16,185,129,0.05);
+        }
+        .balance-horizon {
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 2px;
+        }
+        .balance-year {
+            font-size: 13px;
+            font-weight: 700;
+            color: #475569;
+            margin-bottom: 14px;
+        }
+        .balance-amount {
+            font-size: 42px;
+            font-weight: 900;
+            line-height: 1;
+            font-variant-numeric: tabular-nums;
+            transition: color 0.4s;
+            margin-bottom: 4px;
+        }
+        .balance-box.deficit .balance-amount { color: var(--red); }
+        .balance-box.surplus .balance-amount { color: var(--green); }
+        .balance-unit {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--muted);
+            margin-bottom: 8px;
+        }
+        .balance-pct {
+            font-size: 12px;
+            color: var(--muted);
+            margin-bottom: 16px;
+        }
+        .balance-divider {
+            width: 40px;
+            height: 1px;
+            background: var(--border);
+            margin-bottom: 12px;
+        }
+        .balance-ref-label {
+            font-size: 10px;
+            color: #334155;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            margin-bottom: 4px;
+        }
+        .balance-ref-val {
+            font-size: 13px;
+            font-weight: 700;
+            color: #475569;
+        }
+
+        /* ── Chart ── */
+        .chart-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 22px;
+        }
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+        .chart-title {
+            font-size: 14px;
+            font-weight: 700;
+        }
+        .legend {
+            display: flex;
+            gap: 16px;
+            font-size: 11px;
+            color: var(--muted);
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .legend-dot {
+            width: 20px; height: 3px;
+            border-radius: 2px;
+        }
+        canvas { display: block; }
+
+        /* ── Breakdown ── */
+        .breakdown-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 22px;
+        }
+        .breakdown-title {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.09em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 14px;
+        }
+        .effect-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 9px 10px;
+            border-radius: 9px;
+            margin-bottom: 6px;
+            background: rgba(255,255,255,0.025);
+            border: 1px solid rgba(255,255,255,0.04);
+            transition: background 0.2s;
+        }
+        .effect-row:hover { background: rgba(255,255,255,0.045); }
+        .effect-label { font-size: 12px; color: #94a3b8; }
+        .effect-val {
+            font-size: 13px;
+            font-weight: 800;
+            font-variant-numeric: tabular-nums;
+        }
+        .effect-bar-wrap {
+            width: 60px; height: 4px;
+            background: var(--border);
+            border-radius: 2px;
+            overflow: hidden;
+            margin: 0 10px;
+        }
+        .effect-bar { height: 100%; border-radius: 2px; transition: width 0.3s; }
+
+        /* ── Living standard card ── */
+        .nv-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .nv-label {
+            font-size: 10px;
+            color: var(--muted);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            margin-bottom: 12px;
+        }
+        .nv-value {
+            font-size: 42px;
+            font-weight: 900;
+            color: var(--accent2);
+            line-height: 1;
+            margin-bottom: 6px;
+        }
+        .nv-sub { font-size: 11px; color: var(--muted); line-height: 1.5; }
+
+        /* ── TR Décile section ── */
+        .tr-section {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 22px;
+            margin-top: 20px;
+        }
+        .tr-section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 20px;
+            margin-bottom: 16px;
+        }
+        .tr-note {
+            font-size: 11px;
+            color: var(--muted);
+            background: rgba(255,255,255,0.025);
+            border: 1px solid rgba(255,255,255,0.04);
+            border-left: 2px solid var(--orange);
+            padding: 9px 12px;
+            border-radius: 8px;
+            line-height: 1.6;
+            flex-shrink: 0;
+            max-width: 420px;
+        }
+        .tr-stat-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+            margin-top: 16px;
+        }
+        .tr-stat {
+            background: rgba(255,255,255,0.025);
+            border: 1px solid rgba(255,255,255,0.04);
+            border-radius: 10px;
+            padding: 12px 14px;
+        }
+        .tr-stat-label { font-size: 11px; color: var(--muted); margin-bottom: 5px; }
+        .tr-stat-val { font-size: 24px; font-weight: 900; font-variant-numeric: tabular-nums; color: var(--text); }
+        .tr-stat-delta { font-size: 12px; font-weight: 700; margin-top: 3px; }
+        .tr-stat-delta.pos { color: var(--green); }
+        .tr-stat-delta.neg { color: var(--red); }
+        .tr-stat-delta.neu { color: var(--muted); }
+
+        footer {
+            text-align: center;
+            margin-top: 36px;
+            font-size: 11px;
+            color: #334155;
+            line-height: 1.7;
+        }
+        footer a { color: #475569; text-decoration: none; }
+        footer a:hover { color: var(--accent2); }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <div class="badge">Conseil d'Orientation des Retraites · Rapport Juin 2025</div>
+        <h1>Simulateur du système de retraite</h1>
+        <p>Ajustez les leviers et visualisez en temps réel l'impact sur l'équilibre financier des retraites à l'horizon 2070.</p>
+    </header>
+
+    <div class="main-grid">
+
+        <!-- ════ LEFT: Controls ════ -->
+        <div class="card">
+
+            <div class="section-label">Leviers structurels</div>
+
+            <div class="lever">
+                <div class="lever-header">
+                    <span class="lever-name">🎯 Âge légal de départ</span>
+                    <span class="lever-value" id="val-age">64 ans</span>
+                </div>
+                <div class="lever-desc">Actuellement 64 ans (réforme 2023). Chaque année supplémentaire réduit les dépenses et augmente les cotisations.</div>
+                <div class="slider-wrap">
+                    <div class="slider-bubble" id="bub-age">64 ans</div>
+                    <input type="range" id="sl-age" min="60" max="70" step="0.5" value="64">
+                    <div class="ref-mark" id="mark-age"><div class="ref-line"></div><div class="ref-label">64 ans (réf.)</div></div>
+                </div>
+            </div>
+
+            <div class="lever">
+                <div class="lever-header">
+                    <span class="lever-name">💼 Cotisations salariales</span>
+                    <span class="lever-value" id="val-cotis-sal">±0 pt</span>
+                </div>
+                <div class="lever-desc">Cotisations vieillesse à la charge du salarié (actuellement ~7,3%). Réduit le salaire net — effet récessif limité.</div>
+                <div class="slider-wrap">
+                    <div class="slider-bubble" id="bub-cotis-sal">±0 pt</div>
+                    <input type="range" id="sl-cotis-sal" min="-2" max="5" step="0.5" value="0">
+                    <div class="ref-mark" id="mark-cotis-sal"><div class="ref-line"></div><div class="ref-label">0 pt (réf.)</div></div>
+                </div>
+            </div>
+
+            <div class="lever">
+                <div class="lever-header">
+                    <span class="lever-name">🏭 Cotisations patronales</span>
+                    <span class="lever-value" id="val-cotis-emp">±0 pt</span>
+                </div>
+                <div class="lever-desc">Cotisations vieillesse à la charge de l'employeur (actuellement ~10,5%). Augmente le coût du travail — effet récessif plus fort.</div>
+                <div class="slider-wrap">
+                    <div class="slider-bubble" id="bub-cotis-emp">±0 pt</div>
+                    <input type="range" id="sl-cotis-emp" min="-2" max="6" step="0.5" value="0">
+                    <div class="ref-mark" id="mark-cotis-emp"><div class="ref-line"></div><div class="ref-label">0 pt (réf.)</div></div>
+                </div>
+            </div>
+
+            <div class="lever">
+                <div class="lever-header">
+                    <span class="lever-name">📊 Indexation des pensions</span>
+                </div>
+                <div class="lever-desc">Règle de revalorisation annuelle des pensions. Les salaires indexent mieux le niveau de vie des retraités.</div>
+                <select id="sl-index">
+                    <option value="0">Sur les prix uniquement (actuel)</option>
+                    <option value="1">Mix prix + salaires (50/50)</option>
+                    <option value="2">Sur les salaires (niveau de vie préservé)</option>
+                </select>
+            </div>
+
+            <div class="section-label">Hypothèses démographiques</div>
+
+            <div class="lever">
+                <div class="lever-header">
+                    <span class="lever-name">👶 Taux de fécondité</span>
+                    <span class="lever-value" id="val-fec">1,80 enfant/femme</span>
+                </div>
+                <div class="lever-desc">Scénario COR : 1,8 — Observé en 2025 : 1,56 (plus bas depuis 1917). Effet décalé à partir de 2045.</div>
+                <div class="slider-wrap">
+                    <div class="slider-bubble" id="bub-fec">1,80</div>
+                    <input type="range" id="sl-fec" min="1.2" max="2.2" step="0.05" value="1.8">
+                    <div class="ref-mark" id="mark-fec"><div class="ref-line"></div><div class="ref-label">1,8 (réf.)</div></div>
+                </div>
+            </div>
+
+            <div class="lever">
+                <div class="lever-header">
+                    <span class="lever-name">🌍 Solde migratoire annuel</span>
+                    <span class="lever-value" id="val-mig">+70 000 /an</span>
+                </div>
+                <div class="lever-desc">Scénario COR : +70 000/an. Réalité 2018-22 : +186 000/an. Les migrants sont d'abord cotisants, puis retraités.</div>
+                <div class="slider-wrap">
+                    <div class="slider-bubble" id="bub-mig">+70k</div>
+                    <input type="range" id="sl-mig" min="0" max="300000" step="10000" value="70000">
+                    <div class="ref-mark" id="mark-mig"><div class="ref-line"></div><div class="ref-label">70k (réf.)</div></div>
+                </div>
+            </div>
+
+            <div class="section-label">Hypothèses économiques</div>
+
+            <div class="lever">
+                <div class="lever-header">
+                    <span class="lever-name">⚡ Productivité horaire</span>
+                    <span class="lever-value" id="val-prod">+0,7 %/an</span>
+                </div>
+                <div class="lever-desc">Scénario central COR : 0,7 %. Détermine la croissance des salaires (et donc des cotisations) à long terme.</div>
+                <div class="slider-wrap">
+                    <div class="slider-bubble" id="bub-prod">0,7%</div>
+                    <input type="range" id="sl-prod" min="0.2" max="1.5" step="0.1" value="0.7">
+                    <div class="ref-mark" id="mark-prod"><div class="ref-line"></div><div class="ref-label">0,7% (réf.)</div></div>
+                </div>
+            </div>
+
+            <div class="lever">
+                <div class="lever-header">
+                    <span class="lever-name">📉 Taux de chômage (long terme)</span>
+                    <span class="lever-value" id="val-chom">7,0 %</span>
+                </div>
+                <div class="lever-desc">Scénario COR : 7 % à partir de 2032. Un chômage plus faible = plus de cotisants actifs.</div>
+                <div class="slider-wrap">
+                    <div class="slider-bubble" id="bub-chom">7,0%</div>
+                    <input type="range" id="sl-chom" min="4" max="12" step="0.5" value="7">
+                    <div class="ref-mark" id="mark-chom"><div class="ref-line"></div><div class="ref-label">7% (réf.)</div></div>
+                </div>
+            </div>
+
+            <button class="reset-btn" onclick="resetAll()">↩ Revenir au scénario COR de référence</button>
+        </div>
+
+        <!-- ════ RIGHT: Visualisation ════ -->
+        <div class="right-panel">
+
+            <!-- Status -->
+            <div id="status-banner" class="status-banner">
+                <div id="status-dot" class="status-dot"></div>
+                <span id="status-text"></span>
+            </div>
+
+            <!-- KPIs -->
+            <div class="kpi-row">
+                <div class="kpi" id="kpi-2030">
+                    <div class="kpi-label">Solde 2030</div>
+                    <div class="kpi-value" id="kv-2030">—</div>
+                    <div class="kpi-sub">% du PIB</div>
+                </div>
+                <div class="kpi" id="kpi-2050">
+                    <div class="kpi-label">Solde 2050</div>
+                    <div class="kpi-value" id="kv-2050">—</div>
+                    <div class="kpi-sub">% du PIB</div>
+                </div>
+                <div class="kpi" id="kpi-2070">
+                    <div class="kpi-label">Solde 2070</div>
+                    <div class="kpi-value" id="kv-2070">—</div>
+                    <div class="kpi-sub">% du PIB</div>
+                </div>
+            </div>
+
+            <!-- Chart + balance box -->
+            <div class="chart-row">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <span class="chart-title">Solde du système de retraite (% du PIB, 2024–2070)</span>
+                        <div class="legend">
+                            <div class="legend-item">
+                                <div class="legend-dot" style="background:rgba(99,102,241,0.5);"></div>
+                                <span>Scénario COR</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-dot" style="background:#10b981;"></div>
+                                <span>Votre scénario</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="position:relative;width:100%;height:260px;"><canvas id="chart"></canvas></div>
+                </div>
+
+                <!-- Big balance at 10 years -->
+                <div class="balance-box" id="balance-box">
+                    <div class="balance-horizon">Équilibre à 10 ans</div>
+                    <div class="balance-year">2035</div>
+                    <div class="balance-amount" id="balance-amount">—</div>
+                    <div class="balance-unit">Mds €</div>
+                    <div class="balance-pct" id="balance-pct">—</div>
+                    <div class="balance-divider"></div>
+                    <div class="balance-ref-label">Scénario COR</div>
+                    <div class="balance-ref-val" id="balance-ref">−5,3 Mds €</div>
+                </div>
+            </div>
+
+            <!-- Lower row: breakdown + living std -->
+            <div class="lower-row">
+                <div class="breakdown-card">
+                    <div class="breakdown-title">Impact de chaque levier sur le solde 2070 (vs référence)</div>
+                    <div id="breakdown-list"></div>
+                </div>
+
+                <div class="nv-card">
+                    <div>
+                        <div class="nv-label">Niveau de vie des retraités en 2070</div>
+                        <div class="nv-value" id="kv-nv">—</div>
+                        <div class="nv-sub" id="ks-nv">en % du niveau de vie moyen de la population</div>
+                    </div>
+                    <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border)">
+                        <div style="font-size:10px;color:var(--muted);margin-bottom:6px;font-weight:700;text-transform:uppercase;letter-spacing:.07em">Repères</div>
+                        <div style="font-size:11px;color:#64748b;line-height:1.8">
+                            2022 (observé) : <b style="color:#94a3b8">97%</b><br>
+                            Scénario COR réf. : <b style="color:#94a3b8">87,5%</b><br>
+                            Avec loyers imputés (2022) : <b style="color:#94a3b8">105%</b>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- TR par décile -->
+            <div class="tr-section">
+                <div class="tr-section-header">
+                    <div>
+                        <div class="chart-title">Impact sur le taux de remplacement brut</div>
+                        <div style="font-size:12px;color:var(--muted);margin-top:5px;">Pour trois profils de revenus — scénario COR de référence vs votre simulation</div>
+                    </div>
+                    <div class="tr-note">
+                        Seuls <b style="color:#e2e8f0">l'âge de départ</b> et <b style="color:#e2e8f0">l'indexation</b> agissent directement sur le taux de remplacement individuel.
+                        Les 5 autres curseurs jouent sur l'équilibre macro du système, pas sur la pension individuelle.
+                    </div>
+                </div>
+                <div style="display:flex;gap:16px;margin-bottom:14px;font-size:11px;color:var(--muted);">
+                    <span style="display:flex;align-items:center;gap:6px;"><span style="width:16px;height:3px;background:rgba(99,102,241,0.7);border-radius:2px;display:inline-block;"></span>Référence COR 2025</span>
+                    <span style="display:flex;align-items:center;gap:6px;"><span style="width:16px;height:3px;background:#10b981;border-radius:2px;display:inline-block;"></span>Votre simulation</span>
+                </div>
+                <div style="position:relative;width:100%;height:200px;">
+                    <canvas id="tr-chart"></canvas>
+                </div>
+                <div class="tr-stat-row">
+                    <div class="tr-stat">
+                        <div class="tr-stat-label">D1 — bas salaire (~1 600 €/mois brut)</div>
+                        <div style="display:flex;align-items:baseline;gap:8px;">
+                            <span class="tr-stat-val" id="tr-val-d1">82%</span>
+                            <span style="font-size:12px;color:var(--muted)">réf. 82%</span>
+                        </div>
+                        <div class="tr-stat-delta neu" id="tr-delta-d1">inchangé</div>
+                    </div>
+                    <div class="tr-stat">
+                        <div class="tr-stat-label">D5 — médian (~2 650 €/mois brut)</div>
+                        <div style="display:flex;align-items:baseline;gap:8px;">
+                            <span class="tr-stat-val" id="tr-val-d5">73%</span>
+                            <span style="font-size:12px;color:var(--muted)">réf. 73%</span>
+                        </div>
+                        <div class="tr-stat-delta neu" id="tr-delta-d5">inchangé</div>
+                    </div>
+                    <div class="tr-stat">
+                        <div class="tr-stat-label">D10 — haut salaire (~9 500 €/mois brut)</div>
+                        <div style="display:flex;align-items:baseline;gap:8px;">
+                            <span class="tr-stat-val" id="tr-val-d10">43%</span>
+                            <span style="font-size:12px;color:var(--muted)">réf. 43%</span>
+                        </div>
+                        <div class="tr-stat-delta neu" id="tr-delta-d10">inchangé</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <footer>
+        Simulateur pédagogique basé sur les projections du <a href="https://www.cor-retraites.fr/rapports-du-cor/rapport-annuel-cor-juin-2025-evolutions-perspectives-retraites-france" target="_blank">Rapport annuel du COR – Juin 2025</a>.<br>
+        Les effets sont des estimations simplifiées à des fins d'illustration. Ils ne se substituent pas aux projections officielles du COR.
+    </footer>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// MODEL
+// ═══════════════════════════════════════════════════════════
+
+const YEARS = [2024,2026,2028,2030,2032,2034,2036,2038,2040,2043,2046,2050,2054,2058,2062,2066,2070];
+
+// Baseline from COR 2025 report
+function baseline(y) {
+    const pts = [[2024,-0.1],[2030,-0.2],[2040,-0.65],[2050,-0.95],[2060,-1.2],[2070,-1.4]];
+    for (let i = 0; i < pts.length-1; i++) {
+        if (y >= pts[i][0] && y <= pts[i+1][0]) {
+            const t = (y - pts[i][0]) / (pts[i+1][0] - pts[i][0]);
+            return pts[i][1] + t*(pts[i+1][1]-pts[i][1]);
+        }
+    }
+    return -1.4;
+}
+
+const DEFAULTS = { age:64, cotis_sal:0, cotis_emp:0, index:0, fec:1.8, mig:70000, prod:0.7, chom:7 };
+
+// TR par décile — référence COR 2025 (génération 1980, carrière 43 ans, départ 64 ans)
+const TR_REF = [82, 73, 43]; // D1, D5, D10
+const TR_IDX_BONUS = [0, 5, 11]; // gain TR en pts selon indexation (prix / mixte / salaires)
+
+function computeBalance(y, p) {
+    const base = baseline(y);
+    const T = (y - 2024) / (2070 - 2024); // 0→1
+    let d = 0;
+
+    // 1. Age légal
+    const dAge = p.age - 64;
+    const ageFactor = Math.min(1, Math.max(0, (y-2024)/18));
+    d += dAge * 0.42 * ageFactor;
+
+    // 2. Cotisations salariales (moins récessif : baisse consommation)
+    if (y > 2024) {
+        d += p.cotis_sal * 0.088;
+        d -= p.cotis_sal * 0.012 * T;
+    }
+    // 2b. Cotisations patronales (plus récessif : hausse coût du travail)
+    if (y > 2024) {
+        d += p.cotis_emp * 0.132;
+        d -= p.cotis_emp * 0.038 * T;
+    }
+
+    // 3. Indexation (coût sur le balance, croissant dans le temps)
+    d += [-0, -0.27, -0.54][p.index] * T;
+
+    // 4. Fécondité (décalage démographique, effet à partir de 2042)
+    const dFec = p.fec - 1.8;
+    const fecFactor = Math.max(0, (y-2042)/(2070-2042));
+    d += dFec * 3.2 * fecFactor;
+
+    // 5. Migration (effet positif court terme, atténué long terme)
+    const dMig = p.mig - 70000;
+    if (y > 2024) {
+        const migRamp = Math.min(1, (y-2024)/8);
+        const migDecay = 1 - 0.25*T;
+        d += (dMig/50000) * 0.2 * migRamp * migDecay;
+    }
+
+    // 6. Productivité (cumulatif à partir de 2040)
+    const dProd = p.prod - 0.7;
+    const prodFactor = Math.max(0, (y-2040)/(2070-2040));
+    d += (dProd/0.3) * 0.72 * prodFactor;
+
+    // 7. Chômage (effet à partir de 2032)
+    const dChom = 7 - p.chom;
+    const chomFactor = y>2032 ? Math.min(1,(y-2032)/10) : 0;
+    d += (dChom/2) * 0.28 * chomFactor;
+
+    return base + d;
+}
+
+function computeLivingStd(p) {
+    let s = 87.5;
+    s += (p.age - 64) * 0.9;         // later retirement → slightly better pension
+    s += [0, 4.5, 9][p.index];       // wages indexation preserves living standard
+    s += (0.7 - p.prod) * 11.5;      // higher wages = retirees (price-indexed) fall behind more
+    s -= p.cotis_sal * 0.45;         // hausse cotis salariales = baisse salaire net actif
+    s -= p.cotis_emp * 0.20;         // hausse cotis patronales = pression sur salaires/emploi
+    return Math.min(115, Math.max(58, s));
+}
+
+// ═══════════════════════════════════════════════════════════
+// CHART
+// ═══════════════════════════════════════════════════════════
+
+const ctx = document.getElementById('chart').getContext('2d');
+const baseData = YEARS.map(y => parseFloat(baseline(y).toFixed(3)));
+
+const myChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: YEARS,
+        datasets: [
+            {
+                label: 'Scénario COR (référence)',
+                data: baseData,
+                borderColor: 'rgba(99,102,241,0.45)',
+                backgroundColor: 'transparent',
+                borderWidth: 2,
+                borderDash: [6,4],
+                pointRadius: 0,
+                tension: 0.45,
+                order: 2
+            },
+            {
+                label: 'Votre scénario',
+                data: [...baseData],
+                borderColor: '#10b981',
+                borderWidth: 2.5,
+                pointRadius: 0,
+                pointHoverRadius: 5,
+                pointHoverBackgroundColor: '#10b981',
+                fill: {
+                    target: { value: 0 },
+                    above: 'rgba(16,185,129,0.12)',
+                    below: 'rgba(239,68,68,0.08)'
+                },
+                tension: 0.45,
+                order: 1
+            }
+        ]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode:'index', intersect:false },
+        plugins: {
+            legend: { display: false },
+            tooltip: {
+                backgroundColor: '#0f172a',
+                borderColor: '#1e293b',
+                borderWidth: 1,
+                titleColor: '#e2e8f0',
+                bodyColor: '#94a3b8',
+                padding: 12,
+                callbacks: {
+                    label: c => `${c.dataset.label}: ${c.parsed.y >= 0 ? '+' : ''}${c.parsed.y.toFixed(2)}% du PIB`
+                }
+            }
+        },
+        scales: {
+            x: {
+                grid: { color:'rgba(255,255,255,0.035)' },
+                ticks: { color:'#475569', font:{ size:11 }, maxTicksLimit: 9 }
+            },
+            y: {
+                grid: { color:'rgba(255,255,255,0.035)' },
+                ticks: {
+                    color:'#475569',
+                    font:{ size:11 },
+                    callback: v => (v>=0?'+':'')+v.toFixed(1)+'%'
+                },
+                min: -3, max: 1.8,
+                border: { dash:[3,3] }
+            }
+        },
+        animation: { duration: 250, easing:'easeInOutQuart' }
+    },
+    plugins: [{
+        id: 'zeroLine',
+        beforeDraw(chart) {
+            const {ctx:c, chartArea, scales} = chart;
+            if (!chartArea) return;
+            const y0 = scales.y.getPixelForValue(0);
+            c.save();
+            c.strokeStyle = 'rgba(255,255,255,0.12)';
+            c.lineWidth = 1;
+            c.setLineDash([4,4]);
+            c.beginPath();
+            c.moveTo(chartArea.left, y0);
+            c.lineTo(chartArea.right, y0);
+            c.stroke();
+            // Label "Équilibre"
+            c.font = '10px system-ui';
+            c.fillStyle = 'rgba(255,255,255,0.3)';
+            c.fillText('Équilibre (0%)', chartArea.left+6, y0-5);
+            c.restore();
+        }
+    }]
+});
+
+// ═══════════════════════════════════════════════════════════
+// TR CHART
+// ═══════════════════════════════════════════════════════════
+
+const trCtx = document.getElementById('tr-chart').getContext('2d');
+const trChart = new Chart(trCtx, {
+    type: 'bar',
+    data: {
+        labels: ['D1 — bas salaire\n(~1 600 €/mois)', 'D5 — médian\n(~2 650 €/mois)', 'D10 — haut salaire\n(~9 500 €/mois)'],
+        datasets: [
+            {
+                label: 'Référence COR',
+                data: [...TR_REF],
+                backgroundColor: 'rgba(99,102,241,0.55)',
+                borderColor: 'rgba(99,102,241,0.85)',
+                borderWidth: 1,
+                borderRadius: 4,
+                barPercentage: 0.42
+            },
+            {
+                label: 'Simulation',
+                data: [...TR_REF],
+                backgroundColor: ['rgba(16,185,129,0.6)','rgba(16,185,129,0.6)','rgba(16,185,129,0.6)'],
+                borderColor: ['rgba(16,185,129,0.9)','rgba(16,185,129,0.9)','rgba(16,185,129,0.9)'],
+                borderWidth: 1,
+                borderRadius: 4,
+                barPercentage: 0.42
+            }
+        ]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { display: false },
+            tooltip: {
+                backgroundColor: '#0f172a',
+                borderColor: '#1e293b',
+                borderWidth: 1,
+                titleColor: '#e2e8f0',
+                bodyColor: '#94a3b8',
+                padding: 10,
+                callbacks: {
+                    label: c => `${c.dataset.label} : ${c.parsed.y}%`
+                }
+            }
+        },
+        scales: {
+            x: {
+                grid: { display: false },
+                ticks: { color:'#475569', font:{ size:11 } }
+            },
+            y: {
+                min: 0, max: 105,
+                grid: { color:'rgba(255,255,255,0.035)' },
+                ticks: {
+                    color:'#475569',
+                    font:{ size:11 },
+                    callback: v => v + '%',
+                    stepSize: 20
+                }
+            }
+        },
+        animation: { duration: 200 }
+    }
+});
+
+// ═══════════════════════════════════════════════════════════
+// UPDATE
+// ═══════════════════════════════════════════════════════════
+
+function getParams() {
+    return {
+        age:       parseFloat(document.getElementById('sl-age').value),
+        cotis_sal: parseFloat(document.getElementById('sl-cotis-sal').value),
+        cotis_emp: parseFloat(document.getElementById('sl-cotis-emp').value),
+        index:     parseInt(document.getElementById('sl-index').value),
+        fec:   parseFloat(document.getElementById('sl-fec').value),
+        mig:   parseInt(document.getElementById('sl-mig').value),
+        prod:  parseFloat(document.getElementById('sl-prod').value),
+        chom:  parseFloat(document.getElementById('sl-chom').value)
+    };
+}
+
+// ═══════════════════════════════════════════════════════════
+// SLIDER UI HELPERS
+// ═══════════════════════════════════════════════════════════
+
+// Compute 0→1 fraction for a slider value
+function pct(input, val) {
+    return (val - parseFloat(input.min)) / (parseFloat(input.max) - parseFloat(input.min));
+}
+
+// Update the CSS variable --pct on the wrapper so bubble follows thumb via CSS calc()
+function syncBubble(input, bub, label) {
+    const wrap = input.closest('.slider-wrap');
+    wrap.style.setProperty('--pct', pct(input, parseFloat(input.value)));
+    bub.textContent = label;
+}
+
+// Set --ref on each wrapper once (orange reference mark position)
+function setupRefMarks() {
+    SLIDERS.forEach(({ id, refVal }) => {
+        const input = document.getElementById(id);
+        const wrap  = input.closest('.slider-wrap');
+        wrap.style.setProperty('--ref', pct(input, refVal));
+    });
+}
+
+function fmt(v) { return (v>=0?'+':'')+v.toFixed(2)+'%'; }
+
+function colorClass(v) {
+    return v >= -0.05 ? 'green' : v >= -0.6 ? 'orange' : 'red';
+}
+
+function update() {
+    const p = getParams();
+
+    // ── Labels + bubbles
+    const age = p.age;
+    const ageLabel = (age%1===0?age:age.toFixed(1))+' ans';
+    const fmtPt = v => (v>=0?'+':'')+v.toFixed(1)+' pt';
+
+    document.getElementById('val-age').textContent       = ageLabel;
+    document.getElementById('val-cotis-sal').textContent = fmtPt(p.cotis_sal);
+    document.getElementById('val-cotis-emp').textContent = fmtPt(p.cotis_emp);
+    document.getElementById('val-fec').textContent       = p.fec.toFixed(2).replace('.',',')+' enfant/femme';
+    document.getElementById('val-mig').textContent       = '+'+(p.mig/1000).toFixed(0)+' 000 /an';
+    document.getElementById('val-prod').textContent      = '+'+p.prod.toFixed(1).replace('.',',')+' %/an';
+    document.getElementById('val-chom').textContent      = p.chom.toFixed(1).replace('.',',')+' %';
+
+    // ── Balance box at 10 years (2035)
+    // PIB France 2030 ≈ 3 300 Mds€ (déduit du rapport COR: -6,6Mds = -0,2% PIB)
+    // PIB 2035 ≈ 3 300 × 1,027^5 ≈ 3 762 Mds€ (croissance nominale ~2,7%/an)
+    const PIB_2035 = 3762;
+    const bal2035      = computeBalance(2035, p);
+    const bal2035_ref  = computeBalance(2035, DEFAULTS);
+    const mds          = bal2035      * PIB_2035 / 100;
+    const mds_ref      = bal2035_ref  * PIB_2035 / 100;
+
+    const box       = document.getElementById('balance-box');
+    const amountEl  = document.getElementById('balance-amount');
+    const pctEl     = document.getElementById('balance-pct');
+    const refEl     = document.getElementById('balance-ref');
+
+    const fmtMds = v => (v >= 0 ? '+' : '') + v.toFixed(1).replace('.', ',');
+    amountEl.textContent = fmtMds(mds);
+    pctEl.textContent    = (bal2035 >= 0 ? '+' : '') + bal2035.toFixed(2).replace('.', ',') + '% du PIB';
+    refEl.textContent    = fmtMds(mds_ref) + ' Mds €';
+
+    box.className = 'balance-box ' + (mds >= 0 ? 'surplus' : 'deficit');
+
+    // ── Chart
+    myChart.data.datasets[1].data = YEARS.map(y => parseFloat(computeBalance(y,p).toFixed(3)));
+    myChart.update('none');
+
+    // ── KPI values
+    const b30 = computeBalance(2030, p);
+    const b50 = computeBalance(2050, p);
+    const b70 = computeBalance(2070, p);
+
+    ['2030','2050','2070'].forEach((yr,i) => {
+        const v = [b30,b50,b70][i];
+        document.getElementById('kv-'+yr).textContent = fmt(v);
+        document.getElementById('kpi-'+yr).className = 'kpi '+colorClass(v);
+    });
+
+    // ── Living standard
+    const nv = computeLivingStd(p);
+    const nvBase = computeLivingStd(DEFAULTS);
+    const nvDiff = nv - nvBase;
+    document.getElementById('kv-nv').textContent = nv.toFixed(1)+'%';
+    document.getElementById('ks-nv').textContent =
+        'En % du niveau de vie moyen de la population — '+(nvDiff>=0?'+':'')+nvDiff.toFixed(1)+' pt vs scénario COR';
+
+    // ── Status banner
+    const banner = document.getElementById('status-banner');
+    const dot    = document.getElementById('status-dot');
+    const txt    = document.getElementById('status-text');
+
+    if (b70 >= 0.05) {
+        banner.style.cssText = 'background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3)';
+        dot.style.background = '#10b981';
+        txt.style.color = '#10b981';
+        txt.textContent = '✅ Système excédentaire en 2070 — bravo, vous avez équilibré les retraites !';
+    } else if (b70 >= -0.3) {
+        banner.style.cssText = 'background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.2)';
+        dot.style.background = '#34d399';
+        txt.style.color = '#34d399';
+        txt.textContent = '🟢 Déficit quasi nul en 2070 ('+fmt(b70)+' du PIB) — système financièrement soutenable.';
+    } else if (b70 >= -0.7) {
+        banner.style.cssText = 'background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25)';
+        dot.style.background = '#f59e0b';
+        txt.style.color = '#f59e0b';
+        txt.textContent = '⚠️ Déficit modéré en 2070 ('+fmt(b70)+' du PIB) — des ajustements restent nécessaires.';
+    } else if (b70 >= -1.4) {
+        banner.style.cssText = 'background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2)';
+        dot.style.background = '#f87171';
+        txt.style.color = '#f87171';
+        txt.textContent = '🔴 Déficit persistant en 2070 ('+fmt(b70)+' du PIB) — proche ou similaire au scénario de référence.';
+    } else {
+        banner.style.cssText = 'background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.35)';
+        dot.style.background = '#ef4444';
+        txt.style.color = '#ef4444';
+        txt.textContent = '🚨 Déficit aggravé en 2070 ('+fmt(b70)+' du PIB) — pire que le scénario de référence COR.';
+    }
+
+    // ── Breakdown
+    const refVal = computeBalance(2070, DEFAULTS);
+    const levers = [
+        { label:'🎯 Âge de départ',        key:'age'       },
+        { label:'💼 Cotis. salariales',   key:'cotis_sal' },
+        { label:'🏭 Cotis. patronales',   key:'cotis_emp' },
+        { label:'📊 Indexation',          key:'index'     },
+        { label:'👶 Fécondité',       key:'fec'   },
+        { label:'🌍 Migration',       key:'mig'   },
+        { label:'⚡ Productivité',    key:'prod'  },
+        { label:'📉 Chômage',         key:'chom'  }
+    ];
+
+    const maxAbs = 1.5;
+    const rows = levers.map(lv => {
+        const solo = {...DEFAULTS, [lv.key]: p[lv.key]};
+        const eff = computeBalance(2070, solo) - refVal;
+        const pct = Math.min(100, Math.abs(eff)/maxAbs*100);
+        const col = eff > 0.005 ? '#10b981' : eff < -0.005 ? '#ef4444' : '#475569';
+        const sign = eff >= 0 ? '+' : '';
+        return `<div class="effect-row">
+            <span class="effect-label">${lv.label}</span>
+            <div class="effect-bar-wrap">
+                <div class="effect-bar" style="width:${pct}%;background:${col};margin-left:${eff<0?0:50-pct/2}%"></div>
+            </div>
+            <span class="effect-val" style="color:${col}">${sign}${eff.toFixed(2)} pt</span>
+        </div>`;
+    });
+
+    document.getElementById('breakdown-list').innerHTML = rows.join('');
+
+    // ── TR par décile
+    const ageDelta = (p.age - 64) * 5;
+    const idxBonus = TR_IDX_BONUS[p.index];
+    const simTR = [
+        Math.min(100, Math.max(30, TR_REF[0] + ageDelta + idxBonus)),
+        Math.min(100, Math.max(30, TR_REF[1] + ageDelta + idxBonus)),
+        Math.min(100, Math.max(20, TR_REF[2] + ageDelta + Math.round(idxBonus * 0.7)))
+    ];
+    // Couleur des barres simulation : vert si amélioration, rouge si dégradation
+    const trColors = simTR.map((v, i) =>
+        v > TR_REF[i] + 0.5 ? 'rgba(16,185,129,0.6)' :
+        v < TR_REF[i] - 0.5 ? 'rgba(239,68,68,0.55)' :
+        'rgba(16,185,129,0.6)'
+    );
+    const trBorders = simTR.map((v, i) =>
+        v > TR_REF[i] + 0.5 ? 'rgba(16,185,129,0.9)' :
+        v < TR_REF[i] - 0.5 ? 'rgba(239,68,68,0.8)' :
+        'rgba(16,185,129,0.9)'
+    );
+    trChart.data.datasets[1].data = simTR;
+    trChart.data.datasets[1].backgroundColor = trColors;
+    trChart.data.datasets[1].borderColor = trBorders;
+    trChart.update('none');
+
+    ['d1','d5','d10'].forEach((d, i) => {
+        const sim = simTR[i];
+        const ref = TR_REF[i];
+        const diff = Math.round(sim - ref);
+        document.getElementById('tr-val-'+d).textContent = Math.round(sim) + '%';
+        const el = document.getElementById('tr-delta-'+d);
+        if (Math.abs(diff) < 1) {
+            el.textContent = 'inchangé';
+            el.className = 'tr-stat-delta neu';
+        } else {
+            el.textContent = (diff > 0 ? '+' : '') + diff + ' pt' + (Math.abs(diff) > 1 ? 's' : '');
+            el.className = 'tr-stat-delta ' + (diff > 0 ? 'pos' : 'neg');
+        }
+    });
+}
+
+// ═══════════════════════════════════════════════════════════
+// EVENTS — bubble update is wired DIRECTLY on each slider,
+// independently from the heavy update() function.
+// ═══════════════════════════════════════════════════════════
+
+const SLIDERS = [
+    { id:'sl-age',       bub:'bub-age',       refVal:64,
+      fmt: v => { const n=parseFloat(v); return (n%1===0?n:n.toFixed(1))+' ans'; } },
+    { id:'sl-cotis-sal', bub:'bub-cotis-sal', refVal:0,
+      fmt: v => (parseFloat(v)>=0?'+':'')+parseFloat(v).toFixed(1)+' pt' },
+    { id:'sl-cotis-emp', bub:'bub-cotis-emp', refVal:0,
+      fmt: v => (parseFloat(v)>=0?'+':'')+parseFloat(v).toFixed(1)+' pt' },
+    { id:'sl-fec',   bub:'bub-fec',   refVal:1.8,
+      fmt: v => parseFloat(v).toFixed(2).replace('.',',')+' enf/f' },
+    { id:'sl-mig',   bub:'bub-mig',   refVal:70000,
+      fmt: v => '+'+(parseInt(v)/1000).toFixed(0)+'k /an' },
+    { id:'sl-prod',  bub:'bub-prod',  refVal:0.7,
+      fmt: v => '+'+parseFloat(v).toFixed(1).replace('.',',')+'%/an' },
+    { id:'sl-chom',  bub:'bub-chom',  refVal:7,
+      fmt: v => parseFloat(v).toFixed(1).replace('.',',')+'%' }
+];
+
+function refreshBubble(cfg) {
+    const input = document.getElementById(cfg.id);
+    const bub   = document.getElementById(cfg.bub);
+    syncBubble(input, bub, cfg.fmt(input.value));
+}
+
+function refreshAllBubbles() { SLIDERS.forEach(refreshBubble); }
+
+// Wire each slider: bubble update is first and instant
+SLIDERS.forEach(cfg => {
+    document.getElementById(cfg.id).addEventListener('input', () => {
+        refreshBubble(cfg);
+        update();
+    });
+});
+document.getElementById('sl-index').addEventListener('change', update);
+
+function resetAll() {
+    document.getElementById('sl-age').value       = DEFAULTS.age;
+    document.getElementById('sl-cotis-sal').value = DEFAULTS.cotis_sal;
+    document.getElementById('sl-cotis-emp').value = DEFAULTS.cotis_emp;
+    document.getElementById('sl-index').value     = DEFAULTS.index;
+    document.getElementById('sl-fec').value   = DEFAULTS.fec;
+    document.getElementById('sl-mig').value   = DEFAULTS.mig;
+    document.getElementById('sl-prod').value  = DEFAULTS.prod;
+    document.getElementById('sl-chom').value  = DEFAULTS.chom;
+    refreshAllBubbles();
+    update();
+}
+
+requestAnimationFrame(() => { setupRefMarks(); refreshAllBubbles(); update(); });
+window.addEventListener('resize', setupRefMarks);
+</script>
+</body>
+</html>

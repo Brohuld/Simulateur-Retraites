@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taux de remplacement — Retraite France</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+    <style>
+        :root {
+            --bg: #080c18;
+            --card: #0f172a;
+            --card2: #1a2234;
+            --accent: #6366f1;
+            --accent2: #818cf8;
+            --green: #10b981;
+            --red: #ef4444;
+            --orange: #f59e0b;
+            --blue: #3b82f6;
+            --text: #e2e8f0;
+            --muted: #64748b;
+            --border: #1e293b;
+            --PASS: 4005; /* PASS mensuel brut 2026 */
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            min-height: 100vh;
+        }
+        body::before {
+            content:''; position:fixed; top:-200px; left:-150px;
+            width:600px; height:600px;
+            background:radial-gradient(circle,rgba(99,102,241,0.1) 0%,transparent 65%);
+            pointer-events:none; z-index:0;
+        }
+        body::after {
+            content:''; position:fixed; bottom:-150px; right:-100px;
+            width:500px; height:500px;
+            background:radial-gradient(circle,rgba(16,185,129,0.07) 0%,transparent 65%);
+            pointer-events:none; z-index:0;
+        }
+        .container { position:relative; z-index:1; max-width:1400px; margin:0 auto; padding:28px 24px 48px; }
+
+        /* ── Header ── */
+        header { text-align:center; margin-bottom:36px; }
+        .badge {
+            display:inline-flex; align-items:center; gap:6px;
+            background:rgba(99,102,241,0.15); border:1px solid rgba(99,102,241,0.35);
+            color:var(--accent2); padding:5px 14px; border-radius:99px;
+            font-size:11px; font-weight:700; letter-spacing:0.07em; text-transform:uppercase; margin-bottom:14px;
+        }
+        .badge::before { content:''; width:6px; height:6px; border-radius:50%; background:var(--accent); animation:blink 2s infinite; }
+        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+        h1 {
+            font-size:clamp(24px,4vw,44px); font-weight:900; letter-spacing:-0.02em; margin-bottom:10px;
+            background:linear-gradient(130deg,#f1f5f9 0%,var(--accent2) 60%,#c7d2fe 100%);
+            -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+        }
+        header p { color:var(--muted); font-size:15px; max-width:600px; margin:0 auto; line-height:1.6; }
+        .back-link {
+            display:inline-flex; align-items:center; gap:6px; margin-top:14px;
+            color:var(--muted); text-decoration:none; font-size:12px; font-weight:600;
+            transition:color 0.2s;
+        }
+        .back-link:hover { color:var(--accent2); }
+
+        /* ── Layout ── */
+        .main-grid {
+            display:grid;
+            grid-template-columns:340px 1fr;
+            gap:20px;
+            align-items:start;
+        }
+        @media(max-width:960px) { .main-grid { grid-template-columns:1fr; } }
+
+        /* ── Card ── */
+        .card { background:var(--card); border:1px solid var(--border); border-radius:18px; padding:22px; }
+        .section-label {
+            font-size:10px; font-weight:800; letter-spacing:0.12em; text-transform:uppercase;
+            color:var(--muted); margin:18px 0 12px; display:flex; align-items:center; gap:8px;
+        }
+        .section-label::after { content:''; flex:1; height:1px; background:var(--border); }
+        .section-label:first-child { margin-top:0; }
+
+        /* ── Levers ── */
+        .lever { margin-bottom:16px; }
+        .lever-header { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:4px; }
+        .lever-name { font-size:13px; font-weight:500; }
+        .lever-value { font-size:13px; font-weight:700; color:var(--accent2); font-variant-numeric:tabular-nums; }
+        .lever-desc { font-size:11px; color:var(--muted); margin-bottom:8px; line-height:1.5; }
+
+        /* ── Slider ── */
+        .slider-wrap { position:relative; padding-top:30px; padding-bottom:20px; --thumb:20px; --pct:0; --ref:0; }
+        .slider-bubble {
+            position:absolute; top:2px;
+            left:calc(var(--pct)*(100% - var(--thumb)) + var(--thumb)/2);
+            transform:translateX(-50%);
+            background:var(--accent); color:#fff; font-size:12px; font-weight:700;
+            padding:3px 9px; border-radius:7px; white-space:nowrap; pointer-events:none;
+            z-index:10; box-shadow:0 2px 10px rgba(0,0,0,0.5);
+        }
+        .slider-bubble::after {
+            content:''; position:absolute; top:100%; left:50%; transform:translateX(-50%);
+            border:5px solid transparent; border-top-color:var(--accent);
+        }
+        .ref-mark {
+            position:absolute; bottom:0;
+            left:calc(var(--ref)*(100% - var(--thumb)) + var(--thumb)/2);
+            transform:translateX(-50%); display:flex; flex-direction:column; align-items:center; pointer-events:none;
+        }
+        .ref-line { width:2px; height:8px; background:var(--orange); border-radius:1px; }
+        .ref-label { font-size:10px; font-weight:700; color:var(--orange); white-space:nowrap; margin-top:2px; }
+        input[type="range"] {
+            -webkit-appearance:none; appearance:none; width:100%; height:5px; border-radius:3px;
+            background:var(--border); outline:none; cursor:pointer; display:block;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance:none; width:20px; height:20px; border-radius:50%;
+            background:var(--accent); cursor:grab;
+            box-shadow:0 0 0 3px rgba(99,102,241,0.25); transition:box-shadow 0.15s,transform 0.15s;
+        }
+        input[type="range"]:hover::-webkit-slider-thumb,
+        input[type="range"]:active::-webkit-slider-thumb {
+            box-shadow:0 0 0 6px rgba(99,102,241,0.35); transform:scale(1.1); cursor:grabbing;
+        }
+
+        select {
+            width:100%; background:var(--card2); border:1px solid var(--border); color:var(--text);
+            padding:9px 12px; border-radius:10px; font-size:13px; cursor:pointer; outline:none;
+            transition:border-color 0.2s;
+        }
+        select:focus { border-color:var(--accent); }
+
+        .reset-btn {
+            background:transparent; border:1px solid var(--border); color:var(--muted);
+            padding:9px 0; border-radius:10px; font-size:12px; font-weight:500; cursor:pointer;
+            transition:all 0.2s; width:100%; margin-top:10px;
+        }
+        .reset-btn:hover { border-color:var(--accent); color:var(--accent2); background:rgba(99,102,241,0.05); }
+
+        /* ── Right panel ── */
+        .right-panel { display:flex; flex-direction:column; gap:16px; }
+
+        /* ── Big TR display ── */
+        .tr-row { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+        @media(max-width:600px) { .tr-row { grid-template-columns:1fr; } }
+
+        .tr-box {
+            background:var(--card); border:1px solid var(--border); border-top:3px solid var(--border);
+            border-radius:16px; padding:20px;
+            display:flex; flex-direction:column; align-items:center; text-align:center;
+            transition:border-top-color 0.4s;
+        }
+        .tr-box.good  { border-top-color:var(--green); }
+        .tr-box.ok    { border-top-color:var(--orange); }
+        .tr-box.bad   { border-top-color:var(--red); }
+
+        .tr-box-label { font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:0.09em; color:var(--muted); margin-bottom:8px; }
+        .tr-pct {
+            font-size:54px; font-weight:900; line-height:1; font-variant-numeric:tabular-nums;
+            transition:color 0.4s; margin-bottom:4px;
+        }
+        .tr-box.good .tr-pct { color:var(--green); }
+        .tr-box.ok   .tr-pct { color:var(--orange); }
+        .tr-box.bad  .tr-pct { color:var(--red); }
+
+        .tr-amounts { font-size:12px; color:var(--muted); line-height:1.8; margin-top:8px; }
+        .tr-amounts b { color:#94a3b8; }
+
+        /* ── Chart cards ── */
+        .chart-card { background:var(--card); border:1px solid var(--border); border-radius:18px; padding:22px; }
+        .chart-title { font-size:13px; font-weight:700; margin-bottom:16px; }
+        .chart-sub { font-size:11px; color:var(--muted); margin-top:-12px; margin-bottom:14px; }
+        canvas { max-height:260px; }
+
+        /* ── Interpretation box ── */
+        .interp-box {
+            background:var(--card); border:1px solid var(--border); border-radius:18px; padding:22px;
+        }
+        .interp-title { font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.09em; color:var(--muted); margin-bottom:14px; }
+        .interp-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+        @media(max-width:600px) { .interp-grid { grid-template-columns:1fr; } }
+        .interp-item {
+            background:rgba(255,255,255,0.025); border:1px solid rgba(255,255,255,0.04);
+            border-radius:10px; padding:12px 14px;
+        }
+        .interp-item-label { font-size:11px; color:var(--muted); margin-bottom:4px; }
+        .interp-item-val { font-size:16px; font-weight:800; color:#e2e8f0; font-variant-numeric:tabular-nums; }
+        .interp-item-sub { font-size:11px; color:#475569; margin-top:2px; }
+
+        footer { text-align:center; margin-top:36px; font-size:11px; color:#334155; line-height:1.7; }
+        footer a { color:#475569; text-decoration:none; }
+        footer a:hover { color:var(--accent2); }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <div class="badge">Régime général + Agirc-Arrco · Données COR 2025</div>
+        <h1>Taux de remplacement à la retraite</h1>
+        <p>Estimez votre pension en fonction de votre salaire, votre carrière et votre génération — par tranche de revenu.</p>
+        <a href="simulateur-retraites-COR.html" class="back-link">← Retour au simulateur macro</a>
+    </header>
+
+    <div class="main-grid">
+
+        <!-- ════ LEFT: Controls ════ -->
+        <div class="card">
+            <div class="section-label">Votre profil</div>
+
+            <div class="lever">
+                <div class="lever-header">
+                    <span class="lever-name">💶 Salaire brut mensuel</span>
+                    <span class="lever-value" id="val-sal">3 000 €</span>
+                </div>
+                <div class="lever-desc">Votre salaire actuel. Le PASS mensuel 2026 est 4 005 € — au-dessus, la pension est plafonnée pour la partie de base.</div>
+                <div class="slider-wrap">
+                    <div class="slider-bubble" id="bub-sal">3 000 €</div>
+                    <input type="range" id="sl-sal" min="1400" max="32000" step="100" value="3000">
+                    <div class="ref-mark" id="mark-sal"><div class="ref-line"></div><div class="ref-label">PASS</div></div>
+                </div>
+            </div>
+
+            <div class="lever">
+                <div class="lever-header">
+                    <span class="lever-name">📅 Durée de carrière</span>
+                    <span class="lever-value" id="val-car">43 ans</span>
+                </div>
+                <div class="lever-desc">Durée requise pour le taux plein : 43 ans (172 trimestres) pour les générations nées après 1964.</div>
+                <div class="slider-wrap">
+                    <div class="slider-bubble" id="bub-car">43 ans</div>
+                    <input type="range" id="sl-car" min="20" max="47" step="1" value="43">
+                    <div class="ref-mark" id="mark-car"><div class="ref-line"></div><div class="ref-label">Taux plein</div></div>
+                </div>
+            </div>
+
+            <div class="lever">
+                <div class="lever-header">
+                    <span class="lever-name">🎯 Âge de départ</span>
+                    <span class="lever-value" id="val-age">64 ans</span>
+                </div>
+                <div class="lever-desc">Âge légal : 64 ans. Chaque trimestre supplémentaire après le taux plein = +1,25% (surcote). Avant = décote.</div>
+                <div class="slider-wrap">
+                    <div class="slider-bubble" id="bub-age">64 ans</div>
+                    <input type="range" id="sl-age" min="60" max="72" step="0.5" value="64">
+                    <div class="ref-mark" id="mark-age"><div class="ref-line"></div><div class="ref-label">64 ans</div></div>
+                </div>
+            </div>
+
+            <div class="section-label">Contexte générationnel</div>
+
+            <div class="lever">
+                <div class="lever-header">
+                    <span class="lever-name">🎂 Votre génération</span>
+                </div>
+                <div class="lever-desc">Le taux de remplacement diminue au fil des générations : indexation sur les prix, réformes successives.</div>
+                <select id="sl-gen">
+                    <option value="1960">Nés vers 1960 (à la retraite maintenant)</option>
+                    <option value="1970">Nés vers 1970</option>
+                    <option value="1980" selected>Nés vers 1980 (génération de référence COR)</option>
+                    <option value="1990">Nés vers 1990</option>
+                    <option value="2000">Nés vers 2000 (projections long terme)</option>
+                </select>
+            </div>
+
+            <div class="lever">
+                <div class="lever-header">
+                    <span class="lever-name">💡 Afficher</span>
+                </div>
+                <select id="sl-view">
+                    <option value="brut_net">Brut et net</option>
+                    <option value="generations">Comparaison générations</option>
+                    <option value="career">Comparaison durées de carrière</option>
+                </select>
+            </div>
+
+            <button class="reset-btn" onclick="resetAll()">↩ Réinitialiser</button>
+        </div>
+
+        <!-- ════ RIGHT: Visualisation ════ -->
+        <div class="right-panel">
+
+            <!-- Big TR numbers -->
+            <div class="tr-row">
+                <div class="tr-box" id="box-brut">
+                    <div class="tr-box-label">Taux de remplacement brut</div>
+                    <div class="tr-pct" id="tr-brut">—</div>
+                    <div class="tr-amounts" id="tr-brut-detail">—</div>
+                </div>
+                <div class="tr-box" id="box-net">
+                    <div class="tr-box-label">Taux de remplacement net</div>
+                    <div class="tr-pct" id="tr-net">—</div>
+                    <div class="tr-amounts" id="tr-net-detail">—</div>
+                </div>
+            </div>
+
+            <!-- Main chart: TR by salary bracket -->
+            <div class="chart-card">
+                <div class="chart-title" id="chart-main-title">Taux de remplacement brut selon le salaire</div>
+                <div class="chart-sub" id="chart-main-sub">Génération 1980 · Carrière 43 ans · Départ à 64 ans</div>
+                <canvas id="chart-main"></canvas>
+            </div>
+
+            <!-- Breakdown of pension components -->
+            <div class="interp-box">
+                <div class="interp-title">Composition de votre pension mensuelle estimée</div>
+                <div class="interp-grid">
+                    <div class="interp-item">
+                        <div class="interp-item-label">Régime général (CNAV)</div>
+                        <div class="interp-item-val" id="comp-base">—</div>
+                        <div class="interp-item-sub">50% du salaire plafonné au PASS</div>
+                    </div>
+                    <div class="interp-item">
+                        <div class="interp-item-label">Agirc-Arrco tranche 1</div>
+                        <div class="interp-item-val" id="comp-t1">—</div>
+                        <div class="interp-item-sub">Points sur salaire ≤ PASS</div>
+                    </div>
+                    <div class="interp-item">
+                        <div class="interp-item-label">Agirc-Arrco tranche 2</div>
+                        <div class="interp-item-val" id="comp-t2">—</div>
+                        <div class="interp-item-sub">Points sur salaire > PASS (si applicable)</div>
+                    </div>
+                    <div class="interp-item">
+                        <div class="interp-item-label">Total pension brute</div>
+                        <div class="interp-item-val" id="comp-total">—</div>
+                        <div class="interp-item-sub" id="comp-total-sub">—</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Second chart: TR by generation -->
+            <div class="chart-card">
+                <div class="chart-title">Évolution du taux de remplacement brut selon la génération</div>
+                <div class="chart-sub" id="chart-gen-sub">Pour votre niveau de salaire — carrière complète (43 ans)</div>
+                <canvas id="chart-gen"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        Simulation basée sur les formules légales du régime général (CNAV) et de l'Agirc-Arrco, et calibrée sur les cas-types du <a href="https://www.cor-retraites.fr/rapports-du-cor/rapport-annuel-cor-juin-2025-evolutions-perspectives-retraites-france" target="_blank">Rapport annuel du COR – Juin 2025</a>.<br>
+        Les résultats sont des estimations simplifiées. Votre situation individuelle peut différer (carrière incomplète, chômage, expatriation, régimes spéciaux, etc.).
+    </footer>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// CONSTANTS (2026)
+// ═══════════════════════════════════════════════════════════
+const PASS = 4005;   // PASS mensuel brut 2026 (48 060 €/an)
+const SMIC = 2200;   // SMIC brut mensuel 2026 (approx)
+
+// Taux plein quarters by cohort
+function quartersRequired(gen) {
+    if (gen <= 1957) return 160;
+    if (gen <= 1960) return 161 + (gen - 1957);
+    if (gen <= 1963) return 165 + (gen - 1961);
+    return 172; // 43 ans pour générations 1964+
+}
+
+// ═══════════════════════════════════════════════════════════
+// CORE MODEL
+// ═══════════════════════════════════════════════════════════
+
+function computePension(salary_monthly, career_years, retirement_age, generation) {
+    const career_factor = Math.min(1.0, career_years / 43);
+    const S = salary_monthly;
+
+    // ── Régime général (CNAV) ──────────────────────────
+    // Salaire de référence = moyenne des 25 meilleures années, plafonné au PASS
+    const S_cap = Math.min(S, PASS);
+    const pension_base = S_cap * 0.50 * career_factor;
+
+    // ── Agirc-Arrco T1 (jusqu'au PASS) ────────────────
+    // Taux effectif d'acquisition de points ≈ 5.72% du salaire brut
+    // Valeur du point service = 1.4386€, valeur d'achat = 20.19€
+    // Points/an = S × 5.72% / 20.19  →  pension/an = points × career × 1.4386
+    // Simplifié en ratio annuel : ≈ 24.8% du salaire capé, pour 43 ans
+    const pension_t1 = S_cap * 0.248 * career_factor;
+
+    // ── Agirc-Arrco T2 (PASS → 8 PASS) ──────────────
+    // Taux point-buying T2 ≈ 16.72% du salaire au-dessus du PASS
+    // Ratio annuel ≈ 19.8% pour 43 ans
+    const S_t2 = Math.max(0, Math.min(S - PASS, 7 * PASS));
+    const pension_t2 = S_t2 * 0.198 * career_factor;
+
+    // ── Minimum contributif ───────────────────────────
+    // Si carrière complète : pension de base min ≈ 847€/mois brut (2026)
+    const min_contrib = Math.min(847, S_cap * 0.5) * career_factor;
+
+    // ── Total avant ajustements ───────────────────────
+    let total = Math.max(pension_base + pension_t1 + pension_t2, min_contrib + pension_t1);
+
+    // ── Ajustement âge (surcote / décote) ─────────────
+    // Surcote : +1.25%/trimestre au-delà du taux plein (= +5%/an)
+    // Décote  : −1.25%/trimestre manquant (plafonné à −25%)
+    const age_adj = Math.max(-0.25, (retirement_age - 64) * 0.05);
+    total = total * (1 + age_adj);
+
+    // ── Ajustement générationnel ──────────────────────
+    // Baisse tendancielle due à l'indexation sur les prix vs salaires
+    // COR constate : génération 1990 vs 1960 → -10 à -15 points selon profil
+    // Approximation : -0.45 pt par an de décalage générationnel (à partir de 1965)
+    const gen_penalty = Math.max(-0.18, (generation - 1965) * 0.0045);
+
+    return { pension_base, pension_t1, pension_t2, total, gen_penalty };
+}
+
+function trBrut(salary, career, age, gen) {
+    const r = computePension(salary, career, age, gen);
+    return Math.max(0.15, r.total / salary - r.gen_penalty);
+}
+
+function trNet(salary, career, age, gen) {
+    // Net → net : pendant l'activité, le salarié paie ~27% de charges salariales + CSG 9.2%
+    // À la retraite : CSG 6.6-8.3%, pas de cotisations retraite (≈7% économisés)
+    // Le TRR net est systématiquement supérieur au TRR brut de 8-14 pts selon le salaire
+    const tr_b = trBrut(salary, career, age, gen);
+    // L'écart diminue avec le salaire (moins d'effet des cotisations retraite)
+    const uplift = 0.14 - (salary / 32000) * 0.06;
+    return Math.min(1.10, tr_b + uplift);
+}
+
+// ═══════════════════════════════════════════════════════════
+// CHART SETUP
+// ═══════════════════════════════════════════════════════════
+
+const SALARY_LABELS = ['1 400', '2 200\n(SMIC)', '3 000', '4 000\n(PASS)', '6 000', '8 000\n(2×PASS)', '12 000\n(3×PASS)', '20 000\n(5×PASS)', '32 000\n(8×PASS)'];
+const SALARY_VALUES = [1400, 2200, 3000, 4000, 6000, 8000, 12000, 20000, 32000];
+
+const GEN_LABELS = ['1955', '1960', '1965', '1970', '1975', '1980', '1985', '1990', '1995', '2000'];
+const GEN_VALUES = [1955, 1960, 1965, 1970, 1975, 1980, 1985, 1990, 1995, 2000];
+
+// Palette
+const COL_BRUT   = '#6366f1';
+const COL_NET    = '#10b981';
+const COL_REF    = 'rgba(99,102,241,0.35)';
+const GEN_COLORS = ['#a78bfa','#818cf8','#6366f1','#4f46e5','#4338ca'];
+
+// ── Chart main ──
+const ctxMain = document.getElementById('chart-main').getContext('2d');
+const chartMain = new Chart(ctxMain, {
+    type: 'bar',
+    data: {
+        labels: SALARY_LABELS,
+        datasets: [
+            {
+                label: 'TR brut',
+                data: [],
+                backgroundColor: SALARY_VALUES.map(() => COL_BRUT + 'aa'),
+                borderColor: COL_BRUT,
+                borderWidth: 1,
+                borderRadius: 5,
+                order: 2
+            },
+            {
+                label: 'TR net',
+                data: [],
+                backgroundColor: SALARY_VALUES.map(() => COL_NET + '66'),
+                borderColor: COL_NET,
+                borderWidth: 1,
+                borderRadius: 5,
+                order: 3
+            },
+            {
+                label: 'Votre salaire',
+                data: [],
+                type: 'line',
+                borderColor: var_color('--orange'),
+                backgroundColor: 'transparent',
+                borderWidth: 2,
+                borderDash: [4, 3],
+                pointRadius: 0,
+                order: 1
+            }
+        ]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+            legend: {
+                display: true,
+                labels: { color: '#64748b', font: { size: 11 }, boxWidth: 12, boxHeight: 12 }
+            },
+            tooltip: {
+                backgroundColor: '#0f172a', borderColor: '#1e293b', borderWidth: 1,
+                titleColor: '#e2e8f0', bodyColor: '#94a3b8', padding: 12,
+                callbacks: {
+                    label: c => {
+                        if (c.dataset.label === 'Votre salaire') return null;
+                        return `${c.dataset.label} : ${(c.parsed.y * 100).toFixed(1)}%`;
+                    }
+                }
+            }
+        },
+        scales: {
+            x: { grid: { color: 'rgba(255,255,255,0.035)' }, ticks: { color: '#475569', font: { size: 10 } } },
+            y: {
+                grid: { color: 'rgba(255,255,255,0.035)' },
+                ticks: { color: '#475569', font: { size: 11 }, callback: v => Math.round(v * 100) + '%' },
+                min: 0, max: 1.1
+            }
+        },
+        animation: { duration: 200 }
+    }
+});
+
+// ── Chart generations ──
+const ctxGen = document.getElementById('chart-gen').getContext('2d');
+const chartGen = new Chart(ctxGen, {
+    type: 'line',
+    data: {
+        labels: GEN_LABELS,
+        datasets: [
+            {
+                label: 'TR brut (votre salaire)',
+                data: [],
+                borderColor: COL_BRUT,
+                backgroundColor: COL_BRUT + '20',
+                borderWidth: 2.5,
+                pointRadius: 4,
+                pointBackgroundColor: COL_BRUT,
+                fill: true,
+                tension: 0.4
+            },
+            {
+                label: 'TR net (votre salaire)',
+                data: [],
+                borderColor: COL_NET,
+                backgroundColor: 'transparent',
+                borderWidth: 2,
+                pointRadius: 3,
+                pointBackgroundColor: COL_NET,
+                borderDash: [5, 3],
+                tension: 0.4
+            }
+        ]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+            legend: {
+                display: true,
+                labels: { color: '#64748b', font: { size: 11 }, boxWidth: 12 }
+            },
+            tooltip: {
+                backgroundColor: '#0f172a', borderColor: '#1e293b', borderWidth: 1,
+                titleColor: '#e2e8f0', bodyColor: '#94a3b8', padding: 12,
+                callbacks: {
+                    label: c => `${c.dataset.label} : ${(c.parsed.y * 100).toFixed(1)}%`
+                }
+            }
+        },
+        scales: {
+            x: { grid: { color: 'rgba(255,255,255,0.035)' }, ticks: { color: '#475569', font: { size: 11 } } },
+            y: {
+                grid: { color: 'rgba(255,255,255,0.035)' },
+                ticks: { color: '#475569', font: { size: 11 }, callback: v => Math.round(v * 100) + '%' },
+                min: 0.2, max: 1.0
+            }
+        },
+        animation: { duration: 200 }
+    }
+});
+
+function var_color(name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+
+// ═══════════════════════════════════════════════════════════
+// SLIDER UI
+// ═══════════════════════════════════════════════════════════
+function pct(input, val) {
+    return (val - parseFloat(input.min)) / (parseFloat(input.max) - parseFloat(input.min));
+}
+function syncBubble(input, bub, label) {
+    input.closest('.slider-wrap').style.setProperty('--pct', pct(input, parseFloat(input.value)));
+    bub.textContent = label;
+}
+
+const SLIDERS = [
+    { id:'sl-sal', bub:'bub-sal', refVal:PASS,
+      fmt: v => (parseInt(v)).toLocaleString('fr-FR') + ' €' },
+    { id:'sl-car', bub:'bub-car', refVal:43,
+      fmt: v => parseInt(v) + ' ans' },
+    { id:'sl-age', bub:'bub-age', refVal:64,
+      fmt: v => { const n=parseFloat(v); return (n%1===0?n:n.toFixed(1))+' ans'; } }
+];
+
+function refreshBubble(cfg) {
+    const input = document.getElementById(cfg.id);
+    const bub   = document.getElementById(cfg.bub);
+    syncBubble(input, bub, cfg.fmt(input.value));
+}
+function refreshAllBubbles() { SLIDERS.forEach(refreshBubble); }
+
+function setupRefMarks() {
+    SLIDERS.forEach(({ id, refVal }) => {
+        const input = document.getElementById(id);
+        input.closest('.slider-wrap').style.setProperty('--ref', pct(input, refVal));
+    });
+}
+
+SLIDERS.forEach(cfg => {
+    document.getElementById(cfg.id).addEventListener('input', () => {
+        refreshBubble(cfg);
+        update();
+    });
+});
+['sl-gen', 'sl-view'].forEach(id => document.getElementById(id).addEventListener('change', update));
+
+// ═══════════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════════
+function trClass(v) { return v >= 0.7 ? 'good' : v >= 0.5 ? 'ok' : 'bad'; }
+function fmtEur(v) { return Math.round(v).toLocaleString('fr-FR') + ' €'; }
+function fmtPct(v) { return Math.round(v * 100) + ' %'; }
+
+function highlightBar(chart, salary) {
+    // Find closest salary bracket
+    let bestIdx = 0;
+    let bestDist = Infinity;
+    SALARY_VALUES.forEach((s, i) => {
+        const d = Math.abs(s - salary);
+        if (d < bestDist) { bestDist = d; bestIdx = i; }
+    });
+    // Highlight selected bar
+    const colors_brut = SALARY_VALUES.map((_, i) =>
+        i === bestIdx ? COL_BRUT : COL_BRUT + '66');
+    const colors_net  = SALARY_VALUES.map((_, i) =>
+        i === bestIdx ? COL_NET : COL_NET + '44');
+    chart.data.datasets[0].backgroundColor = colors_brut;
+    chart.data.datasets[0].borderColor     = SALARY_VALUES.map((_, i) => i === bestIdx ? COL_BRUT : COL_BRUT + '88');
+    chart.data.datasets[1].backgroundColor = colors_net;
+    chart.data.datasets[1].borderColor     = SALARY_VALUES.map((_, i) => i === bestIdx ? COL_NET : COL_NET + '66');
+}
+
+// ═══════════════════════════════════════════════════════════
+// UPDATE
+// ═══════════════════════════════════════════════════════════
+function update() {
+    const salary = parseInt(document.getElementById('sl-sal').value);
+    const career = parseInt(document.getElementById('sl-car').value);
+    const age    = parseFloat(document.getElementById('sl-age').value);
+    const gen    = parseInt(document.getElementById('sl-gen').value);
+    const view   = document.getElementById('sl-view').value;
+
+    // ── Side labels
+    document.getElementById('val-sal').textContent = salary.toLocaleString('fr-FR') + ' €';
+    document.getElementById('val-car').textContent = career + ' ans';
+    const ageN = age; document.getElementById('val-age').textContent = (ageN%1===0?ageN:ageN.toFixed(1)) + ' ans';
+
+    // ── Compute pension
+    const r = computePension(salary, career, age, gen);
+    const gen_penalty = r.gen_penalty;
+    const pension_brut = Math.max(200, r.total - r.gen_penalty * salary);
+    const pension_brut_monthly = pension_brut;
+
+    const tr_b = Math.max(0.15, r.total / salary - gen_penalty);
+    const tr_n = trNet(salary, career, age, gen);
+
+    // ── Big boxes
+    const brut_pct = Math.round(tr_b * 100);
+    const net_pct  = Math.round(tr_n * 100);
+
+    document.getElementById('tr-brut').textContent = brut_pct + ' %';
+    document.getElementById('tr-net').textContent  = net_pct  + ' %';
+
+    ['box-brut', 'box-net'].forEach((id, i) => {
+        const v = [tr_b, tr_n][i];
+        document.getElementById(id).className = 'tr-box ' + trClass(v);
+    });
+
+    // Net salary (active) ≈ gross × 0.78 (charges ~22%)
+    const net_sal = salary * 0.78;
+    const net_pen = pension_brut_monthly * (tr_n / tr_b);
+
+    document.getElementById('tr-brut-detail').innerHTML =
+        `Salaire brut : <b>${fmtEur(salary)}</b>/mois<br>Pension brute estimée : <b>${fmtEur(pension_brut_monthly)}</b>/mois`;
+    document.getElementById('tr-net-detail').innerHTML =
+        `Salaire net estimé : <b>${fmtEur(net_sal)}</b>/mois<br>Pension nette estimée : <b>${fmtEur(net_pen)}</b>/mois`;
+
+    // ── Composition breakdown
+    document.getElementById('comp-base').textContent = fmtEur(r.pension_base) + '/mois';
+    document.getElementById('comp-t1').textContent   = fmtEur(r.pension_t1)   + '/mois';
+    document.getElementById('comp-t2').textContent   = salary > PASS ? fmtEur(r.pension_t2) + '/mois' : '—';
+    document.getElementById('comp-total').textContent = fmtEur(pension_brut_monthly) + '/mois';
+    document.getElementById('comp-total-sub').textContent = `soit ${brut_pct}% de votre salaire brut`;
+
+    // ── Main chart (TR by salary bracket)
+    const show_net = (view !== 'career');
+    const tr_brut_data = SALARY_VALUES.map(s => trBrut(s, career, age, gen));
+    const tr_net_data  = SALARY_VALUES.map(s => trNet(s, career, age, gen));
+
+    chartMain.data.datasets[0].data = tr_brut_data;
+
+    if (view === 'career') {
+        // Show 3 career lengths
+        chartMain.data.datasets[1].data = SALARY_VALUES.map(s => trBrut(s, 35, age, gen));
+        chartMain.data.datasets[1].label = 'TR brut (35 ans de carrière)';
+        chartMain.data.datasets[1].backgroundColor = SALARY_VALUES.map(() => '#f59e0b44');
+        chartMain.data.datasets[1].borderColor = '#f59e0b';
+        document.getElementById('chart-main-title').textContent = 'Impact de la durée de carrière sur le taux de remplacement brut';
+        document.getElementById('chart-main-sub').textContent = `Génération ${gen} · Départ à ${age} ans — barres violettes: ${career} ans, orange: 35 ans`;
+    } else {
+        chartMain.data.datasets[1].data = tr_net_data;
+        chartMain.data.datasets[1].label = 'TR net';
+        chartMain.data.datasets[1].backgroundColor = SALARY_VALUES.map(() => COL_NET + '44');
+        chartMain.data.datasets[1].borderColor = COL_NET;
+        document.getElementById('chart-main-title').textContent = 'Taux de remplacement selon le niveau de salaire';
+        document.getElementById('chart-main-sub').textContent = `Génération ${gen} · ${career} ans de carrière · Départ à ${age} ans`;
+    }
+
+    // Vertical dotted line for selected salary: use a scatter point
+    chartMain.data.datasets[2].data = tr_brut_data.map(() => tr_b);
+    highlightBar(chartMain, salary);
+    chartMain.update('none');
+
+    // ── Generation chart
+    const gen_brut = GEN_VALUES.map(g => trBrut(salary, career, age, g));
+    const gen_net  = GEN_VALUES.map(g => trNet(salary, career, age, g));
+    chartGen.data.datasets[0].data = gen_brut;
+    chartGen.data.datasets[1].data = gen_net;
+    document.getElementById('chart-gen-sub').textContent =
+        `Pour ${salary.toLocaleString('fr-FR')} € brut/mois · ${career} ans de carrière · Départ à ${age} ans`;
+
+    // Highlight selected generation
+    const genIdx = GEN_VALUES.indexOf(gen);
+    chartGen.data.datasets[0].pointRadius = GEN_VALUES.map((_, i) => i === genIdx ? 7 : 3);
+    chartGen.data.datasets[0].pointBackgroundColor = GEN_VALUES.map((_, i) => i === genIdx ? '#f59e0b' : COL_BRUT);
+    chartGen.update('none');
+}
+
+function resetAll() {
+    document.getElementById('sl-sal').value = 3000;
+    document.getElementById('sl-car').value = 43;
+    document.getElementById('sl-age').value = 64;
+    document.getElementById('sl-gen').value = 1980;
+    document.getElementById('sl-view').value = 'brut_net';
+    refreshAllBubbles();
+    update();
+}
+
+requestAnimationFrame(() => { setupRefMarks(); refreshAllBubbles(); update(); });
+window.addEventListener('resize', setupRefMarks);
+</script>
+</body>
+</html>
