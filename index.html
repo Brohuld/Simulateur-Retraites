@@ -334,6 +334,7 @@
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 12px;
+            /* gap identique au chart-row pour alignement visuel */
         }
         .kpi {
             background: var(--card);
@@ -385,11 +386,11 @@
         /* ── Chart row ── */
         .chart-row {
             display: grid;
-            grid-template-columns: 1fr 180px;
-            gap: 16px;
+            grid-template-columns: 2fr 1fr;
+            gap: 12px;
             align-items: stretch;
         }
-        @media (max-width: 800px) {
+        @media (max-width: 700px) {
             .chart-row { grid-template-columns: 1fr; }
         }
 
