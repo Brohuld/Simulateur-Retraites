@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulateur Retraites — COR 2025</title>
+    <title>Simulateur Retraites — COR 2026</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
     <style>
         :root {
@@ -105,7 +105,7 @@
         /* ── Layout ── */
         .main-grid {
             display: grid;
-            grid-template-columns: 260px minmax(0, 560px);
+            grid-template-columns: 286px minmax(0, 504px);
             gap: 16px;
             align-items: start;
         }
@@ -371,6 +371,12 @@
             color: var(--muted);
             margin-top: 4px;
         }
+        .kpi-sub-ref {
+            font-size: 10px;
+            color: #94a3b8;
+            opacity: 0.75;
+            margin-top: 2px;
+        }
 
         /* ── Lower row ── */
         .lower-row {
@@ -468,6 +474,13 @@
             font-size: 13px;
             font-weight: 700;
             color: #475569;
+        }
+        .balance-ref-val-2025 {
+            font-size: 10px;
+            font-weight: 600;
+            color: #94a3b8;
+            opacity: 0.75;
+            margin-top: 2px;
         }
 
         /* ── Chart ── */
@@ -633,7 +646,7 @@
 <body>
 <div class="container">
     <header>
-        <div class="badge">Conseil d'Orientation des Retraites · Rapport Juin 2025</div>
+        <div class="badge">Conseil d'Orientation des Retraites · Rapport Juin 2026</div>
         <h1>Simulateur du système de retraite</h1>
         <p>Ajustez les leviers et visualisez en temps réel l'impact sur l'équilibre financier des retraites à l'horizon 2070.</p>
     </header>
@@ -687,13 +700,16 @@
             <div class="lever">
                 <div class="lever-header">
                     <span class="lever-name">📊 Indexation des pensions</span>
+                    <span class="lever-value" id="val-index">Sur les prix (actuel)</span>
                 </div>
-                <div class="lever-desc">Règle de revalorisation annuelle des pensions. Les salaires indexent mieux le niveau de vie des retraités.</div>
-                <select id="sl-index">
-                    <option value="0">Sur les prix uniquement (actuel)</option>
-                    <option value="1">Mix prix + salaires (50/50)</option>
-                    <option value="2">Sur les salaires (niveau de vie préservé)</option>
-                </select>
+                <div class="lever-desc">Règle de revalorisation annuelle des pensions, de la désindexation totale (gel : améliore le solde mais réduit le niveau de vie des retraités) à l'indexation sur les salaires (préserve le niveau de vie mais coûte au système). Le scénario actuel indexe sur les prix.</div>
+                <div class="slider-wrap">
+                    <div class="slider-bubble" id="bub-index">Prix</div>
+                    <input type="range" id="sl-index" min="-1" max="1" step="0.1" value="0">
+                    <div class="ref-mark" id="mark-index"><div class="ref-line"></div><div class="ref-label">Prix (réf.)</div></div>
+                    <div class="ref-mark" style="--ref:0;bottom:0;left:calc(0 * (100% - var(--thumb)) + var(--thumb) / 2);transform:translateX(0);align-items:flex-start;"><div class="ref-line" style="background:#94a3b8;"></div><div class="ref-label" style="color:#94a3b8;white-space:normal;width:60px;text-align:left;line-height:1.2;">Désindexation<br>totale</div></div>
+                    <div class="ref-mark" style="--ref:1;bottom:0;left:calc(1 * (100% - var(--thumb)) + var(--thumb) / 2);"><div class="ref-line" style="background:#94a3b8;"></div><div class="ref-label" style="color:#94a3b8;">Salaires</div></div>
+                </div>
             </div>
 
             <div class="section-label">Hypothèses démographiques</div>
@@ -701,27 +717,29 @@
             <div class="lever">
                 <div class="lever-header">
                     <span class="lever-name">👶 Taux de fécondité</span>
-                    <span class="lever-value" id="val-fec">1,80 enfant/femme</span>
+                    <span class="lever-value" id="val-fec">1,45 enfant/femme</span>
                 </div>
-                <div class="lever-desc">Scénario COR : 1,8 — Observé en 2025 : 1,56 (plus bas depuis 1917). Effet décalé à partir de 2045.</div>
+                <div class="lever-desc">Scénario COR 2026 : 1,45 à partir de 2028 (COR 2025 : 1,8). Observé en 2025 : 1,56 (plus bas depuis 1917). Effet décalé à partir de 2045.</div>
                 <div class="slider-wrap">
-                    <div class="slider-bubble" id="bub-fec">1,80</div>
-                    <input type="range" id="sl-fec" min="1.2" max="2.2" step="0.05" value="1.8">
-                    <div class="ref-mark" id="mark-fec"><div class="ref-line"></div><div class="ref-label">1,8 (réf.)</div></div>
-                    <div class="ref-mark" style="--ref:0.36;bottom:0;left:calc(0.36 * (100% - var(--thumb)) + var(--thumb) / 2);"><div class="ref-line" style="background:#22d3ee;"></div><div class="ref-label" style="color:#22d3ee;">INSEE</div></div>
+                    <div class="slider-bubble" id="bub-fec">1,45</div>
+                    <input type="range" id="sl-fec" min="1.4" max="2.1" step="0.05" value="1.45">
+                    <div class="ref-mark" id="mark-fec"><div class="ref-line"></div><div class="ref-label">1,45 (réf.)</div></div>
+                    <div class="ref-mark" style="--ref:0.5714;bottom:0;left:calc(0.5714 * (100% - var(--thumb)) + var(--thumb) / 2);"><div class="ref-line" style="background:#94a3b8;"></div><div class="ref-label" style="color:#94a3b8;">COR 2025</div></div>
+                    <div class="ref-mark" style="--ref:0.2286;bottom:0;left:calc(0.2286 * (100% - var(--thumb)) + var(--thumb) / 2);"><div class="ref-line" style="background:#22d3ee;"></div><div class="ref-label" style="color:#22d3ee;">INSEE</div></div>
                 </div>
             </div>
 
             <div class="lever">
                 <div class="lever-header">
                     <span class="lever-name">🌍 Solde migratoire annuel</span>
-                    <span class="lever-value" id="val-mig">+70 000 /an</span>
+                    <span class="lever-value" id="val-mig">+150 000 /an</span>
                 </div>
-                <div class="lever-desc">Scénario COR : +70 000/an. Réalité 2018-22 : +186 000/an. Les migrants sont d'abord cotisants, puis retraités.</div>
+                <div class="lever-desc">Scénario COR 2026 : +150 000/an dès 2026 (COR 2025 : +70 000/an). Réalité 2018-22 : +186 000/an. Les migrants sont d'abord cotisants, puis retraités.</div>
                 <div class="slider-wrap">
-                    <div class="slider-bubble" id="bub-mig">+70k</div>
-                    <input type="range" id="sl-mig" min="0" max="300000" step="10000" value="70000">
-                    <div class="ref-mark" id="mark-mig"><div class="ref-line"></div><div class="ref-label">70k (réf.)</div></div>
+                    <div class="slider-bubble" id="bub-mig">+150k</div>
+                    <input type="range" id="sl-mig" min="0" max="300000" step="10000" value="150000">
+                    <div class="ref-mark" id="mark-mig"><div class="ref-line"></div><div class="ref-label">150k (réf.)</div></div>
+                    <div class="ref-mark" style="--ref:0.2333;bottom:0;left:calc(0.2333 * (100% - var(--thumb)) + var(--thumb) / 2);"><div class="ref-line" style="background:#94a3b8;"></div><div class="ref-label" style="color:#94a3b8;">COR 2025</div></div>
                 </div>
             </div>
 
@@ -732,10 +750,10 @@
                     <span class="lever-name">⚡ Productivité horaire</span>
                     <span class="lever-value" id="val-prod">+0,7 %/an</span>
                 </div>
-                <div class="lever-desc">Scénario central COR : 0,7 %. Détermine la croissance des salaires (et donc des cotisations) à long terme.</div>
+                <div class="lever-desc">Scénario central COR 2026 : 0,7 % (inchangé vs COR 2025). Détermine la croissance des salaires (et donc des cotisations) à long terme.</div>
                 <div class="slider-wrap">
                     <div class="slider-bubble" id="bub-prod">0,7%</div>
-                    <input type="range" id="sl-prod" min="0.2" max="1.5" step="0.1" value="0.7">
+                    <input type="range" id="sl-prod" min="0" max="1.4" step="0.1" value="0.7">
                     <div class="ref-mark" id="mark-prod"><div class="ref-line"></div><div class="ref-label">0,7% (réf.)</div></div>
                 </div>
             </div>
@@ -745,10 +763,10 @@
                     <span class="lever-name">📉 Taux de chômage (long terme)</span>
                     <span class="lever-value" id="val-chom">7,0 %</span>
                 </div>
-                <div class="lever-desc">Scénario COR : 7 % à partir de 2032. Un chômage plus faible = plus de cotisants actifs.</div>
+                <div class="lever-desc">Scénario COR 2026 : 7 % à partir de 2032 (hypothèse inchangée vs COR 2025 ; chômage observé en 2025 : 7,7 %). Un chômage plus faible = plus de cotisants actifs.</div>
                 <div class="slider-wrap">
                     <div class="slider-bubble" id="bub-chom">7,0%</div>
-                    <input type="range" id="sl-chom" min="4" max="12" step="0.5" value="7">
+                    <input type="range" id="sl-chom" min="3" max="11" step="0.5" value="7">
                     <div class="ref-mark" id="mark-chom"><div class="ref-line"></div><div class="ref-label">7% (réf.)</div></div>
                 </div>
             </div>
@@ -771,16 +789,19 @@
                     <div class="kpi-label">Solde 2030</div>
                     <div class="kpi-value" id="kv-2030">—</div>
                     <div class="kpi-sub">% du PIB</div>
+                    <div class="kpi-sub-ref" id="kr-2030">COR 2025 : —</div>
                 </div>
                 <div class="kpi" id="kpi-2050">
                     <div class="kpi-label">Solde 2050</div>
                     <div class="kpi-value" id="kv-2050">—</div>
                     <div class="kpi-sub">% du PIB</div>
+                    <div class="kpi-sub-ref" id="kr-2050">COR 2025 : —</div>
                 </div>
                 <div class="kpi" id="kpi-2070">
                     <div class="kpi-label">Solde 2070</div>
                     <div class="kpi-value" id="kv-2070">—</div>
                     <div class="kpi-sub">% du PIB</div>
+                    <div class="kpi-sub-ref" id="kr-2070">COR 2025 : —</div>
                 </div>
             </div>
 
@@ -792,11 +813,15 @@
                         <div class="legend">
                             <div class="legend-item">
                                 <div class="legend-dot" style="background:rgba(99,102,241,0.5);"></div>
-                                <span>Scénario COR</span>
+                                <span>Scénario COR 2026</span>
                             </div>
                             <div class="legend-item">
                                 <div class="legend-dot" style="background:#10b981;"></div>
                                 <span>Votre scénario</span>
+                            </div>
+                            <div class="legend-item" style="opacity:0.7;font-size:10px;">
+                                <div class="legend-dot" style="background:#94a3b8;width:6px;height:6px;"></div>
+                                <span>COR 2025 (ancien)</span>
                             </div>
                         </div>
                     </div>
@@ -811,8 +836,9 @@
                     <div class="balance-unit">Mds €</div>
                     <div class="balance-pct" id="balance-pct">—</div>
                     <div class="balance-divider"></div>
-                    <div class="balance-ref-label">Scénario COR</div>
+                    <div class="balance-ref-label">Scénario COR 2026</div>
                     <div class="balance-ref-val" id="balance-ref">−5,3 Mds €</div>
+                    <div class="balance-ref-val-2025" id="balance-ref-2025">COR 2025 : —</div>
                 </div>
             </div>
 
@@ -892,7 +918,7 @@
 
 
     <footer>
-        Simulateur pédagogique basé sur les projections du <a href="https://www.cor-retraites.fr/rapports-du-cor/rapport-annuel-cor-juin-2025-evolutions-perspectives-retraites-france" target="_blank">Rapport annuel du COR – Juin 2025</a>.<br>
+        Simulateur pédagogique basé sur les projections du <a href="https://www.cor-retraites.fr/rapports-du-cor/rapport-annuel-cor-juin-2026-evolutions-perspectives-retraites-france" target="_blank">Rapport annuel du COR – Juin 2026</a>.<br>
         Les effets sont des estimations simplifiées à des fins d'illustration. Ils ne se substituent pas aux projections officielles du COR.
     </footer>
 </div>
@@ -904,9 +930,26 @@
 
 const YEARS = [2024,2026,2028,2030,2032,2034,2036,2038,2040,2043,2046,2050,2054,2058,2062,2066,2070];
 
-// Baseline from COR 2025 report
+// Baseline from COR 2026 report (synthèse juin 2026, scénario de référence
+// avec les nouvelles hypothèses Insee avril 2026 : fécondité 1,45 enf/femme
+// à partir de 2028, solde migratoire +150 000/an).
+// Points officiels : 2024=-0,1 ; 2030=-0,2 ; 2045=-0,9 ; 2070=-2,4 (% PIB)
+// 2030 et 2045 sont identiques à COR 2025 — seul 2070 diverge.
 function baseline(y) {
-    const pts = [[2024,-0.1],[2030,-0.2],[2040,-0.65],[2050,-0.95],[2060,-1.2],[2070,-1.4]];
+    const pts = [[2024,-0.1],[2030,-0.2],[2045,-0.9],[2070,-2.4]];
+    for (let i = 0; i < pts.length-1; i++) {
+        if (y >= pts[i][0] && y <= pts[i+1][0]) {
+            const t = (y - pts[i][0]) / (pts[i+1][0] - pts[i][0]);
+            return pts[i][1] + t*(pts[i+1][1]-pts[i][1]);
+        }
+    }
+    return -2.4;
+}
+
+// Ancien scénario de référence COR 2025 (conservé pour comparaison)
+// Points officiels : 2024=-0,1 ; 2030=-0,2 ; 2045=-0,9 ; 2070=-1,4 (% PIB)
+function baselineCOR2025(y) {
+    const pts = [[2024,-0.1],[2030,-0.2],[2045,-0.9],[2070,-1.4]];
     for (let i = 0; i < pts.length-1; i++) {
         if (y >= pts[i][0] && y <= pts[i+1][0]) {
             const t = (y - pts[i][0]) / (pts[i+1][0] - pts[i][0]);
@@ -916,11 +959,10 @@ function baseline(y) {
     return -1.4;
 }
 
-const DEFAULTS = { age:64, cotis_sal:0, cotis_emp:0, index:0, fec:1.8, mig:70000, prod:0.7, chom:7 };
+const DEFAULTS = { age:64, cotis_sal:0, cotis_emp:0, index:0, fec:1.45, mig:150000, prod:0.7, chom:7 };
 
 // TR par décile — référence COR 2025 (génération 1980, carrière 43 ans, départ 64 ans)
 const TR_REF = [82, 73, 43]; // D1, D5, D10
-const TR_IDX_BONUS = [0, 5, 11]; // gain TR en pts selon indexation (prix / mixte / salaires)
 
 function computeBalance(y, p) {
     const base = baseline(y);
@@ -943,16 +985,17 @@ function computeBalance(y, p) {
         d -= p.cotis_emp * 0.038 * T;
     }
 
-    // 3. Indexation (coût sur le balance, croissant dans le temps)
-    d += [-0, -0.27, -0.54][p.index] * T;
+    // 3. Indexation (coût/gain sur le solde, croissant dans le temps)
+    // p.index ∈ [-1,1] : -1 = désindexation totale (gel), 0 = prix (actuel, neutre), +1 = salaires
+    d += -0.54 * p.index * T;
 
     // 4. Fécondité (décalage démographique, effet à partir de 2042)
-    const dFec = p.fec - 1.8;
+    const dFec = p.fec - 1.45;
     const fecFactor = Math.max(0, (y-2042)/(2070-2042));
     d += dFec * 3.2 * fecFactor;
 
     // 5. Migration (effet positif court terme, atténué long terme)
-    const dMig = p.mig - 70000;
+    const dMig = p.mig - 150000;
     if (y > 2024) {
         const migRamp = Math.min(1, (y-2024)/8);
         const migDecay = 1 - 0.25*T;
@@ -975,7 +1018,7 @@ function computeBalance(y, p) {
 function computeLivingStd(p) {
     let s = 87.5;
     s += (p.age - 64) * 0.9;         // later retirement → slightly better pension
-    s += [0, 4.5, 9][p.index];       // wages indexation preserves living standard
+    s += 9 * p.index; // wages indexation (+1) preserves living standard; désindexation (-1) degrades it
     s += (0.7 - p.prod) * 11.5;      // higher wages = retirees (price-indexed) fall behind more
     s -= p.cotis_sal * 0.45;         // hausse cotis salariales = baisse salaire net actif
     s -= p.cotis_emp * 0.20;         // hausse cotis patronales = pression sur salaires/emploi
@@ -988,6 +1031,7 @@ function computeLivingStd(p) {
 
 const ctx = document.getElementById('chart').getContext('2d');
 const baseData = YEARS.map(y => parseFloat(baseline(y).toFixed(3)));
+const baseData2025 = YEARS.map(y => parseFloat(baselineCOR2025(y).toFixed(3)));
 
 const myChart = new Chart(ctx, {
     type: 'line',
@@ -995,7 +1039,18 @@ const myChart = new Chart(ctx, {
         labels: YEARS,
         datasets: [
             {
-                label: 'Scénario COR (référence)',
+                label: 'COR 2025 (ancien scénario)',
+                data: baseData2025,
+                borderColor: 'rgba(148,163,184,0.4)',
+                backgroundColor: 'transparent',
+                borderWidth: 1,
+                borderDash: [2,3],
+                pointRadius: 0,
+                tension: 0.45,
+                order: 3
+            },
+            {
+                label: 'Scénario COR 2026 (référence)',
                 data: baseData,
                 borderColor: 'rgba(99,102,241,0.45)',
                 backgroundColor: 'transparent',
@@ -1158,7 +1213,7 @@ function getParams() {
         age:       parseFloat(document.getElementById('sl-age').value),
         cotis_sal: parseFloat(document.getElementById('sl-cotis-sal').value),
         cotis_emp: parseFloat(document.getElementById('sl-cotis-emp').value),
-        index:     parseInt(document.getElementById('sl-index').value),
+        index:     parseFloat(document.getElementById('sl-index').value),
         fec:   parseFloat(document.getElementById('sl-fec').value),
         mig:   parseInt(document.getElementById('sl-mig').value),
         prod:  parseFloat(document.getElementById('sl-prod').value),
@@ -1197,6 +1252,15 @@ function colorClass(v) {
     return v >= -0.05 ? 'green' : v >= -0.6 ? 'orange' : 'red';
 }
 
+// Libellé descriptif de la position du curseur d'indexation (-1 → +1)
+function indexLabel(n) {
+    if (n <= -0.95) return 'Désindexation totale (gel)';
+    if (n >= 0.95)  return 'Sur les salaires';
+    if (Math.abs(n) < 0.05) return 'Sur les prix (actuel)';
+    if (n < 0) return 'Désindexation partielle (' + n.toFixed(1) + ')';
+    return 'Partielle vers les salaires (+' + n.toFixed(1) + ')';
+}
+
 function update() {
     const p = getParams();
 
@@ -1208,6 +1272,7 @@ function update() {
     document.getElementById('val-age').textContent       = ageLabel;
     document.getElementById('val-cotis-sal').textContent = fmtPt(p.cotis_sal);
     document.getElementById('val-cotis-emp').textContent = fmtPt(p.cotis_emp);
+    document.getElementById('val-index').textContent     = indexLabel(p.index);
     document.getElementById('val-fec').textContent       = p.fec.toFixed(2).replace('.',',')+' enfant/femme';
     document.getElementById('val-mig').textContent       = '+'+(p.mig/1000).toFixed(0)+' 000 /an';
     document.getElementById('val-prod').textContent      = '+'+p.prod.toFixed(1).replace('.',',')+' %/an';
@@ -1226,16 +1291,21 @@ function update() {
     const amountEl  = document.getElementById('balance-amount');
     const pctEl     = document.getElementById('balance-pct');
     const refEl     = document.getElementById('balance-ref');
+    const ref2025El = document.getElementById('balance-ref-2025');
 
     const fmtMds = v => (v >= 0 ? '+' : '') + v.toFixed(1).replace('.', ',');
     amountEl.textContent = fmtMds(mds);
     pctEl.textContent    = (bal2035 >= 0 ? '+' : '') + bal2035.toFixed(2).replace('.', ',') + '% du PIB';
     refEl.textContent    = fmtMds(mds_ref) + ' Mds €';
 
+    const bal2035_2025 = baselineCOR2025(2035);
+    const mds_2025      = bal2035_2025 * PIB_2035 / 100;
+    ref2025El.textContent = 'COR 2025 : ' + fmtMds(mds_2025) + ' Mds €';
+
     box.className = 'balance-box ' + (mds >= 0 ? 'surplus' : 'deficit');
 
     // ── Chart
-    myChart.data.datasets[1].data = YEARS.map(y => parseFloat(computeBalance(y,p).toFixed(3)));
+    myChart.data.datasets[2].data = YEARS.map(y => parseFloat(computeBalance(y,p).toFixed(3)));
     myChart.update('none');
 
     // ── KPI values
@@ -1247,6 +1317,7 @@ function update() {
         const v = [b30,b50,b70][i];
         document.getElementById('kv-'+yr).textContent = fmt(v);
         document.getElementById('kpi-'+yr).className = 'kpi '+colorClass(v);
+        document.getElementById('kr-'+yr).textContent = 'COR 2025 : '+fmt(baselineCOR2025(parseInt(yr)));
     });
 
     // ── Living standard
@@ -1272,12 +1343,12 @@ function update() {
         dot.style.background = '#34d399';
         txt.style.color = '#34d399';
         txt.textContent = '🟢 Déficit quasi nul en 2070 ('+fmt(b70)+' du PIB) — système financièrement soutenable.';
-    } else if (b70 >= -0.7) {
+    } else if (b70 >= -1.2) {
         banner.style.cssText = 'background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25)';
         dot.style.background = '#f59e0b';
         txt.style.color = '#f59e0b';
         txt.textContent = '⚠️ Déficit modéré en 2070 ('+fmt(b70)+' du PIB) — des ajustements restent nécessaires.';
-    } else if (b70 >= -1.4) {
+    } else if (b70 >= -2.4) {
         banner.style.cssText = 'background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2)';
         dot.style.background = '#f87171';
         txt.style.color = '#f87171';
@@ -1322,7 +1393,7 @@ function update() {
 
     // ── TR par décile
     const ageDelta = (p.age - 64) * 5;
-    const idxBonus = TR_IDX_BONUS[p.index];
+    const idxBonus = 11 * p.index;
     const simTR = [
         Math.min(100, Math.max(30, TR_REF[0] + ageDelta + idxBonus)),
         Math.min(100, Math.max(30, TR_REF[1] + ageDelta + idxBonus)),
@@ -1372,9 +1443,15 @@ const SLIDERS = [
       fmt: v => (parseFloat(v)>=0?'+':'')+parseFloat(v).toFixed(1)+' pt' },
     { id:'sl-cotis-emp', bub:'bub-cotis-emp', refVal:0,
       fmt: v => (parseFloat(v)>=0?'+':'')+parseFloat(v).toFixed(1)+' pt' },
-    { id:'sl-fec',   bub:'bub-fec',   refVal:1.8,
+    { id:'sl-index', bub:'bub-index', refVal:0,
+      fmt: v => { const n=parseFloat(v);
+        if (n<=-0.95) return 'Gel total';
+        if (n>=0.95)  return 'Salaires';
+        if (Math.abs(n)<0.05) return 'Prix';
+        return (n>0?'+':'')+n.toFixed(1); } },
+    { id:'sl-fec',   bub:'bub-fec',   refVal:1.45,
       fmt: v => parseFloat(v).toFixed(2).replace('.',',')+' enf/f' },
-    { id:'sl-mig',   bub:'bub-mig',   refVal:70000,
+    { id:'sl-mig',   bub:'bub-mig',   refVal:150000,
       fmt: v => '+'+(parseInt(v)/1000).toFixed(0)+'k /an' },
     { id:'sl-prod',  bub:'bub-prod',  refVal:0.7,
       fmt: v => '+'+parseFloat(v).toFixed(1).replace('.',',')+'%/an' },
@@ -1397,8 +1474,6 @@ SLIDERS.forEach(cfg => {
         update();
     });
 });
-document.getElementById('sl-index').addEventListener('change', update);
-
 function resetAll() {
     document.getElementById('sl-age').value       = DEFAULTS.age;
     document.getElementById('sl-cotis-sal').value = DEFAULTS.cotis_sal;
