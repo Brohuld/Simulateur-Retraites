@@ -109,6 +109,21 @@
             gap: 16px;
             align-items: start;
         }
+        /* IMPORTANT : ce bloc doit rester AVANT le @media (max-width: 700px) ci-dessous.
+           En CSS, à largeur égale, la règle qui apparaît en dernier dans le fichier gagne —
+           donc le point de rupture le plus étroit (700px) doit toujours être déclaré
+           après les plus larges (ici 1300px) pour bien le remplacer sur mobile. */
+        @media (max-width: 1300px) {
+            .main-grid { grid-template-columns: 286px minmax(0, 504px); }
+            .side-column {
+                grid-column: 1 / -1;
+                border-left: none;
+                padding-left: 0;
+                border-top: 4px solid var(--orange);
+                padding-top: 20px;
+                margin-top: 4px;
+            }
+        }
         @media (max-width: 700px) {
             .main-grid { grid-template-columns: 1fr; }
             .side-column { grid-column: auto; }
@@ -612,17 +627,6 @@
             padding-left: 16px;
         }
         .side-column .tr-section { margin-top: 0; }
-        @media (max-width: 1300px) {
-            .main-grid { grid-template-columns: 286px minmax(0, 504px); }
-            .side-column {
-                grid-column: 1 / -1;
-                border-left: none;
-                padding-left: 0;
-                border-top: 4px solid var(--orange);
-                padding-top: 20px;
-                margin-top: 4px;
-            }
-        }
         .tr-section-header {
             display: flex;
             flex-wrap: wrap;
