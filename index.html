@@ -55,10 +55,17 @@
             padding: 28px 24px 40px;
         }
 
-        /* ── Header ── */
+        /* ── Header ──
+           max-width aligné sur la largeur réelle de .main-grid à chaque palier
+           (286+16+504+16+460=1282 en 3 colonnes, 286+16+504=806 en 2 colonnes)
+           pour que le titre ne dépasse pas les colonnes du dessous (iPad paysage etc). */
         header {
             text-align: center;
-            margin-bottom: 36px;
+            margin: 0 auto 36px;
+            max-width: 1282px;
+        }
+        @media (max-width: 1300px) {
+            header { max-width: 806px; }
         }
         .badge {
             display: inline-flex;
