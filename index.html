@@ -596,10 +596,15 @@
         }
         .tr-section-header {
             display: flex;
+            flex-wrap: wrap;
             justify-content: space-between;
             align-items: flex-start;
             gap: 20px;
             margin-bottom: 16px;
+        }
+        .tr-section-header > div:first-child {
+            flex: 1 1 200px;
+            min-width: 0;
         }
         .tr-note {
             font-size: 11px;
@@ -610,8 +615,10 @@
             padding: 9px 12px;
             border-radius: 8px;
             line-height: 1.6;
-            flex-shrink: 0;
-            max-width: 420px;
+            flex: 0 1 420px;
+            min-width: 0;
+            max-width: min(420px, 100%);
+            box-sizing: border-box;
         }
         .tr-stat-row {
             display: grid;
@@ -631,6 +638,64 @@
         .tr-stat-delta.pos { color: var(--green); }
         .tr-stat-delta.neg { color: var(--red); }
         .tr-stat-delta.neu { color: var(--muted); }
+
+        /* ── Ratio actifs/retraités ── */
+        .ratio-legend {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 14px;
+            font-size: 11px;
+            color: var(--muted);
+        }
+        .ratio-legend-item { display: flex; align-items: center; gap: 6px; }
+        .ratio-legend-dot { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+        .ratio-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 18px;
+        }
+        .ratio-box {
+            background: rgba(255,255,255,0.025);
+            border: 1px solid rgba(255,255,255,0.04);
+            border-radius: 12px;
+            padding: 18px 14px;
+            text-align: center;
+        }
+        .ratio-box-year {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--muted);
+            margin-bottom: 10px;
+        }
+        .ratio-box-value {
+            font-size: 32px;
+            font-weight: 900;
+            color: var(--accent2);
+            line-height: 1;
+            font-variant-numeric: tabular-nums;
+        }
+        .ratio-box-note {
+            font-size: 10px;
+            color: var(--muted);
+            margin-top: 6px;
+        }
+        .ratio-sources {
+            margin-top: 16px;
+            padding-top: 14px;
+            border-top: 1px solid var(--border);
+            font-size: 10px;
+            color: #334155;
+            line-height: 1.7;
+        }
+        .ratio-sources a { color: #475569; text-decoration: none; }
+        .ratio-sources a:hover { color: var(--accent2); }
+        @media (max-width: 640px) {
+            .ratio-row { grid-template-columns: 1fr; }
+        }
 
         footer {
             text-align: center;
@@ -911,6 +976,48 @@
                         </div>
                         <div class="tr-stat-delta neu" id="tr-delta-d10">inchangé</div>
                     </div>
+                </div>
+            </div>
+
+            <!-- Ratio cotisants/retraités -->
+            <div class="tr-section">
+                <div class="tr-section-header">
+                    <div>
+                        <div class="chart-title">Ratio cotisants / retraités, 1960–2070</div>
+                        <div style="font-size:12px;color:var(--muted);margin-top:5px;">Nombre d'actifs cotisants pour un retraité, tous régimes confondus</div>
+                    </div>
+                </div>
+                <div class="ratio-legend">
+                    <div class="ratio-legend-item"><span class="ratio-legend-dot" style="background:#6366f1;"></span>Données observées</div>
+                    <div class="ratio-legend-item"><span class="ratio-legend-dot" style="background:#475569;"></span>Estimation interpolée (non officielle)</div>
+                    <div class="ratio-legend-item"><span class="ratio-legend-dot" style="background:#f59e0b;"></span>Projection officielle COR</div>
+                </div>
+                <div style="position:relative;width:100%;height:220px;">
+                    <canvas id="ratio-chart"></canvas>
+                </div>
+                <div class="ratio-row">
+                    <div class="ratio-box">
+                        <div class="ratio-box-year">1960</div>
+                        <div class="ratio-box-value">4,69 : 1</div>
+                        <div class="ratio-box-note">Donnée observée</div>
+                    </div>
+                    <div class="ratio-box">
+                        <div class="ratio-box-year">2025</div>
+                        <div class="ratio-box-value">1,80 : 1</div>
+                        <div class="ratio-box-note">Dernière estimation COR</div>
+                    </div>
+                    <div class="ratio-box">
+                        <div class="ratio-box-year">2070</div>
+                        <div class="ratio-box-value">1,41 : 1</div>
+                        <div class="ratio-box-note">Projection COR — scénario de référence</div>
+                    </div>
+                </div>
+                <div class="ratio-sources">
+                    Sources : Insee, <a href="https://www.insee.fr/fr/statistiques/2415121" target="_blank">Cotisants, retraités et rapport démographique tous régimes</a> (2004–2023) ·
+                    <a href="https://www.cor-retraites.fr/sites/default/files/2025-06/RA_2025_def_publi.pdf" target="_blank">Rapport annuel du COR — Juin 2025</a> ·
+                    Sénat, <a href="https://www.senat.fr/rap/l97-73-3/l97-73-33.html" target="_blank">PLFSS 1998, rapport n°73 tome III</a> (données 1960–1990, source DSS/DEES) ·
+                    <a href="https://evaluation.securite-sociale.fr/home/retraite/1-6-ratio-de-dependance-demograp.html" target="_blank">DSS — Ratio de dépendance démographique</a>.
+                    Les valeurs 2030/2040/2050/2060 sont une interpolation illustrative, pas une donnée officielle point par point.
                 </div>
             </div>
         </div>
@@ -1198,6 +1305,62 @@ const trChart = new Chart(trCtx, {
                     callback: v => v + '%',
                     stepSize: 20
                 }
+            }
+        },
+        animation: { duration: 200 }
+    }
+});
+
+// ═══════════════════════════════════════════════════════════
+// RATIO COTISANTS / RETRAITÉS (statique, hors leviers)
+// ═══════════════════════════════════════════════════════════
+// Sources : Insee (2415121, série 2004-2023) ; Rapport annuel COR juin 2025 (2025 et 2070) ;
+// Sénat PLFSS 1998, rapport n°73-III, source DSS/DEES (1960-1990).
+// Les valeurs 2030/2040/2050/2060 sont une interpolation illustrative (pas une donnée officielle).
+
+const ratioCtx = document.getElementById('ratio-chart').getContext('2d');
+const ratioLabels = ['1960','1970','1980','1990','2000','2010','2020','2025','2030‡','2040‡','2050‡','2060‡','2070†'];
+const ratioData   = [4.69, 3.13, 2.79, 2.1, 2.1, 1.78, 1.75, 1.8, 1.7, 1.55, 1.47, 1.42, 1.41];
+const ratioColors = ['#6366f1','#6366f1','#6366f1','#6366f1','#6366f1','#6366f1','#6366f1','#6366f1','#475569','#475569','#475569','#475569','#f59e0b'];
+
+new Chart(ratioCtx, {
+    type: 'bar',
+    data: {
+        labels: ratioLabels,
+        datasets: [{
+            label: 'Cotisants pour 1 retraité',
+            data: ratioData,
+            backgroundColor: ratioColors,
+            borderRadius: 4,
+            maxBarThickness: 36
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { display: false },
+            tooltip: {
+                backgroundColor: '#0f172a',
+                borderColor: '#1e293b',
+                borderWidth: 1,
+                titleColor: '#e2e8f0',
+                bodyColor: '#94a3b8',
+                padding: 10,
+                callbacks: {
+                    label: c => c.parsed.y.toFixed(2).replace('.', ',') + ' cotisants par retraité'
+                }
+            }
+        },
+        scales: {
+            x: {
+                grid: { display: false },
+                ticks: { color:'#475569', font:{ size:10 }, autoSkip: false, maxRotation: 0 }
+            },
+            y: {
+                beginAtZero: true,
+                grid: { color:'rgba(255,255,255,0.035)' },
+                ticks: { color:'#475569', font:{ size:11 } }
             }
         },
         animation: { duration: 200 }
