@@ -628,9 +628,11 @@
         .side-column .tr-section { margin-top: 0; }
         /* IMPORTANT : doit rester APRÈS la règle .side-column ci-dessus pour gagner
            la cascade (sinon border-left/padding-left de base reprennent le dessus
-           sur mobile/tablette, comme pour .tr-note et .main-grid). */
+           sur mobile/tablette, comme pour .tr-note). Ne pas remettre .main-grid ici :
+           sa propre règle (plus haut dans le fichier, lignes ~106-133) gère déjà
+           tous les breakpoints — la dupliquer ici la ferait gagner à tort sur le
+           "1fr" du @media 700px puisqu'elle apparaîtrait après lui dans le fichier. */
         @media (max-width: 1300px) {
-            .main-grid { grid-template-columns: 286px minmax(0, 504px); }
             .side-column {
                 grid-column: 1 / -1;
                 border-left: none;
