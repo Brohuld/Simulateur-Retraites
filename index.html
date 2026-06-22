@@ -105,12 +105,13 @@
         /* ── Layout ── */
         .main-grid {
             display: grid;
-            grid-template-columns: 286px minmax(0, 504px);
+            grid-template-columns: 286px minmax(0, 504px) minmax(0, 460px);
             gap: 16px;
             align-items: start;
         }
         @media (max-width: 700px) {
             .main-grid { grid-template-columns: 1fr; }
+            .side-column { grid-column: auto; }
             .chart-row { grid-template-columns: 1fr; }
             .balance-box { order: -1; display: flex; flex-direction: row; align-items: center; gap: 20px; padding: 16px 20px; }
             .balance-amount { font-size: 28px; }
@@ -594,6 +595,27 @@
             padding: 22px;
             margin-top: 20px;
         }
+
+        /* ── Side column: à droite du graphique sur grand écran, repasse en dessous sinon ── */
+        .side-column {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            border-left: 4px solid var(--orange);
+            padding-left: 16px;
+        }
+        .side-column .tr-section { margin-top: 0; }
+        @media (max-width: 1300px) {
+            .main-grid { grid-template-columns: 286px minmax(0, 504px); }
+            .side-column {
+                grid-column: 1 / -1;
+                border-left: none;
+                padding-left: 0;
+                border-top: 4px solid var(--orange);
+                padding-top: 20px;
+                margin-top: 4px;
+            }
+        }
         .tr-section-header {
             display: flex;
             flex-wrap: wrap;
@@ -930,96 +952,100 @@
                     </div>
                 </div>
             </div>
+        </div>
 
+        <!-- ════ THIRD COLUMN (desktop): à droite du graphique de solde ════ -->
+        <div class="side-column">
 
-            <!-- TR par décile -->
-            <div class="tr-section">
-                <div class="tr-section-header">
-                    <div>
-                        <div class="chart-title">Impact sur le taux de remplacement brut</div>
-                        <div style="font-size:12px;color:var(--muted);margin-top:5px;">Pour trois profils de revenus — scénario COR de référence vs votre simulation</div>
-                    </div>
-                    <div class="tr-note">
-                        Seuls <b style="color:#e2e8f0">l'âge de départ</b> et <b style="color:#e2e8f0">l'indexation</b> agissent directement sur le taux de remplacement individuel.
-                        Les 5 autres curseurs jouent sur l'équilibre macro du système, pas sur la pension individuelle.
-                    </div>
+        <!-- TR par décile -->
+        <div class="tr-section">
+            <div class="tr-section-header">
+                <div>
+                    <div class="chart-title">Impact sur le taux de remplacement brut</div>
+                    <div style="font-size:12px;color:var(--muted);margin-top:5px;">Pour trois profils de revenus — scénario COR de référence vs votre simulation</div>
                 </div>
-                <div style="display:flex;gap:16px;margin-bottom:14px;font-size:11px;color:var(--muted);">
-                    <span style="display:flex;align-items:center;gap:6px;"><span style="width:16px;height:3px;background:rgba(99,102,241,0.7);border-radius:2px;display:inline-block;"></span>Référence COR 2025</span>
-                    <span style="display:flex;align-items:center;gap:6px;"><span style="width:16px;height:3px;background:#10b981;border-radius:2px;display:inline-block;"></span>Votre simulation</span>
-                </div>
-                <div style="position:relative;width:100%;height:200px;">
-                    <canvas id="tr-chart"></canvas>
-                </div>
-                <div class="tr-stat-row">
-                    <div class="tr-stat">
-                        <div class="tr-stat-label">D1 — bas salaire (~1 600 €/mois brut)</div>
-                        <div style="display:flex;align-items:baseline;gap:8px;">
-                            <span class="tr-stat-val" id="tr-val-d1">82%</span>
-                            <span style="font-size:12px;color:var(--muted)">réf. 82%</span>
-                        </div>
-                        <div class="tr-stat-delta neu" id="tr-delta-d1">inchangé</div>
-                    </div>
-                    <div class="tr-stat">
-                        <div class="tr-stat-label">D5 — médian (~2 650 €/mois brut)</div>
-                        <div style="display:flex;align-items:baseline;gap:8px;">
-                            <span class="tr-stat-val" id="tr-val-d5">73%</span>
-                            <span style="font-size:12px;color:var(--muted)">réf. 73%</span>
-                        </div>
-                        <div class="tr-stat-delta neu" id="tr-delta-d5">inchangé</div>
-                    </div>
-                    <div class="tr-stat">
-                        <div class="tr-stat-label">D10 — haut salaire (~9 500 €/mois brut)</div>
-                        <div style="display:flex;align-items:baseline;gap:8px;">
-                            <span class="tr-stat-val" id="tr-val-d10">43%</span>
-                            <span style="font-size:12px;color:var(--muted)">réf. 43%</span>
-                        </div>
-                        <div class="tr-stat-delta neu" id="tr-delta-d10">inchangé</div>
-                    </div>
+                <div class="tr-note">
+                    Seuls <b style="color:#e2e8f0">l'âge de départ</b> et <b style="color:#e2e8f0">l'indexation</b> agissent directement sur le taux de remplacement individuel.
+                    Les 5 autres curseurs jouent sur l'équilibre macro du système, pas sur la pension individuelle.
                 </div>
             </div>
-
-            <!-- Ratio cotisants/retraités -->
-            <div class="tr-section">
-                <div class="tr-section-header">
-                    <div>
-                        <div class="chart-title">Ratio cotisants / retraités, 1960–2070</div>
-                        <div style="font-size:12px;color:var(--muted);margin-top:5px;">Nombre d'actifs cotisants pour un retraité, tous régimes confondus</div>
+            <div style="display:flex;gap:16px;margin-bottom:14px;font-size:11px;color:var(--muted);">
+                <span style="display:flex;align-items:center;gap:6px;"><span style="width:16px;height:3px;background:rgba(99,102,241,0.7);border-radius:2px;display:inline-block;"></span>Référence COR 2025</span>
+                <span style="display:flex;align-items:center;gap:6px;"><span style="width:16px;height:3px;background:#10b981;border-radius:2px;display:inline-block;"></span>Votre simulation</span>
+            </div>
+            <div style="position:relative;width:100%;height:200px;">
+                <canvas id="tr-chart"></canvas>
+            </div>
+            <div class="tr-stat-row">
+                <div class="tr-stat">
+                    <div class="tr-stat-label">D1 — bas salaire (~1 600 €/mois brut)</div>
+                    <div style="display:flex;align-items:baseline;gap:8px;">
+                        <span class="tr-stat-val" id="tr-val-d1">82%</span>
+                        <span style="font-size:12px;color:var(--muted)">réf. 82%</span>
                     </div>
+                    <div class="tr-stat-delta neu" id="tr-delta-d1">inchangé</div>
                 </div>
-                <div class="ratio-legend">
-                    <div class="ratio-legend-item"><span class="ratio-legend-dot" style="background:#6366f1;"></span>Données observées</div>
-                    <div class="ratio-legend-item"><span class="ratio-legend-dot" style="background:#475569;"></span>Estimation interpolée (non officielle)</div>
-                    <div class="ratio-legend-item"><span class="ratio-legend-dot" style="background:#f59e0b;"></span>Projection officielle COR</div>
-                </div>
-                <div style="position:relative;width:100%;height:220px;">
-                    <canvas id="ratio-chart"></canvas>
-                </div>
-                <div class="ratio-row">
-                    <div class="ratio-box">
-                        <div class="ratio-box-year">1960</div>
-                        <div class="ratio-box-value">4,69 : 1</div>
-                        <div class="ratio-box-note">Donnée observée</div>
+                <div class="tr-stat">
+                    <div class="tr-stat-label">D5 — médian (~2 650 €/mois brut)</div>
+                    <div style="display:flex;align-items:baseline;gap:8px;">
+                        <span class="tr-stat-val" id="tr-val-d5">73%</span>
+                        <span style="font-size:12px;color:var(--muted)">réf. 73%</span>
                     </div>
-                    <div class="ratio-box">
-                        <div class="ratio-box-year">2025</div>
-                        <div class="ratio-box-value">1,80 : 1</div>
-                        <div class="ratio-box-note">Dernière estimation COR</div>
-                    </div>
-                    <div class="ratio-box">
-                        <div class="ratio-box-year">2070</div>
-                        <div class="ratio-box-value">1,41 : 1</div>
-                        <div class="ratio-box-note">Projection COR — scénario de référence</div>
-                    </div>
+                    <div class="tr-stat-delta neu" id="tr-delta-d5">inchangé</div>
                 </div>
-                <div class="ratio-sources">
-                    Sources : Insee, <a href="https://www.insee.fr/fr/statistiques/2415121" target="_blank">Cotisants, retraités et rapport démographique tous régimes</a> (2004–2023) ·
-                    <a href="https://www.cor-retraites.fr/sites/default/files/2025-06/RA_2025_def_publi.pdf" target="_blank">Rapport annuel du COR — Juin 2025</a> ·
-                    Sénat, <a href="https://www.senat.fr/rap/l97-73-3/l97-73-33.html" target="_blank">PLFSS 1998, rapport n°73 tome III</a> (données 1960–1990, source DSS/DEES) ·
-                    <a href="https://evaluation.securite-sociale.fr/home/retraite/1-6-ratio-de-dependance-demograp.html" target="_blank">DSS — Ratio de dépendance démographique</a>.
-                    Les valeurs 2030/2040/2050/2060 sont une interpolation illustrative, pas une donnée officielle point par point.
+                <div class="tr-stat">
+                    <div class="tr-stat-label">D10 — haut salaire (~9 500 €/mois brut)</div>
+                    <div style="display:flex;align-items:baseline;gap:8px;">
+                        <span class="tr-stat-val" id="tr-val-d10">43%</span>
+                        <span style="font-size:12px;color:var(--muted)">réf. 43%</span>
+                    </div>
+                    <div class="tr-stat-delta neu" id="tr-delta-d10">inchangé</div>
                 </div>
             </div>
+        </div>
+
+        <!-- Ratio cotisants/retraités -->
+        <div class="tr-section">
+            <div class="tr-section-header">
+                <div>
+                    <div class="chart-title">Ratio cotisants / retraités, 1960–2070</div>
+                    <div style="font-size:12px;color:var(--muted);margin-top:5px;">Nombre d'actifs cotisants pour un retraité, tous régimes confondus</div>
+                </div>
+            </div>
+            <div class="ratio-legend">
+                <div class="ratio-legend-item"><span class="ratio-legend-dot" style="background:#6366f1;"></span>Données observées</div>
+                <div class="ratio-legend-item"><span class="ratio-legend-dot" style="background:#475569;"></span>Estimation interpolée (non officielle)</div>
+                <div class="ratio-legend-item"><span class="ratio-legend-dot" style="background:#f59e0b;"></span>Projection officielle COR</div>
+            </div>
+            <div style="position:relative;width:100%;height:220px;">
+                <canvas id="ratio-chart"></canvas>
+            </div>
+            <div class="ratio-row">
+                <div class="ratio-box">
+                    <div class="ratio-box-year">1960</div>
+                    <div class="ratio-box-value">4,69 : 1</div>
+                    <div class="ratio-box-note">Donnée observée</div>
+                </div>
+                <div class="ratio-box">
+                    <div class="ratio-box-year">2025</div>
+                    <div class="ratio-box-value">1,80 : 1</div>
+                    <div class="ratio-box-note">Dernière estimation COR</div>
+                </div>
+                <div class="ratio-box">
+                    <div class="ratio-box-year">2070</div>
+                    <div class="ratio-box-value">1,41 : 1</div>
+                    <div class="ratio-box-note">Projection COR — scénario de référence</div>
+                </div>
+            </div>
+            <div class="ratio-sources">
+                Sources : Insee, <a href="https://www.insee.fr/fr/statistiques/2415121" target="_blank">Cotisants, retraités et rapport démographique tous régimes</a> (2004–2023) ·
+                <a href="https://www.cor-retraites.fr/sites/default/files/2025-06/RA_2025_def_publi.pdf" target="_blank">Rapport annuel du COR — Juin 2025</a> ·
+                Sénat, <a href="https://www.senat.fr/rap/l97-73-3/l97-73-33.html" target="_blank">PLFSS 1998, rapport n°73 tome III</a> (données 1960–1990, source DSS/DEES) ·
+                <a href="https://evaluation.securite-sociale.fr/home/retraite/1-6-ratio-de-dependance-demograp.html" target="_blank">DSS — Ratio de dépendance démographique</a>.
+                Les valeurs 2030/2040/2050/2060 sont une interpolation illustrative, pas une donnée officielle point par point.
+            </div>
+        </div>
+
         </div>
     </div>
 
