@@ -379,26 +379,33 @@
             margin-top: 2px;
         }
 
-        /* ── Lower row ── */
+        /* ── Lower row ──
+           Même grille à 3 colonnes égales que .kpi-row (même gap), avec les
+           cartes larges qui span 2 colonnes : leur bord droit tombe alors
+           exactement sur le bord droit de "Solde 2050" (2e colonne du KPI-row). */
         .lower-row {
             display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 16px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
         }
+        .lower-row .breakdown-card { grid-column: span 2; }
         @media (max-width: 700px) {
             .lower-row { grid-template-columns: 1fr; }
+            .lower-row .breakdown-card { grid-column: auto; }
             .kpi-row   { grid-template-columns: 1fr 1fr; }
         }
 
-        /* ── Chart row ── */
+        /* ── Chart row ── même logique d'alignement que .lower-row ── */
         .chart-row {
             display: grid;
-            grid-template-columns: 2fr 1fr;
+            grid-template-columns: repeat(3, 1fr);
             gap: 12px;
             align-items: stretch;
         }
+        .chart-row .chart-card { grid-column: span 2; }
         @media (max-width: 700px) {
             .chart-row { grid-template-columns: 1fr; }
+            .chart-row .chart-card { grid-column: auto; }
         }
 
         /* ── Balance box ── */
