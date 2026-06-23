@@ -2236,6 +2236,7 @@ function updateCompensation(p) {
     const costMds = totalDelta / 1e9;
     compCostPctPIB = costMds / COMP_PIB * 100;
 
+
     const costEl = document.getElementById('comp-cost');
     costEl.textContent = (costMds >= 0 ? '+' : '') + costMds.toFixed(1) + ' Mds€/an';
     costEl.style.color = costMds > 1 ? '#ef4444' : costMds < -1 ? '#10b981' : '#e2e8f0';
