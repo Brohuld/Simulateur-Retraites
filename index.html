@@ -147,19 +147,30 @@
             .container { padding: 16px 14px 32px; }
         }
 
-        /* ── 4ème colonne équité (Mac desktop ≥1480px) ── */
-        .equity-column { display: none; }
+        /* ── 4ème colonne équité ── */
+        /* Base : visible partout, pleine largeur sur tablette/mobile */
+        .equity-column {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            border-top: 4px solid rgba(99,102,241,0.45);
+            padding-top: 16px;
+        }
+        /* Tablette (700px–1479px) : pleine largeur sous la grille */
+        @media (min-width: 700px) and (max-width: 1479px) {
+            .equity-column { grid-column: 1 / -1; }
+        }
+        /* Grand écran ≥1480px : 4ème colonne à droite */
         @media (min-width: 1480px) {
-            .equity-column { display: flex; }
             .main-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr); }
             .container { max-width: 1870px; }
             header { max-width: 1820px; }
-        }
-        .equity-column {
-            flex-direction: column;
-            gap: 16px;
-            border-left: 4px solid rgba(99,102,241,0.45);
-            padding-left: 16px;
+            .equity-column {
+                border-top: none;
+                border-left: 4px solid rgba(99,102,241,0.45);
+                padding-top: 0;
+                padding-left: 16px;
+            }
         }
         .equity-column .tr-section { margin-top: 0; }
         .tri-gen-btns {
