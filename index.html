@@ -855,11 +855,17 @@
             border-top: 1px solid var(--border);
         }
         .comp-title {
+            display: flex;
+            align-items: center;
+            gap: 7px;
             font-size: 12px;
             font-weight: 600;
             color: #e2e8f0;
             margin-bottom: 4px;
         }
+        #comp-active { cursor: pointer; accent-color: var(--accent2); width: 14px; height: 14px; }
+        .comp-body { transition: opacity 0.2s; }
+        .comp-body.disabled { opacity: 0.38; pointer-events: none; }
         .comp-subtitle {
             font-size: 11px;
             color: var(--muted);
@@ -870,7 +876,7 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            margin: 7px 0;
+            margin: 7px 0 18px 0;
         }
         .comp-slider-label {
             font-size: 11px;
@@ -878,10 +884,38 @@
             width: 55px;
             flex-shrink: 0;
         }
-        .comp-slider-row input[type=range] {
+        .comp-slider-wrap {
             flex: 1;
+            position: relative;
+        }
+        .comp-slider-wrap input[type=range] {
+            width: 100%;
             accent-color: rgba(99,102,241,0.8);
             cursor: pointer;
+            display: block;
+        }
+        .comp-ref-tick {
+            position: absolute;
+            /* (0.18+2)/4 = 54.5% ; correction thumb ≈ 8px sur largeur totale */
+            left: calc(54.5% - 8px * (1 - 2 * 0.545));
+            top: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            pointer-events: none;
+            transform: translateX(-50%);
+        }
+        .comp-ref-tick::before {
+            content: '';
+            width: 1px;
+            height: 5px;
+            background: rgba(245,158,11,0.6);
+        }
+        .comp-ref-tick-label {
+            font-size: 9px;
+            color: rgba(245,158,11,0.7);
+            white-space: nowrap;
+            margin-top: 1px;
         }
         .comp-tri-val {
             font-size: 12px;
@@ -893,6 +927,7 @@
         .comp-results {
             margin-top: 14px;
             display: grid;
+            grid-template-columns: 1fr !important;
             grid-template-columns: 1fr 1fr;
             gap: 8px;
         }
@@ -985,7 +1020,7 @@
                 <div class="lever-desc">Règle de revalorisation annuelle des pensions, de la désindexation totale (gel : améliore le solde mais réduit le niveau de vie des retraités) à l'indexation sur les salaires (préserve le niveau de vie mais coûte au système). Le scénario actuel indexe sur les prix.</div>
                 <div class="slider-wrap">
                     <div class="slider-bubble" id="bub-index">Prix</div>
-                    <input type="range" id="sl-index" min="-1" max="1" step="0.1" value="0">
+                    <input type="range" id="sl-index" min="-1" max="1" step="0.05" value="0">
                     <div class="ref-mark" id="mark-index"><div class="ref-line"></div><div class="ref-label">Prix (réf.)</div></div>
                     <div class="ref-mark" style="--ref:0;bottom:0;left:calc(0 * (100% - var(--thumb)) + var(--thumb) / 2);transform:translateX(0);align-items:flex-start;"><div class="ref-line" style="background:#94a3b8;"></div><div class="ref-label" style="color:#94a3b8;white-space:normal;width:60px;text-align:left;line-height:1.2;">Désindexation<br>totale</div></div>
                     <div class="ref-mark" style="--ref:1;bottom:0;left:calc(1 * (100% - var(--thumb)) + var(--thumb) / 2);"><div class="ref-line" style="background:#94a3b8;"></div><div class="ref-label" style="color:#94a3b8;">Salaires</div></div>
@@ -1033,7 +1068,7 @@
                 <div class="lever-desc">Scénario central COR 2026 : 0,7 % (inchangé vs COR 2025). Détermine la croissance des salaires (et donc des cotisations) à long terme.</div>
                 <div class="slider-wrap">
                     <div class="slider-bubble" id="bub-prod">0,7%</div>
-                    <input type="range" id="sl-prod" min="0" max="1.4" step="0.1" value="0.7">
+                    <input type="range" id="sl-prod" min="0" max="1.4" step="0.05" value="0.7">
                     <div class="ref-mark" id="mark-prod"><div class="ref-line"></div><div class="ref-label">0,7% (réf.)</div></div>
                 </div>
             </div>
@@ -1048,6 +1083,46 @@
                     <div class="slider-bubble" id="bub-chom">7,0%</div>
                     <input type="range" id="sl-chom" min="3" max="11" step="0.5" value="7">
                     <div class="ref-mark" id="mark-chom"><div class="ref-line"></div><div class="ref-label">7% (réf.)</div></div>
+                </div>
+            </div>
+
+            <!-- ── Compensation TRI ── -->
+            <div class="comp-section">
+                <div class="comp-title">
+                    <input type="checkbox" id="comp-active" onchange="onCompToggle()">
+                    ⚖️ Compensation équité (TRI cible)
+                </div>
+                <div class="comp-body disabled" id="comp-body">
+                    <div class="comp-subtitle">
+                        TRI cible pour D1 et D10 — interpolation linéaire pour les déciles intermédiaires.
+                    </div>
+                    <div class="comp-slider-row">
+                        <span class="comp-slider-label">D1 (bas sal.)</span>
+                        <div class="comp-slider-wrap">
+                            <input type="range" id="comp-d1" min="-2" max="2" step="0.05" value="0"
+                                   oninput="onCompSlider()">
+                            <span class="comp-ref-tick"><span class="comp-ref-tick-label">réf.</span></span>
+                        </div>
+                        <span class="comp-tri-val" id="comp-d1-val">+0.0%</span>
+                    </div>
+                    <div class="comp-slider-row">
+                        <span class="comp-slider-label">D10 (haut sal.)</span>
+                        <div class="comp-slider-wrap">
+                            <input type="range" id="comp-d10" min="-2" max="2" step="0.05" value="0"
+                                   oninput="onCompSlider()">
+                            <span class="comp-ref-tick"><span class="comp-ref-tick-label">réf.</span></span>
+                        </div>
+                        <span class="comp-tri-val" id="comp-d10-val">+0.0%</span>
+                    </div>
+                    <div class="comp-results">
+                        <div class="comp-result-box">
+                            <div class="comp-result-label">Coût annuel (impact sur le solde)</div>
+                            <div class="comp-result-val" id="comp-cost">0 Mds€/an</div>
+                        </div>
+                    </div>
+                    <div class="comp-impossible" id="comp-impossible" style="display:none;">
+                        ⚠️ Pour cette hypothèse, le taux de remplacement dépasse 100 % sur certains déciles.
+                    </div>
                 </div>
             </div>
 
@@ -1269,40 +1344,6 @@
                 âge d'entrée estimé (D1 = 19 ans, D5 = 22 ans, D10 = 25 ans). (* 2020 : projection prospective.)
             </div>
 
-            <!-- ── Compensation TRI ── -->
-            <div class="comp-section">
-                <div class="comp-title">Coût d'une mesure de compensation</div>
-                <div class="comp-subtitle">
-                    Fixez un TRI cible pour D1 et D10 — les déciles intermédiaires sont interpolés linéairement.
-                    Le coût est calculé via le taux de remplacement supplémentaire nécessaire.
-                </div>
-                <div class="comp-slider-row">
-                    <span class="comp-slider-label">D1 (bas sal.)</span>
-                    <input type="range" id="comp-d1" min="-2" max="2" step="0.1" value="0"
-                           oninput="onCompSlider()">
-                    <span class="comp-tri-val" id="comp-d1-val">+0.0%</span>
-                </div>
-                <div class="comp-slider-row">
-                    <span class="comp-slider-label">D10 (haut sal.)</span>
-                    <input type="range" id="comp-d10" min="-2" max="2" step="0.1" value="0"
-                           oninput="onCompSlider()">
-                    <span class="comp-tri-val" id="comp-d10-val">+0.0%</span>
-                </div>
-                <div class="comp-results">
-                    <div class="comp-result-box">
-                        <div class="comp-result-label">Coût annuel</div>
-                        <div class="comp-result-val" id="comp-cost">0 Mds€</div>
-                    </div>
-                    <div class="comp-result-box">
-                        <div class="comp-result-label">Impact solde</div>
-                        <div class="comp-result-val" id="comp-pib">0.000% PIB</div>
-                    </div>
-                </div>
-                <div class="comp-impossible" id="comp-impossible" style="display:none;">
-                    ⚠️ Certains déciles nécessitent un TR &gt; 100% — la compensation ne peut pas se faire uniquement via le taux de remplacement. Un départ anticipé serait nécessaire.
-                </div>
-            </div>
-
         </div>
 
         </div>
@@ -1356,6 +1397,9 @@ const DEFAULTS = { age:64, cotis_sal:0, cotis_emp:0, index:0, fec:1.45, mig:1500
 // TR par décile — référence COR 2025 (génération 1980, carrière 43 ans, départ 64 ans)
 const TR_REF = [82, 73, 43]; // D1, D5, D10
 
+// Coût de la compensation équité exprimé en % du PIB — mis à jour par updateCompensation() avant chaque calcul de solde
+let compCostPctPIB = 0;
+
 function computeBalance(y, p) {
     const base = baseline(y);
     const T = (y - 2024) / (2070 - 2024); // 0→1
@@ -1404,7 +1448,7 @@ function computeBalance(y, p) {
     const chomFactor = y>2032 ? Math.min(1,(y-2032)/10) : 0;
     d += (dChom/2) * 0.28 * chomFactor;
 
-    return base + d;
+    return base + d - compCostPctPIB;
 }
 
 function computeLivingStd(p) {
@@ -1712,6 +1756,9 @@ function indexLabel(n) {
 function update() {
     const p = getParams();
 
+    // ── Compensation équité : calculer le coût AVANT le solde (met à jour compCostPctPIB)
+    updateCompensation(p);
+
     // ── Labels + bubbles
     const age = p.age;
     const ageLabel = (age%1===0?age:age.toFixed(1))+' ans';
@@ -1985,7 +2032,6 @@ function updateTriChart(p) {
     triGenChart.data.datasets[0].borderColor     = tris.map(v =>
         v === null ? 'rgba(100,100,100,0.6)' : v >= 0 ? 'rgba(16,185,129,0.9)' : 'rgba(239,68,68,0.85)');
     triGenChart.update('none');
-    updateCompensation(p);
 }
 
 let currentTriGen = '1980';
@@ -1997,22 +2043,48 @@ let triGenChart = null;
     triGenChart = new Chart(triCanvas.getContext('2d'), {
         type: 'bar',
         data: {
-            labels: ['D1','D2','D3','D4','D5','D6','D7','D8','D9','D10'],
+            labels: [1600,1900,2100,2350,2650,3200,3800,4800,6500,9500].map((s,i) =>
+                ['D'+(i+1), s.toLocaleString('fr-FR')+'€']),
             datasets: [{
-                label: 'TRI (%)',
+                type: 'bar',
+                label: 'TRI actuel (%)',
                 data: new Array(10).fill(0),
                 backgroundColor: new Array(10).fill('rgba(16,185,129,0.7)'),
                 borderColor:     new Array(10).fill('rgba(16,185,129,0.9)'),
                 borderWidth: 1,
                 borderRadius: 3,
                 borderSkipped: false,
+                order: 2,
+            }, {
+                type: 'line',
+                label: 'Votre scénario',
+                data: new Array(10).fill(null),
+                borderColor: 'rgba(245,158,11,0.9)',
+                backgroundColor: 'rgba(245,158,11,0.15)',
+                borderWidth: 2,
+                borderDash: [5, 4],
+                pointBackgroundColor: 'rgba(245,158,11,0.9)',
+                pointRadius: 4,
+                pointHoverRadius: 6,
+                tension: 0,
+                order: 1,
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                legend: { display: false },
+                legend: {
+                    display: true,
+                    labels: {
+                        color: '#94a3b8',
+                        font: { size: 10 },
+                        boxWidth: 24,
+                        boxHeight: 2,
+                        padding: 8,
+                        filter: (item) => item.datasetIndex === 1 && item.text !== '',
+                    }
+                },
                 tooltip: {
                     backgroundColor: '#0f172a',
                     borderColor: '#1e293b',
@@ -2031,7 +2103,7 @@ let triGenChart = null;
             scales: {
                 x: {
                     grid: { display: false },
-                    ticks: { color: '#475569', font: { size: 10 } }
+                    ticks: { color: '#475569', font: { size: 10 }, maxRotation: 90, minRotation: 90, autoSkip: false }
                 },
                 y: {
                     grid: { color: 'rgba(255,255,255,0.04)' },
@@ -2064,7 +2136,7 @@ let triGenChart = null;
         }]
     });
     document.getElementById('tri-interp').innerHTML = TRI_GEN_DATA['1980'].interp;
-    updateTriChart(DEFAULTS);
+    // updateTriChart est appelé par requestAnimationFrame ci-dessous après le layout
 })();
 
 function selectTriGen(gen) {
@@ -2094,20 +2166,35 @@ function findTRforTRI(ae, ad, ev, tau_pct, tri_target) {
 }
 
 function updateCompensation(p) {
-    const d1El  = document.getElementById('comp-d1');
-    const d10El = document.getElementById('comp-d10');
+    const d1El     = document.getElementById('comp-d1');
+    const d10El    = document.getElementById('comp-d10');
+    const activeEl = document.getElementById('comp-active');
     if (!d1El) return;
 
     const triD1  = parseFloat(d1El.value);
     const triD10 = parseFloat(d10El.value);
+    const isActive = activeEl ? activeEl.checked : false;
 
     const fmtTRI = v => (v >= 0 ? '+' : '') + v.toFixed(1) + '%';
     document.getElementById('comp-d1-val').textContent  = fmtTRI(triD1);
     document.getElementById('comp-d10-val').textContent = fmtTRI(triD10);
-
-    // Couleur des valeurs affichées
     document.getElementById('comp-d1-val').style.color  = triD1  > 0 ? '#10b981' : triD1  < 0 ? '#ef4444' : '#94a3b8';
     document.getElementById('comp-d10-val').style.color = triD10 > 0 ? '#10b981' : triD10 < 0 ? '#ef4444' : '#94a3b8';
+
+    // Fast path : désactivé uniquement (sliders à 0 avec checkbox active = scénario valide)
+    if (!isActive) {
+        compCostPctPIB = 0;
+        document.getElementById('comp-cost').textContent = '0 Mds€/an';
+        document.getElementById('comp-cost').style.color = '#e2e8f0';
+        document.getElementById('comp-impossible').style.display = 'none';
+        // Masquer la ligne cible sur le graphe TRI
+        if (triGenChart) {
+            triGenChart.data.datasets[1].data  = new Array(10).fill(null);
+            triGenChart.data.datasets[1].label = '';
+            triGenChart.update('none');
+        }
+        return;
+    }
 
     const gen = currentTriGen;
     const { ref_age, tau_base } = TRI_GEN_PARAMS[gen];
@@ -2119,6 +2206,7 @@ function updateCompensation(p) {
 
     let totalDelta = 0;
     let impossible = false;
+    const triTargetLine = [];
 
     TRI_AGE_ENTREE.forEach((ae, i) => {
         const trCurrent = Math.min(100, Math.max(20,
@@ -2127,26 +2215,38 @@ function updateCompensation(p) {
             : trRefArr[i] + ageDelta + Math.round(idxBonus * 0.7)
         ));
         const triTarget = triD1 + (triD10 - triD1) * i / 9;
+        triTargetLine.push(parseFloat(triTarget.toFixed(3)));
         const trNeeded  = findTRforTRI(ae, p.age, evArr[i], tauEff, triTarget);
         if (trNeeded > 100) impossible = true;
         totalDelta += (trNeeded - trCurrent) / 100 * COMP_SALAIRES_ANNUELS[i] * COMP_N_PAR_DECILE;
     });
 
-    const costMds   = totalDelta / 1e9;
-    const impactPIB = costMds / COMP_PIB * 100;
+    const costMds = totalDelta / 1e9;
+    compCostPctPIB = costMds / COMP_PIB * 100;
 
     const costEl = document.getElementById('comp-cost');
-    const pibEl  = document.getElementById('comp-pib');
     costEl.textContent = (costMds >= 0 ? '+' : '') + costMds.toFixed(1) + ' Mds€/an';
     costEl.style.color = costMds > 1 ? '#ef4444' : costMds < -1 ? '#10b981' : '#e2e8f0';
-    pibEl.textContent  = (impactPIB >= 0 ? '+' : '') + impactPIB.toFixed(3) + '% du PIB';
-    pibEl.style.color  = costEl.style.color;
 
     document.getElementById('comp-impossible').style.display = impossible ? '' : 'none';
+
+    // Afficher la ligne cible sur le graphe TRI
+    if (triGenChart) {
+        triGenChart.data.datasets[1].data  = triTargetLine;
+        triGenChart.data.datasets[1].label = 'Votre scénario';
+        triGenChart.update('none');
+    }
+}
+
+function onCompToggle() {
+    const active = document.getElementById('comp-active').checked;
+    const body   = document.getElementById('comp-body');
+    if (body) body.classList.toggle('disabled', !active);
+    update();
 }
 
 function onCompSlider() {
-    updateCompensation(getParams());
+    update(); // update() appelle updateCompensation() en premier, puis recalcule le solde
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -2201,6 +2301,13 @@ function resetAll() {
     document.getElementById('sl-mig').value   = DEFAULTS.mig;
     document.getElementById('sl-prod').value  = DEFAULTS.prod;
     document.getElementById('sl-chom').value  = DEFAULTS.chom;
+    // Réinitialiser la compensation équité
+    const compActive = document.getElementById('comp-active');
+    if (compActive) compActive.checked = false;
+    const compBody = document.getElementById('comp-body');
+    if (compBody) compBody.classList.add('disabled');
+    document.getElementById('comp-d1').value  = 0;
+    document.getElementById('comp-d10').value = 0;
     refreshAllBubbles();
     update();
 }
