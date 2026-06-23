@@ -2175,7 +2175,7 @@ function updateCompensation(p) {
     const triD10 = parseFloat(d10El.value);
     const isActive = activeEl ? activeEl.checked : false;
 
-    const fmtTRI = v => (v >= 0 ? '+' : '') + v.toFixed(1) + '%';
+    const fmtTRI = v => (v >= 0 ? '+' : '') + v.toFixed(2) + '%';
     document.getElementById('comp-d1-val').textContent  = fmtTRI(triD1);
     document.getElementById('comp-d10-val').textContent = fmtTRI(triD10);
     document.getElementById('comp-d1-val').style.color  = triD1  > 0 ? '#10b981' : triD1  < 0 ? '#ef4444' : '#94a3b8';
