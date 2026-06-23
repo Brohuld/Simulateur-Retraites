@@ -147,6 +147,63 @@
             .container { padding: 16px 14px 32px; }
         }
 
+        /* ── 4ème colonne équité (Mac desktop ≥1480px) ── */
+        .equity-column { display: none; }
+        @media (min-width: 1480px) {
+            .equity-column { display: flex; }
+            .main-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr); }
+            .container { max-width: 1870px; }
+            header { max-width: 1820px; }
+        }
+        .equity-column {
+            flex-direction: column;
+            gap: 16px;
+            border-left: 4px solid rgba(99,102,241,0.45);
+            padding-left: 16px;
+        }
+        .equity-column .tr-section { margin-top: 0; }
+        .tri-gen-btns {
+            display: flex;
+            gap: 5px;
+            margin: 10px 0 12px;
+        }
+        .tri-gen-btn {
+            padding: 4px 10px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+            letter-spacing: 0.03em;
+        }
+        .tri-gen-btn:hover { border-color: rgba(99,102,241,0.5); color: #a5b4fc; }
+        .tri-gen-btn.active {
+            background: rgba(99,102,241,0.15);
+            border-color: rgba(99,102,241,0.45);
+            color: #a5b4fc;
+        }
+        .tri-interp {
+            font-size: 11px;
+            color: #94a3b8;
+            line-height: 1.6;
+            margin-top: 12px;
+            padding: 10px 12px;
+            background: rgba(99,102,241,0.06);
+            border-left: 2px solid rgba(99,102,241,0.35);
+            border-radius: 0 6px 6px 0;
+        }
+        .tri-method {
+            font-size: 10px;
+            color: var(--muted);
+            line-height: 1.5;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid var(--border);
+        }
+
         /* ── Cards ── */
         .card {
             background: var(--card);
@@ -688,11 +745,13 @@
         }
         .tr-stat-row {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
             gap: 12px;
             margin-top: 16px;
         }
         .tr-stat {
+            min-width: 0;
+            overflow: hidden;
             background: rgba(255,255,255,0.025);
             border: 1px solid rgba(255,255,255,0.04);
             border-radius: 10px;
@@ -700,7 +759,7 @@
             display: flex;
             flex-direction: column;
         }
-        .tr-stat-label { font-size: 11px; color: var(--muted); margin-bottom: 5px; flex: 1; }
+        .tr-stat-label { font-size: 11px; color: var(--muted); margin-bottom: 5px; flex: 1; overflow-wrap: break-word; }
         .tr-stat-val { font-size: 24px; font-weight: 900; font-variant-numeric: tabular-nums; color: var(--text); }
         .tr-stat-delta { font-size: 12px; font-weight: 700; margin-top: 3px; }
         .tr-stat-delta.pos { color: var(--green); }
@@ -720,15 +779,17 @@
         .ratio-legend-dot { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
         .ratio-row {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(3, minmax(0, 1fr));
             gap: 12px;
             margin-top: 18px;
         }
         .ratio-box {
+            min-width: 0;
+            overflow: hidden;
             background: rgba(255,255,255,0.025);
             border: 1px solid rgba(255,255,255,0.04);
             border-radius: 12px;
-            padding: 18px 14px;
+            padding: 18px 10px;
             text-align: center;
         }
         .ratio-box-year {
@@ -740,11 +801,12 @@
             margin-bottom: 10px;
         }
         .ratio-box-value {
-            font-size: 32px;
+            font-size: 18px;
             font-weight: 900;
             color: var(--accent2);
-            line-height: 1;
+            line-height: 1.2;
             font-variant-numeric: tabular-nums;
+            white-space: nowrap;
         }
         .ratio-box-note {
             font-size: 10px;
@@ -1007,7 +1069,7 @@
         <div class="tr-section">
             <div class="tr-section-header">
                 <div>
-                    <div class="chart-title">Impact sur le taux de remplacement brut</div>
+                    <div class="chart-title">Le taux de remplacement : le montant de la retraite par rapport au dernier salaire</div>
                     <div style="font-size:12px;color:var(--muted);margin-top:5px;">Pour trois profils de revenus — scénario COR de référence vs votre simulation</div>
                 </div>
                 <div class="tr-note">
@@ -1025,26 +1087,20 @@
             <div class="tr-stat-row">
                 <div class="tr-stat">
                     <div class="tr-stat-label">D1 — bas salaire (~1 600 €/mois brut)</div>
-                    <div style="display:flex;align-items:baseline;gap:8px;">
-                        <span class="tr-stat-val" id="tr-val-d1">82%</span>
-                        <span style="font-size:12px;color:var(--muted)">réf. 82%</span>
-                    </div>
+                    <div class="tr-stat-val" id="tr-val-d1">82%</div>
+                    <div style="font-size:11px;color:var(--muted);margin-top:2px;">réf. 82%</div>
                     <div class="tr-stat-delta neu" id="tr-delta-d1">inchangé</div>
                 </div>
                 <div class="tr-stat">
                     <div class="tr-stat-label">D5 — médian (~2 650 €/mois brut)</div>
-                    <div style="display:flex;align-items:baseline;gap:8px;">
-                        <span class="tr-stat-val" id="tr-val-d5">73%</span>
-                        <span style="font-size:12px;color:var(--muted)">réf. 73%</span>
-                    </div>
+                    <div class="tr-stat-val" id="tr-val-d5">73%</div>
+                    <div style="font-size:11px;color:var(--muted);margin-top:2px;">réf. 73%</div>
                     <div class="tr-stat-delta neu" id="tr-delta-d5">inchangé</div>
                 </div>
                 <div class="tr-stat">
                     <div class="tr-stat-label">D10 — haut salaire (~9 500 €/mois brut)</div>
-                    <div style="display:flex;align-items:baseline;gap:8px;">
-                        <span class="tr-stat-val" id="tr-val-d10">43%</span>
-                        <span style="font-size:12px;color:var(--muted)">réf. 43%</span>
-                    </div>
+                    <div class="tr-stat-val" id="tr-val-d10">43%</div>
+                    <div style="font-size:11px;color:var(--muted);margin-top:2px;">réf. 43%</div>
                     <div class="tr-stat-delta neu" id="tr-delta-d10">inchangé</div>
                 </div>
             </div>
@@ -1089,6 +1145,43 @@
                 Sénat, <a href="https://www.senat.fr/rap/l97-73-3/l97-73-33.html" target="_blank">PLFSS 1998, rapport n°73 tome III</a> (données 1960–1990, source DSS/DEES) ·
                 <a href="https://evaluation.securite-sociale.fr/home/retraite/1-6-ratio-de-dependance-demograp.html" target="_blank">DSS — Ratio de dépendance démographique</a>.
                 Les valeurs 2030/2040/2050/2060 sont une interpolation illustrative, pas une donnée officielle point par point.
+            </div>
+        </div>
+
+        </div>
+
+        <!-- ════ 4th COLUMN (Mac desktop ≥1480px) : Équité intergénérationnelle ════ -->
+        <div class="equity-column">
+
+        <div class="tr-section">
+            <div class="tr-section-header">
+                <div>
+                    <div class="chart-title">L'équité du système : les gagnants et les perdants</div>
+                    <div style="font-size:12px;color:var(--muted);margin-top:5px;">Rendement implicite selon le profil de revenu et la génération</div>
+                </div>
+                <div class="tr-note">
+                    Le <b style="color:#e2e8f0">TRI</b> (Taux de Rendement Interne) est le rendement implicite du système selon votre profil de revenu.
+                    Un TRI <b style="color:#10b981">positif</b> signifie que le système verse plus en pensions qu'il n'a coûté en cotisations — un TRI
+                    <b style="color:#ef4444">négatif</b> l'inverse. Seul <b style="color:#e2e8f0">l'âge de départ</b> impacte directement ce calcul.
+                </div>
+            </div>
+            <div class="tri-gen-btns">
+                <button class="tri-gen-btn" onclick="selectTriGen('1960')">1960</button>
+                <button class="tri-gen-btn active" onclick="selectTriGen('1980')">1980</button>
+                <button class="tri-gen-btn" onclick="selectTriGen('2000')">2000</button>
+                <button class="tri-gen-btn" onclick="selectTriGen('2020')">2020 *</button>
+            </div>
+            <div style="position:relative;width:100%;height:200px;">
+                <canvas id="tri-gen-chart"></canvas>
+            </div>
+            <div class="tri-interp" id="tri-interp"></div>
+            <div class="tri-method">
+                <b style="color:#64748b;">Méthode :</b> le TRI est le taux <i>r</i> qui égalise la valeur actuelle des cotisations versées
+                (τ × salaire × durée carrière) et des pensions reçues (TR × salaire × durée retraite).
+                Paramètres par décile : taux de cotisation τ (~18–29 % selon génération, COR 2026 p.134) ·
+                taux de remplacement brut (COR 2026 : D1 = 82 %, D5 = 73 %, D10 = 43 %) ·
+                espérance de vie différenciée par CSP (DREES 2013 + INSEE 2020-22) ·
+                âge d'entrée estimé (D1 = 19 ans, D5 = 22 ans, D10 = 25 ans). (* 2020 : projection prospective.)
             </div>
         </div>
 
@@ -1324,7 +1417,7 @@ const trCtx = document.getElementById('tr-chart').getContext('2d');
 const trChart = new Chart(trCtx, {
     type: 'bar',
     data: {
-        labels: ['D1 — bas salaire\n(~1 600 €/mois)', 'D5 — médian\n(~2 650 €/mois)', 'D10 — haut salaire\n(~9 500 €/mois)'],
+        labels: ['D1', 'D5', 'D10'],
         datasets: [
             {
                 label: 'Référence COR',
@@ -1427,7 +1520,7 @@ new Chart(ratioCtx, {
         scales: {
             x: {
                 grid: { display: false },
-                ticks: { color:'#475569', font:{ size:10 }, autoSkip: false, maxRotation: 0 }
+                ticks: { color:'#475569', font:{ size:10 }, autoSkip: true, maxTicksLimit: 7, maxRotation: 0 }
             },
             y: {
                 beginAtZero: true,
@@ -1664,6 +1757,203 @@ function update() {
             el.className = 'tr-stat-delta ' + (diff > 0 ? 'pos' : 'neg');
         }
     });
+
+    // ── TRI dynamique (colonne 4)
+    updateTriChart(p);
+}
+
+// ═══════════════════════════════════════════════════════════
+// TRI ACTUARIEL PAR GÉNÉRATION (4ème colonne équité)
+// ═══════════════════════════════════════════════════════════
+
+const TRI_GEN_DATA = {
+    "1960": {
+        tris: [1.08, 1.22, 1.43, 1.62, 1.79, 1.82, 1.64, 1.26, 1.29, 1.29],
+        interp: "Tous les déciles bénéficient d'un TRI positif. La retraite à 61 ans avec des cotisations faibles (~18 %) a rendu le système très généreux pour toutes les catégories. Le pic se situe en D5–D6 (classe moyenne supérieure), où un bon taux de remplacement se combine à une espérance de vie favorable."
+    },
+    "1980": {
+        tris: [-0.19, 0.06, 0.21, 0.41, 0.56, 0.51, 0.46, 0.15, -0.07, -0.26],
+        interp: "Interprétation : pour la génération 1980 par exemple, D1 (ouvrier) est pénalisé par une espérance de vie courte (~77 ans) qui ne compense pas son taux de remplacement de 82 % — seulement 13 ans de retraite pour ~45 ans de cotisations. À l'autre extrême, D9–D10 (cadres) ont une espérance de vie plus longue mais un taux de remplacement faible (43 %) insuffisant pour compenser. <span style=\"font-weight:700;color:var(--orange)\">C'est la classe médiane (D4–D5) qui tire le meilleur parti du système.</span>"
+    },
+    "2000": {
+        tris: [0.96, 0.87, 0.88, 0.91, 1.17, 0.99, 0.83, 0.50, 0.27, 0.08],
+        interp: "Le gain d'espérance de vie (+7–8 ans vs 1980) redresse tous les profils en territoire positif, malgré des cotisations plus élevées (~28 %). D1 en bénéficie proportionnellement le plus : chaque année supplémentaire compte davantage quand la retraite ne durait que 13 ans. La bosse centrale (D4–D5) persiste."
+    },
+    "2020": {
+        tris: [1.19, 1.08, 1.13, 1.14, 1.18, 0.97, 0.82, 0.62, 0.28, 0.04],
+        interp: "Projection très incertaine. Si l'espérance de vie continue à progresser (+11 ans vs 1980), tous les profils resteraient en territoire positif malgré des cotisations plus élevées (~29 %). La courbe s'aplatit : le système deviendrait moins inégalitaire en termes actuariels — à condition que les écarts d'EV entre CSP ne s'aggravent pas."
+    }
+};
+
+// ── Paramètres de référence pour le calcul dynamique du TRI ──
+
+// Âge d'entrée dans la carrière par décile — interpolation linéaire entre
+// D1=19 ans (ouvrier), D5=22 ans (médian), D10=25 ans (cadre sup.)
+const TRI_AGE_ENTREE = [19, 19.75, 20.5, 21.25, 22, 22.6, 23.2, 23.8, 24.4, 25];
+
+// Espérance de vie par décile et par génération — interpolation linéaire entre
+// ancres D1 / D5 / D10 (hommes, DREES 2013 + INSEE 2022)
+const TRI_EV = {
+    "1960": [77, 78, 79, 80, 81, 81.8, 82.6, 83.4, 84.2, 85],
+    "1980": [77, 78, 79, 80, 81, 81.8, 82.6, 83.4, 84.2, 85],
+    "2000": [84, 85, 86, 86.8, 87.6, 88.4, 89.2, 90, 90.8, 91.6],
+    "2020": [88, 89, 90, 90.8, 91.6, 92.4, 93.2, 94, 94.8, 95.6],
+};
+
+// TR brut de référence par décile — interpolation linéaire entre ancres COR
+// (D1, D5, D10) à l'âge de départ de référence de chaque génération
+const TRI_TR_REF = {
+    "1960": [85, 83, 81, 78, 76, 70, 64, 58, 52, 46],
+    "1980": [82, 80, 78, 75, 73, 67, 61, 55, 49, 43],
+    "2000": [82, 80, 78, 75, 73, 67, 61, 55, 49, 43],
+    "2020": [79, 77, 75, 72, 70, 64, 58, 52, 46, 41],
+};
+
+// Âge et taux de cotisation de référence par génération
+const TRI_GEN_PARAMS = {
+    "1960": { ref_age: 61, tau_base: 18 },
+    "1980": { ref_age: 64, tau_base: 25 },
+    "2000": { ref_age: 64, tau_base: 28 },
+    "2020": { ref_age: 65, tau_base: 29 },
+};
+
+// Calcul du TRI par bissection (même logique que Python)
+function computeTRIbisect(age_entree, age_depart, ev, tr_pct, tau_pct) {
+    const Tc = Math.max(1, Math.round(age_depart - age_entree));
+    const Tr = Math.round(ev - age_depart);
+    if (Tr <= 0) return null;
+    const tau = tau_pct / 100;
+    const tr  = tr_pct  / 100;
+    const npv = r => {
+        let s = 0;
+        for (let t = 0; t < Tc; t++) s -= tau / Math.pow(1 + r, t);
+        for (let t = 0; t < Tr; t++) s += tr  / Math.pow(1 + r, Tc + t);
+        return s;
+    };
+    let lo = -0.20, hi = 0.30;
+    if (npv(lo) < 0) return +(lo * 100).toFixed(2);
+    if (npv(hi) > 0) return +(hi * 100).toFixed(2);
+    for (let i = 0; i < 150; i++) {
+        const mid = (lo + hi) / 2;
+        npv(mid) > 0 ? lo = mid : hi = mid;
+    }
+    return +((lo + hi) / 2 * 100).toFixed(2);
+}
+
+// Mise à jour du graphique TRI selon les sliders actifs
+function updateTriChart(p) {
+    if (!triGenChart) return;
+    const gen = currentTriGen;
+    const { ref_age, tau_base } = TRI_GEN_PARAMS[gen];
+    const evArr    = TRI_EV[gen];
+    const trRefArr = TRI_TR_REF[gen];
+
+    const ageDelta     = (p.age - ref_age) * 5;   // même logique que simTR col. 3
+    const idxBonus     = 11 * p.index;
+    const tauEffective = tau_base + p.cotis_sal + p.cotis_emp;
+
+    const tris = TRI_AGE_ENTREE.map((ae, i) => {
+        const trAdj = i < 5
+            ? Math.min(100, Math.max(20, trRefArr[i] + ageDelta + idxBonus))
+            : Math.min(100, Math.max(20, trRefArr[i] + ageDelta + Math.round(idxBonus * 0.7)));
+        return computeTRIbisect(ae, p.age, evArr[i], trAdj, tauEffective);
+    });
+
+    triGenChart.data.datasets[0].data            = tris;
+    triGenChart.data.datasets[0].backgroundColor = tris.map(v =>
+        v === null ? 'rgba(100,100,100,0.4)' : v >= 0 ? 'rgba(16,185,129,0.7)' : 'rgba(239,68,68,0.65)');
+    triGenChart.data.datasets[0].borderColor     = tris.map(v =>
+        v === null ? 'rgba(100,100,100,0.6)' : v >= 0 ? 'rgba(16,185,129,0.9)' : 'rgba(239,68,68,0.85)');
+    triGenChart.update('none');
+}
+
+let currentTriGen = '1980';
+let triGenChart = null;
+
+(function initTriChart() {
+    const triCanvas = document.getElementById('tri-gen-chart');
+    if (!triCanvas) return;
+    triGenChart = new Chart(triCanvas.getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: ['D1','D2','D3','D4','D5','D6','D7','D8','D9','D10'],
+            datasets: [{
+                label: 'TRI (%)',
+                data: new Array(10).fill(0),
+                backgroundColor: new Array(10).fill('rgba(16,185,129,0.7)'),
+                borderColor:     new Array(10).fill('rgba(16,185,129,0.9)'),
+                borderWidth: 1,
+                borderRadius: 3,
+                borderSkipped: false,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: '#0f172a',
+                    borderColor: '#1e293b',
+                    borderWidth: 1,
+                    titleColor: '#e2e8f0',
+                    bodyColor: '#94a3b8',
+                    padding: 8,
+                    callbacks: {
+                        label: c => {
+                            const v = c.parsed.y;
+                            return ' TRI : ' + (v >= 0 ? '+' : '') + v.toFixed(2) + ' %';
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: { display: false },
+                    ticks: { color: '#475569', font: { size: 10 } }
+                },
+                y: {
+                    grid: { color: 'rgba(255,255,255,0.04)' },
+                    ticks: {
+                        color: '#475569',
+                        font: { size: 10 },
+                        callback: v => (v >= 0 ? '+' : '') + v.toFixed(1) + '%'
+                    }
+                }
+            },
+            animation: { duration: 350, easing: 'easeInOutQuart' }
+        },
+        plugins: [{
+            id: 'triZeroLine',
+            beforeDraw(chart) {
+                const { ctx: c, chartArea, scales } = chart;
+                if (!chartArea || !scales.y) return;
+                const y0 = scales.y.getPixelForValue(0);
+                c.save();
+                c.strokeStyle = 'rgba(255,255,255,0.25)';
+                c.lineWidth = 1;
+                c.setLineDash([4, 4]);
+                c.beginPath();
+                c.moveTo(chartArea.left, y0);
+                c.lineTo(chartArea.right, y0);
+                c.stroke();
+                c.setLineDash([]);
+                c.restore();
+            }
+        }]
+    });
+    document.getElementById('tri-interp').innerHTML = TRI_GEN_DATA['1980'].interp;
+    updateTriChart(DEFAULTS);
+})();
+
+function selectTriGen(gen) {
+    if (!triGenChart) return;
+    currentTriGen = gen;
+    document.getElementById('tri-interp').innerHTML = TRI_GEN_DATA[gen].interp;
+    document.querySelectorAll('.tri-gen-btn').forEach(b => {
+        b.classList.toggle('active', b.textContent.trim().startsWith(gen));
+    });
+    updateTriChart(getParams());
 }
 
 // ═══════════════════════════════════════════════════════════
