@@ -1440,10 +1440,9 @@ function computeBalance(y, p) {
         d += (dMig/50000) * 0.2 * migRamp * migDecay;
     }
 
-    // 6. Productivité (cumulatif à partir de 2040)
+    // 6. Productivité (cumulatif dès 2024 — salaires → cotisations)
     const dProd = p.prod - 0.7;
-    const prodFactor = Math.max(0, (y-2040)/(2070-2040));
-    d += (dProd/0.3) * 0.72 * prodFactor;
+    d += (dProd/0.3) * 0.72 * T;
 
     // 7. Chômage (effet à partir de 2032)
     const dChom = 7 - p.chom;
@@ -1451,6 +1450,17 @@ function computeBalance(y, p) {
     d += (dChom/2) * 0.28 * chomFactor;
 
     return base + d - compCostPctPIB;
+}
+
+// Intégrale trapézoïdale du solde sur 2024-2070 (% du PIB × années)
+function computeCumulativeBalance(p) {
+    let cumul = 0;
+    for (let i = 0; i < YEARS.length - 1; i++) {
+        const b1 = computeBalance(YEARS[i], p);
+        const b2 = computeBalance(YEARS[i + 1], p);
+        cumul += (b1 + b2) / 2 * (YEARS[i + 1] - YEARS[i]);
+    }
+    return cumul;
 }
 
 function computeLivingStd(p) {
@@ -1825,36 +1835,48 @@ function update() {
     document.getElementById('ks-nv').textContent =
         'En % du niveau de vie moyen de la population — '+(nvDiff>=0?'+':'')+nvDiff.toFixed(1)+' pt vs scénario COR';
 
-    // ── Status banner
+    // ── Status banner — basé sur la réduction du déficit cumulé 2024-2070
     const banner = document.getElementById('status-banner');
     const dot    = document.getElementById('status-dot');
     const txt    = document.getElementById('status-text');
 
-    if (b70 >= 0.05) {
+    const refCumul  = computeCumulativeBalance(DEFAULTS);
+    const userCumul = computeCumulativeBalance(p);
+    // score : % du déficit cumulé de référence éliminé (0%=identique, 100%=équilibré, <0%=aggravé)
+    const score = refCumul !== 0 ? (userCumul - refCumul) / Math.abs(refCumul) * 100 : 0;
+    const fmtScore = s => Math.round(Math.abs(s)) + '%';
+    const b70str = fmt(b70); // solde 2070 pour info
+
+    if (score >= 95) {
         banner.style.cssText = 'background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3)';
         dot.style.background = '#10b981';
         txt.style.color = '#10b981';
-        txt.textContent = '✅ Système excédentaire en 2070 — bravo, vous avez équilibré les retraites !';
-    } else if (b70 >= -0.3) {
+        txt.textContent = '✅ Déficit cumulé 2024–2070 quasi nul ou excédentaire — vous avez pratiquement équilibré le système !';
+    } else if (score >= 65) {
         banner.style.cssText = 'background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.2)';
         dot.style.background = '#34d399';
         txt.style.color = '#34d399';
-        txt.textContent = '🟢 Déficit quasi nul en 2070 ('+fmt(b70)+' du PIB) — système financièrement soutenable.';
-    } else if (b70 >= -1.2) {
+        txt.textContent = '🟢 Réduction majeure du déficit cumulé 2024–2070 (−'+fmtScore(score)+' vs référence COR) — solde 2070 : '+b70str+' du PIB.';
+    } else if (score >= 30) {
         banner.style.cssText = 'background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25)';
         dot.style.background = '#f59e0b';
         txt.style.color = '#f59e0b';
-        txt.textContent = '⚠️ Déficit modéré en 2070 ('+fmt(b70)+' du PIB) — des ajustements restent nécessaires.';
-    } else if (b70 >= -2.4) {
+        txt.textContent = '⚠️ Amélioration significative du déficit cumulé 2024–2070 (−'+fmtScore(score)+' vs référence COR) — solde 2070 : '+b70str+' du PIB.';
+    } else if (score >= 5) {
         banner.style.cssText = 'background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2)';
         dot.style.background = '#f87171';
         txt.style.color = '#f87171';
-        txt.textContent = '🔴 Déficit persistant en 2070 ('+fmt(b70)+' du PIB) — proche ou similaire au scénario de référence.';
+        txt.textContent = '🔴 Amélioration partielle du déficit cumulé 2024–2070 (−'+fmtScore(score)+' vs référence COR) — solde 2070 : '+b70str+' du PIB.';
+    } else if (score >= -5) {
+        banner.style.cssText = 'background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.25)';
+        dot.style.background = '#f87171';
+        txt.style.color = '#f87171';
+        txt.textContent = '🔴 Déficit cumulé 2024–2070 quasi identique au scénario de référence COR — solde 2070 : '+b70str+' du PIB.';
     } else {
         banner.style.cssText = 'background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.35)';
         dot.style.background = '#ef4444';
         txt.style.color = '#ef4444';
-        txt.textContent = '🚨 Déficit aggravé en 2070 ('+fmt(b70)+' du PIB) — pire que le scénario de référence COR.';
+        txt.textContent = '🚨 Déficit cumulé 2024–2070 aggravé de '+fmtScore(score)+' par rapport au scénario de référence COR — solde 2070 : '+b70str+' du PIB.';
     }
 
     // ── Breakdown
@@ -2213,11 +2235,7 @@ function updateCompensation(p) {
     const trNeededArr = [];
 
     TRI_AGE_ENTREE.forEach((ae, i) => {
-        const trCurrent = Math.min(100, Math.max(20,
-            i < 5
-            ? trRefArr[i] + ageDelta + idxBonus
-            : trRefArr[i] + ageDelta + Math.round(idxBonus * 0.7)
-        ));
+        const trCurrent = Math.min(100, Math.max(20, trRefArr[i] + ageDelta));
         const triTarget = triD1 + (triD10 - triD1) * i / 9;
         triTargetLine.push(parseFloat(triTarget.toFixed(3)));
         const trNeeded  = findTRforTRI(ae, p.age, evArr[i], tauEff, triTarget);
