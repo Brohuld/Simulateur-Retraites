@@ -1230,7 +1230,7 @@
             <div class="tr-section-header">
                 <div>
                     <div class="chart-title">Le taux de remplacement : le montant de la retraite par rapport au dernier salaire</div>
-                    <div style="font-size:12px;color:var(--muted);margin-top:5px;">Pour trois profils de revenus — scénario COR de référence vs votre simulation</div>
+                    <div style="font-size:12px;color:var(--muted);margin-top:5px;">Pour trois profils de revenus de la génération 1980 (départ à 64 ans) — scénario COR de référence vs votre simulation</div>
                 </div>
                 <div class="tr-note">
                     Seuls <b style="color:#e2e8f0">l'âge de départ</b> et <b style="color:#e2e8f0">l'indexation</b> agissent directement sur le taux de remplacement individuel.
@@ -1399,6 +1399,8 @@ const TR_REF = [82, 73, 43]; // D1, D5, D10
 
 // Coût de la compensation équité exprimé en % du PIB — mis à jour par updateCompensation() avant chaque calcul de solde
 let compCostPctPIB = 0;
+// TR cibles [D1, D5, D10] calculés par la compensation — null si inactive
+let compSimTR = null;
 
 function computeBalance(y, p) {
     const base = baseline(y);
@@ -1889,7 +1891,7 @@ function update() {
     // ── TR par décile
     const ageDelta = (p.age - 64) * 5;
     const idxBonus = 11 * p.index;
-    const simTR = [
+    const simTR = compSimTR ? [...compSimTR] : [
         Math.min(100, Math.max(30, TR_REF[0] + ageDelta + idxBonus)),
         Math.min(100, Math.max(30, TR_REF[1] + ageDelta + idxBonus)),
         Math.min(100, Math.max(20, TR_REF[2] + ageDelta + Math.round(idxBonus * 0.7)))
@@ -2184,6 +2186,7 @@ function updateCompensation(p) {
     // Fast path : désactivé uniquement (sliders à 0 avec checkbox active = scénario valide)
     if (!isActive) {
         compCostPctPIB = 0;
+        compSimTR = null;
         document.getElementById('comp-cost').textContent = '0 Mds€/an';
         document.getElementById('comp-cost').style.color = '#e2e8f0';
         document.getElementById('comp-impossible').style.display = 'none';
@@ -2207,6 +2210,7 @@ function updateCompensation(p) {
     let totalDelta = 0;
     let impossible = false;
     const triTargetLine = [];
+    const trNeededArr = [];
 
     TRI_AGE_ENTREE.forEach((ae, i) => {
         const trCurrent = Math.min(100, Math.max(20,
@@ -2217,9 +2221,17 @@ function updateCompensation(p) {
         const triTarget = triD1 + (triD10 - triD1) * i / 9;
         triTargetLine.push(parseFloat(triTarget.toFixed(3)));
         const trNeeded  = findTRforTRI(ae, p.age, evArr[i], tauEff, triTarget);
+        trNeededArr.push(trNeeded);
         if (trNeeded > 100) impossible = true;
         totalDelta += (trNeeded - trCurrent) / 100 * COMP_SALAIRES_ANNUELS[i] * COMP_N_PAR_DECILE;
     });
+
+    // TR cibles pour D1 (i=0), D5 (i=4), D10 (i=9) → injectés dans le graphe TR
+    compSimTR = [
+        Math.round(trNeededArr[0]),
+        Math.round(trNeededArr[4]),
+        Math.round(trNeededArr[9])
+    ];
 
     const costMds = totalDelta / 1e9;
     compCostPctPIB = costMds / COMP_PIB * 100;
