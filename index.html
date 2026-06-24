@@ -962,7 +962,7 @@
 <div class="container">
     <header>
         <div class="badge">Conseil d'Orientation des Retraites · Rapport Juin 2026</div>
-        <h1>Simulateur du système de retraite</h1>
+        <h1>Simulateur du système de retraite <a href="notice.html" title="Guide d'utilisation" style="display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;background:#fbbf24;border:none;border-radius:50%;color:#1e293b;-webkit-text-fill-color:#1e293b;font-size:1.3rem;font-weight:900;text-decoration:none;vertical-align:middle;margin-left:12px;transition:background .2s;" onmouseover="this.style.background='#f59e0b'" onmouseout="this.style.background='#fbbf24'">?</a></h1>
         <p>Ajustez les leviers et visualisez en temps réel l'impact sur l'équilibre financier des retraites à l'horizon 2070.</p>
     </header>
 
@@ -2227,7 +2227,7 @@ function updateCompensation(p) {
     const trRefArr = TRI_TR_REF[gen];
     const ageDelta  = (p.age - ref_age) * 5;
     const idxBonus  = 11 * p.index;
-    const tauEff    = tau_base + p.cotis_sal + p.cotis_emp;
+    const tauEff    = tau_base + p.cotis_sal + p.cotis_emp; // cotisations affectent le TRI
 
     let totalDelta = 0;
     let impossible = false;
@@ -2251,7 +2251,7 @@ function updateCompensation(p) {
         Math.round(trNeededArr[9])
     ];
 
-    const costMds = totalDelta / 1e9;
+    const costMds = totalDelta / 1e9; // peut être négatif : effort de D10 = recette pour le système
     compCostPctPIB = costMds / COMP_PIB * 100;
 
 

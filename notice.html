@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notice — Simulateur de retraites</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --surface: #1e293b;
+    --surface2: #263348;
+    --border: #334155;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --accent: #6366f1;
+    --accent2: #10b981;
+    --warn: #f59e0b;
+    --danger: #ef4444;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 16px;
+    line-height: 1.7;
+  }
+
+  .page {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+  }
+
+  /* Back link */
+  .back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 14px;
+    margin-bottom: 36px;
+    transition: color .2s;
+  }
+  .back:hover { color: var(--text); }
+
+  /* Title */
+  h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    background: linear-gradient(135deg, #a5b4fc, #34d399);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .subtitle {
+    color: var(--muted);
+    font-size: 1rem;
+    margin-bottom: 48px;
+  }
+
+  /* Sections */
+  h2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #a5b4fc;
+    margin: 48px 0 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  h3 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--text);
+    margin: 28px 0 10px;
+  }
+  p { margin-bottom: 14px; color: var(--text); }
+  p:last-child { margin-bottom: 0; }
+
+  /* Cards */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin: 16px 0;
+  }
+  .card-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 16px 0;
+  }
+  @media (max-width: 600px) { .card-row { grid-template-columns: 1fr; } }
+
+  /* Indicator illustration */
+  .indicator {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin: 16px 0;
+  }
+  .indicator-title {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .indicator-body { color: var(--muted); font-size: .95rem; }
+
+  /* Gauge / bar illustration */
+  .gauge {
+    background: var(--surface2);
+    border-radius: 8px;
+    height: 32px;
+    position: relative;
+    overflow: hidden;
+    margin: 12px 0 6px;
+    display: flex;
+    align-items: center;
+  }
+  .gauge-fill {
+    height: 100%;
+    border-radius: 8px;
+    position: absolute;
+    left: 0;
+    top: 0;
+  }
+  .gauge-label {
+    position: relative;
+    z-index: 1;
+    padding: 0 12px;
+    font-size: .85rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .gauge-axis {
+    display: flex;
+    justify-content: space-between;
+    font-size: .78rem;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+
+  /* Timeline chart simulation */
+  .timeline {
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+    height: 80px;
+    margin: 16px 0 8px;
+    padding: 0 4px;
+  }
+  .timeline-bar {
+    flex: 1;
+    border-radius: 3px 3px 0 0;
+    position: relative;
+  }
+  .timeline-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: .78rem;
+    color: var(--muted);
+    padding: 0 4px;
+  }
+
+  /* Example box */
+  .example {
+    background: #1a2744;
+    border-left: 3px solid var(--accent);
+    border-radius: 0 8px 8px 0;
+    padding: 14px 18px;
+    margin: 14px 0;
+    font-size: .95rem;
+  }
+  .example strong { color: #a5b4fc; }
+
+  /* Lever card */
+  .lever-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 22px;
+    margin: 14px 0;
+  }
+  .lever-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .lever-icon { font-size: 1.3rem; }
+  .lever-name { font-weight: 700; font-size: 1rem; }
+  .lever-desc { color: var(--muted); font-size: .93rem; margin-bottom: 10px; }
+  .lever-effect {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+  }
+  .tag {
+    font-size: .8rem;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-weight: 600;
+  }
+  .tag-green { background: #064e3b; color: #34d399; }
+  .tag-red { background: #450a0a; color: #fca5a5; }
+  .tag-blue { background: #1e3a5f; color: #93c5fd; }
+  .tag-orange { background: #431407; color: #fdba74; }
+
+  /* Chip COR */
+  .cor-ref {
+    display: inline-block;
+    font-size: .78rem;
+    padding: 2px 9px;
+    background: #2d1b69;
+    color: #a5b4fc;
+    border-radius: 10px;
+    margin-left: 8px;
+    font-weight: 500;
+  }
+
+  /* Highlight box */
+  .highlight {
+    background: #0c2340;
+    border: 1px solid #1e4976;
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin: 16px 0;
+    font-size: .95rem;
+  }
+  .highlight strong { color: #60a5fa; }
+
+  /* Separator */
+  hr { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+
+  /* Table des matières */
+  .toc {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin: 0 0 40px;
+  }
+  .toc-title {
+    font-size: .85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--muted);
+    margin-bottom: 14px;
+  }
+  .toc ol { padding-left: 18px; }
+  .toc > ol > li { margin-bottom: 6px; }
+  .toc > ol > li > ol { margin-top: 4px; }
+  .toc > ol > li > ol > li { margin-bottom: 2px; }
+  .toc a { color: #a5b4fc; text-decoration: none; font-size: .93rem; }
+  .toc a:hover { text-decoration: underline; color: #c7d2fe; }
+  .toc .toc-sub a { color: var(--muted); font-size: .88rem; }
+  .toc .toc-sub a:hover { color: var(--text); }
+
+  /* TRI scale illustration */
+  .tri-scale {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--surface2);
+    border-radius: 8px;
+    padding: 10px 16px;
+    margin: 12px 0;
+    font-size: .85rem;
+    gap: 4px;
+  }
+  .tri-neg { color: var(--danger); font-weight: 600; }
+  .tri-zero { color: var(--warn); font-weight: 600; }
+  .tri-pos { color: var(--accent2); font-weight: 600; }
+  .tri-arrow { color: var(--muted); font-size: 1.1rem; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <a href="index.html" class="back">← Retour au simulateur</a>
+
+  <h1>📖 Guide du simulateur</h1>
+  <p class="subtitle">Comprendre le système de retraites français — et les leviers pour l'équilibrer</p>
+
+  <nav class="toc">
+    <div class="toc-title">Table des matières</div>
+    <ol>
+      <li><a href="#vue-ensemble">Vue d'ensemble</a></li>
+      <li><a href="#indicateurs">Les indicateurs</a>
+        <ol>
+          <li class="toc-sub"><a href="#solde">Le solde du système</a></li>
+          <li class="toc-sub"><a href="#taux-remplacement">Le taux de remplacement</a></li>
+          <li class="toc-sub"><a href="#tri">Le taux de rendement interne (TRI)</a></li>
+        </ol>
+      </li>
+      <li><a href="#leviers-macro">Les leviers macroéconomiques</a>
+        <ol>
+          <li class="toc-sub"><a href="#age">Âge légal de départ</a></li>
+          <li class="toc-sub"><a href="#cotis-sal">Cotisations salariales</a></li>
+          <li class="toc-sub"><a href="#cotis-pat">Cotisations patronales</a></li>
+          <li class="toc-sub"><a href="#indexation">Indexation des pensions</a></li>
+          <li class="toc-sub"><a href="#fecondite">Fécondité</a></li>
+          <li class="toc-sub"><a href="#migration">Solde migratoire</a></li>
+          <li class="toc-sub"><a href="#productivite">Productivité horaire</a></li>
+          <li class="toc-sub"><a href="#chomage">Taux de chômage</a></li>
+        </ol>
+      </li>
+      <li><a href="#equite">Les leviers d'équité</a></li>
+      <li><a href="#resultats">Comment lire les résultats ?</a></li>
+    </ol>
+  </nav>
+
+  <!-- ======================================= -->
+  <h2 id="vue-ensemble">Vue d'ensemble</h2>
+
+  <p>Ce simulateur est fondé sur les projections du <strong>Conseil d'Orientation des Retraites (COR)</strong>, l'organisme officiel qui modélise l'avenir financier du système de retraites français. Il vous permet d'explorer ce qui se passerait si on activait différents leviers de réforme : reculer l'âge de départ, modifier les cotisations, changer les règles d'indexation des pensions, etc.</p>
+
+  <div class="highlight">
+    <strong>Deux questions fondamentales</strong><br>
+    1. <strong>Les comptes sont-ils à l'équilibre ?</strong> (le système encaisse-t-il autant qu'il dépense ?)<br>
+    2. <strong>Est-ce équitable entre générations et entre niveaux de revenus ?</strong> (tout le monde a-t-il un retour proportionnel à ce qu'il a versé ?)
+  </div>
+
+  <p>Le simulateur ne prétend pas à une précision absolue — les projections à 50 ans comportent une marge d'incertitude importante. Son objectif est de donner des ordres de grandeur et d'illustrer les tensions entre équilibre financier et justice sociale.</p>
+
+  <hr>
+
+  <!-- ======================================= -->
+  <h2 id="indicateurs">Les indicateurs</h2>
+
+  <!-- Solde -->
+  <div class="indicator">
+    <div class="indicator-title" id="solde">📊 Le solde du système</div>
+    <div class="indicator-body">
+      <p>Le solde mesure la différence entre ce que le système <strong>encaisse</strong> (cotisations des actifs) et ce qu'il <strong>dépense</strong> (pensions des retraités). Il est exprimé en <strong>pourcentage du PIB</strong>.</p>
+
+      <p><strong>Pourquoi le PIB ?</strong> Parce qu'un déficit de 60 milliards d'euros n'a pas le même poids si la richesse nationale est de 2 000 ou de 4 000 milliards. Le rapport au PIB permet de comparer dans le temps.</p>
+
+      <div class="gauge-axis"><span>Excédent ✅</span><span>Déficit croissant 🔴</span></div>
+      <div class="gauge" style="background: linear-gradient(to right, #064e3b, #1e293b, #450a0a);">
+        <div class="gauge-label" style="left:50%; position:absolute;">← 0 % du PIB →</div>
+      </div>
+
+      <p style="margin-top:12px;">Le scénario de référence COR 2026 prévoit un déficit de <strong>−2,4 % du PIB en 2070</strong>, soit environ 80 milliards d'euros aux prix d'aujourd'hui. Le système est actuellement proche de l'équilibre mais se dégrade progressivement avec le vieillissement démographique.</p>
+
+      <div class="example">
+        <strong>Exemple :</strong> Si le solde passe de −2,4 % à −1,2 % du PIB en 2070, on a divisé le déficit par deux. Cela représente une économie d'environ 40 milliards d'euros par an.
+      </div>
+    </div>
+  </div>
+
+  <!-- Taux de remplacement -->
+  <div class="indicator">
+    <div class="indicator-title" id="taux-remplacement">💶 Le taux de remplacement</div>
+    <div class="indicator-body">
+      <p>Le taux de remplacement mesure combien un retraité perçoit de pension par rapport à son <strong>dernier salaire</strong>. Un taux de 70 % signifie qu'une personne qui gagnait 2 000 € net touchera 1 400 € de pension.</p>
+
+      <p>Il varie fortement selon les revenus :</p>
+
+      <div class="card-row">
+        <div class="card">
+          <div style="color:#34d399;font-weight:700;font-size:1.1rem;">D1 — Bas salaires</div>
+          <div style="font-size:1.8rem;font-weight:700;margin:8px 0;">~82 %</div>
+          <div style="color:var(--muted);font-size:.85rem;">Salaire d'env. 1 600 €/mois. Le taux est élevé grâce au minimum contributif.</div>
+        </div>
+        <div class="card">
+          <div style="color:#60a5fa;font-weight:700;font-size:1.1rem;">D5 — Salaires médians</div>
+          <div style="font-size:1.8rem;font-weight:700;margin:8px 0;">~73 %</div>
+          <div style="color:var(--muted);font-size:.85rem;">Salaire d'env. 2 100 €/mois. Régime général, sans dispositif spécifique.</div>
+        </div>
+        <div class="card">
+          <div style="color:#f59e0b;font-weight:700;font-size:1.1rem;">D10 — Hauts salaires</div>
+          <div style="font-size:1.8rem;font-weight:700;margin:8px 0;">~43 %</div>
+          <div style="color:var(--muted);font-size:.85rem;">Salaire d'env. 9 500 €/mois. Le plafond de la Sécu plafonne les droits.</div>
+        </div>
+        <div class="card" style="display:flex;align-items:center;">
+          <div style="color:var(--muted);font-size:.9rem;">Ces valeurs sont celles du scénario de référence COR pour la génération 1980 partant à 64 ans après 43 ans de carrière.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TRI -->
+  <div class="indicator">
+    <div class="indicator-title" id="tri">📈 Le taux de rendement interne (TRI)</div>
+    <div class="indicator-body">
+      <p>Le TRI répond à la question : <strong>si je traitais mes cotisations comme un placement financier, quel taux d'intérêt annuel obtiendrais-je ?</strong></p>
+
+      <p>Il tient compte de tout : ce qu'on verse pendant sa carrière, l'âge auquel on part, et combien on vit à la retraite.</p>
+
+      <div class="tri-scale">
+        <span class="tri-neg">−2 % ou moins<br><small>On reçoit nettement moins<br>qu'on a versé</small></span>
+        <span class="tri-arrow">→</span>
+        <span class="tri-zero">0 %<br><small>Équilibre : on récupère<br>exactement ce qu'on a versé</small></span>
+        <span class="tri-arrow">→</span>
+        <span class="tri-pos">+2 % ou plus<br><small>On reçoit plus<br>qu'on a versé</small></span>
+      </div>
+
+      <p>Un TRI <strong>négatif</strong> ne signifie pas forcément que le système est injuste — il peut refléter un effort de solidarité voulu (financer les retraites des autres, couvrir les carrières incomplètes, etc.).</p>
+
+      <div class="example">
+        <strong>Pourquoi le TRI varie selon les déciles ?</strong><br>
+        D1 commence à travailler jeune (vers 19 ans), a une carrière longue, et une espérance de vie plus courte — le système ne lui est pas très favorable en rendement pur. D10 commence à travailler tard (études longues), vit plus longtemps à la retraite — même avec un taux de remplacement plus faible, son TRI peut être meilleur.
+      </div>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- ======================================= -->
+  <h2 id="leviers-macro">Les leviers macroéconomiques</h2>
+
+  <p>Ces leviers agissent directement sur l'équilibre financier du système. Leur effet est progressif : les changements structurels mettent des années à se traduire en flux financiers.</p>
+
+  <!-- Âge -->
+  <div class="lever-card">
+    <div class="lever-header">
+      <span class="lever-icon" id="age">🎯</span>
+      <span class="lever-name">Âge légal de départ</span>
+      <span class="cor-ref">Réf. : 64 ans</span>
+    </div>
+    <div class="lever-desc">L'âge minimum auquel on peut liquider sa retraite à taux plein (sous réserve d'avoir le nombre de trimestres requis).</div>
+    <p>Reculer l'âge de départ améliore le solde de deux façons simultanées : les actifs cotisent plus longtemps, et les retraités perçoivent leur pension pendant moins d'années. C'est le levier le plus puissant à court terme, mais il a un coût social : il pénalise les travailleurs ayant commencé jeune et ceux aux métiers pénibles.</p>
+    <div class="example">
+      <strong>Exemple :</strong> Passer de 64 à 67 ans améliore le solde de l'ordre de +1 % du PIB à l'horizon 2070. C'est significatif — mais cela représente aussi 3 années de vie active supplémentaires pour tous les travailleurs.
+    </div>
+    <div class="lever-effect">
+      <span class="tag tag-green">↑ Solde : fort</span>
+      <span class="tag tag-blue">↓ TRI D1 : pénalise les carrières longues</span>
+    </div>
+  </div>
+
+  <!-- Cotisations sal -->
+  <div class="lever-card">
+    <div class="lever-header">
+      <span class="lever-icon" id="cotis-sal">💼</span>
+      <span class="lever-name">Cotisations salariales</span>
+      <span class="cor-ref">Réf. : taux actuel</span>
+    </div>
+    <div class="lever-desc">La part du salaire brut prélevée directement sur la fiche de paie du salarié pour financer les retraites.</div>
+    <p>Augmenter les cotisations salariales apporte des recettes immédiates au système, mais réduit le salaire net des actifs (moins de pouvoir d'achat). Inversement, les baisser améliore le pouvoir d'achat mais creuse le déficit.</p>
+    <div class="example">
+      <strong>Exemple :</strong> Une hausse de +1 point de cotisations (ex : passer de 11 % à 12 %) représente environ 5 à 6 milliards d'euros de recettes supplémentaires par an pour le système.
+    </div>
+    <div class="lever-effect">
+      <span class="tag tag-green">↑ Solde si hausse</span>
+      <span class="tag tag-red">↓ Salaire net</span>
+      <span class="tag tag-blue">↓ TRI (on cotise plus pour la même pension)</span>
+    </div>
+  </div>
+
+  <!-- Cotisations pat -->
+  <div class="lever-card">
+    <div class="lever-header">
+      <span class="lever-icon" id="cotis-pat">🏭</span>
+      <span class="lever-name">Cotisations patronales</span>
+      <span class="cor-ref">Réf. : taux actuel</span>
+    </div>
+    <div class="lever-desc">La part versée par l'employeur sur chaque salaire, en sus du salaire brut du salarié.</div>
+    <p>Contrairement aux cotisations salariales, elles ne réduisent pas directement le salaire net — mais elles augmentent le coût du travail pour l'entreprise, ce qui peut peser sur l'emploi ou les salaires à long terme. L'effet sur le solde est donc légèrement amoindri par ces effets indirects.</p>
+    <div class="lever-effect">
+      <span class="tag tag-green">↑ Solde si hausse (effet moindre qu'en salarial)</span>
+      <span class="tag tag-orange">⚠ Coût du travail : risque sur l'emploi</span>
+    </div>
+  </div>
+
+  <!-- Indexation -->
+  <div class="lever-card">
+    <div class="lever-header">
+      <span class="lever-icon" id="indexation">📊</span>
+      <span class="lever-name">Indexation des pensions</span>
+      <span class="cor-ref">Réf. : sur les prix</span>
+    </div>
+    <div class="lever-desc">La règle qui détermine comment les pensions évoluent chaque année une fois liquidées.</div>
+    <p>Actuellement, les pensions sont revalorisées selon l'inflation (les prix). Deux autres options existent :</p>
+    <p><strong>Désindexation (gel) :</strong> les pensions ne bougent plus. Le pouvoir d'achat des retraités s'érode progressivement par rapport aux actifs, mais le système économise. Effet financier croissant avec le temps.</p>
+    <p><strong>Indexation sur les salaires :</strong> les pensions suivent l'évolution du niveau de vie général. Le pouvoir d'achat des retraités est préservé, mais le coût pour le système augmente.</p>
+    <div class="example">
+      <strong>Exemple :</strong> Un gel total des pensions pendant 46 ans (2024–2070) améliorerait le solde d'environ +0,5 % du PIB en 2070 — mais les retraités de 2070 auraient perdu en pouvoir d'achat relatif l'équivalent de plusieurs décennies de croissance salariale.
+    </div>
+    <div class="lever-effect">
+      <span class="tag tag-green">↑ Solde si désindexation</span>
+      <span class="tag tag-red">↓ Niveau de vie des retraités</span>
+      <span class="tag tag-blue">↓ TRI (pension vaut moins en termes réels)</span>
+    </div>
+  </div>
+
+  <!-- Fécondité -->
+  <div class="lever-card">
+    <div class="lever-header">
+      <span class="lever-icon" id="fecondite">👶</span>
+      <span class="lever-name">Fécondité</span>
+      <span class="cor-ref">Réf. : 1,45 enfant/femme</span>
+    </div>
+    <div class="lever-desc">L'indice conjoncturel de fécondité — le nombre moyen d'enfants par femme en âge de procréer.</div>
+    <p>C'est le levier au <strong>délai d'action le plus long</strong> : un enfant né aujourd'hui n'entrera sur le marché du travail que dans 18 à 22 ans. Son effet sur le solde du système n'est donc visible qu'à partir de 2042–2045. C'est un investissement sur la démographie future, pas une solution à court terme.</p>
+    <div class="example">
+      <strong>Exemple :</strong> Remonter la fécondité à 1,8 enfant/femme (niveau de 2010) n'aurait aucun effet sur le solde avant 2042, mais améliorerait significativement l'équilibre à l'horizon 2060–2070.
+    </div>
+    <div class="lever-effect">
+      <span class="tag tag-green">↑ Solde à long terme (après 2042)</span>
+      <span class="tag tag-orange">⚠ Aucun effet avant 2042</span>
+    </div>
+  </div>
+
+  <!-- Migration -->
+  <div class="lever-card">
+    <div class="lever-header">
+      <span class="lever-icon" id="migration">🌍</span>
+      <span class="lever-name">Solde migratoire</span>
+      <span class="cor-ref">Réf. : +150 000/an</span>
+    </div>
+    <div class="lever-desc">Le nombre net d'entrées sur le territoire (entrées moins sorties) chaque année.</div>
+    <p>Les nouveaux arrivants en âge de travailler cotisent immédiatement, ce qui améliore le solde à court terme. Mais ils vieillissent aussi et prendront leur retraite : l'effet positif se dilue progressivement. La migration est un <strong>soutien utile mais limité</strong> — elle ne résout pas structurellement le problème du vieillissement.</p>
+    <div class="lever-effect">
+      <span class="tag tag-green">↑ Solde à court terme</span>
+      <span class="tag tag-orange">↘ Effet décroissant à long terme</span>
+    </div>
+  </div>
+
+  <!-- Productivité -->
+  <div class="lever-card">
+    <div class="lever-header">
+      <span class="lever-icon" id="productivite">⚡</span>
+      <span class="lever-name">Productivité horaire</span>
+      <span class="cor-ref">Réf. : +0,7 %/an (COR 2026)</span>
+    </div>
+    <div class="lever-desc">Le rythme auquel la valeur produite par heure de travail augmente chaque année.</div>
+    <p>Une économie plus productive génère des salaires plus élevés, donc des cotisations plus élevées. C'est la <strong>principale variable de long terme</strong> : une différence de 0,5 point de croissance de la productivité, maintenue pendant 46 ans, change radicalement la situation du système en 2070. Le scénario COR 2026 retient 0,7 %/an — identique au COR 2025.</p>
+    <div class="example">
+      <strong>Exemple :</strong> La moyenne des pays de l'OCDE tourne autour de +1,0 %/an sur longue période. Si la France atteignait ce rythme (contre 0,7 % dans le scénario central), le déficit 2070 serait réduit d'environ 0,3 à 0,5 point de PIB. C'est utile, mais insuffisant pour résorber seul le déficit.
+    </div>
+    <div class="lever-effect">
+      <span class="tag tag-green">↑ Solde progressivement</span>
+      <span class="tag tag-blue">Effet croissant dans le temps</span>
+    </div>
+  </div>
+
+  <!-- Chômage -->
+  <div class="lever-card">
+    <div class="lever-header">
+      <span class="lever-icon" id="chomage">👥</span>
+      <span class="lever-name">Taux de chômage</span>
+      <span class="cor-ref">Réf. : 7 %</span>
+    </div>
+    <div class="lever-desc">La part de la population active sans emploi.</div>
+    <p>Un chômage plus faible signifie plus de personnes qui cotisent. L'effet est rapide (quelques années) mais plafonné : on ne peut pas descendre indéfiniment en dessous du "plein emploi". Le scénario central COR retient 7 %, ce qui est déjà inférieur au niveau actuel — une hypothèse volontariste.</p>
+    <div class="lever-effect">
+      <span class="tag tag-green">↑ Solde si baisse du chômage</span>
+      <span class="tag tag-blue">Effet visible à partir de 2030–2035</span>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- ======================================= -->
+  <h2 id="equite">Les leviers d'équité : redistribution par décile</h2>
+
+  <p>Ces deux curseurs permettent de simuler une <strong>redistribution des pensions entre niveaux de revenus</strong>, en ciblant un taux de rendement souhaité pour chaque décile. Ce n'est pas un levier macroéconomique au sens strict — c'est un <strong>choix de société</strong> sur la façon de répartir l'effort.</p>
+
+  <div class="highlight">
+    <strong>Rappel : déciles de revenus</strong><br>
+    D1 = les 10 % de salariés les moins bien payés · D5 = revenus médians · D10 = les 10 % les mieux payés.<br>
+    Les curseurs fixent le rendement souhaité pour D1 et D10 ; les déciles intermédiaires sont interpolés.
+  </div>
+
+  <div class="lever-card">
+    <div class="lever-header">
+      <span class="lever-icon">⚖️</span>
+      <span class="lever-name">TRI cible D1 et TRI cible D10</span>
+    </div>
+    <div class="lever-desc">Le taux de rendement que l'on souhaite garantir (ou imposer) à chaque extrémité de l'échelle des revenus.</div>
+
+    <p><strong>TRI D1 positif :</strong> on garantit aux travailleurs modestes un retour sur cotisations supérieur à zéro. Cela nécessite de verser un complément de pension — un coût pour le système.</p>
+
+    <p><strong>TRI D10 négatif :</strong> on demande aux hauts revenus d'accepter un rendement inférieur à ce qu'ils auraient "droit" en pur calcul actuariel. Leur pension est volontairement réduite — ce qui génère une économie pour le système. C'est un mécanisme de solidarité explicite.</p>
+
+    <p>Le coût net (ou l'économie nette) de cette redistribution est affiché dans le simulateur et intégré au solde global.</p>
+
+    <div class="example">
+      <strong>La situation actuelle (curseurs à zéro) :</strong><br>
+      Sans redistribution, le graphique du simulateur révèle une inégalité de fait : D1 affiche un TRI <strong>négatif</strong> (−0,2 % environ), tandis que D5 à D8 sont positifs, et D9–D10 repassent légèrement négatifs.<br><br>
+      Pourquoi D1 est-il pénalisé ? Les travailleurs modestes commencent à travailler jeunes, ont des carrières longues — et une <strong>espérance de vie plus courte</strong>. Résultat : ils cotisent beaucoup, mais touchent leur retraite pendant moins longtemps. En pur calcul financier, le système ne leur est pas favorable.<br><br>
+      Pourquoi D9–D10 sont-ils aussi légèrement négatifs ? Malgré une espérance de vie plus longue (qui devrait améliorer leur TRI), leur <strong>taux de remplacement est faible</strong> (43 % pour D10) car le système plafonne les droits au-delà d'un certain salaire. Ils contribuent donc plus au financement collectif qu'ils ne récupèrent en proportion.<br><br>
+      Les déciles D4 à D7 — les salaires intermédiaires — sont les grands bénéficiaires du système actuel en termes de rendement pur.<br><br>
+      <strong>Les curseurs d'équité permettent de corriger ces déséquilibres</strong> en fixant des cibles de rendement différentes : par exemple, garantir un TRI minimum positif à D1, ou demander un effort plus explicite à D10.
+    </div>
+    <div style="margin:16px 0;text-align:center;">
+      <p style="color:var(--muted);font-size:.85rem;margin-bottom:8px;">Exemple — TRI par décile, génération 1980, scénario de référence (curseurs à zéro)</p>
+      <img src="tri-exemple.png" alt="Graphique TRI par décile — génération 1980" style="width:260px;border-radius:10px;border:1px solid var(--border);">
+    </div>
+
+    <p>On peut choisir de corriger ces inégalités en jouant sur les curseurs d'équité. Dans l'exemple ci-dessous, le TRI de D1 a été fixé à +0,55 % et celui de D10 à −0,15 %. Le coût global est neutre pour le système, mais correspond à une baisse de "rentabilité" pour les déciles du milieu, qui financent en partie la redistribution.</p>
+
+    <div style="margin:16px 0;display:flex;gap:16px;align-items:flex-start;justify-content:center;flex-wrap:wrap;">
+      <div style="text-align:center;">
+        <p style="color:var(--muted);font-size:.85rem;margin-bottom:8px;">Réglage des curseurs</p>
+        <img src="tri-exemple%203.png" alt="Curseurs TRI D1=+0,55% D10=-0,15%" style="width:260px;border-radius:10px;border:1px solid var(--border);">
+      </div>
+      <div style="text-align:center;">
+        <p style="color:var(--muted);font-size:.85rem;margin-bottom:8px;">TRI résultant par décile</p>
+        <img src="tri-exemple%202.png" alt="Graphique TRI résultant avec redistribution" style="width:260px;border-radius:10px;border:1px solid var(--border);">
+      </div>
+    </div>
+
+    <div class="lever-effect">
+      <span class="tag tag-green">D10 négatif → recette pour le système</span>
+      <span class="tag tag-red">D1 positif → coût pour le système</span>
+      <span class="tag tag-blue">Effet net variable selon les curseurs</span>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- ======================================= -->
+  <h2 id="resultats">Comment lire les résultats ?</h2>
+
+  <div class="card">
+    <h3 style="margin-top:0;">Le solde en 2070</h3>
+    <p>C'est le chiffre de référence : le déficit (ou excédent) du système en fin de période. Le scénario COR est à −2,4 % du PIB. Tout scénario qui réduit ce chiffre améliore la situation.</p>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:0;">Le déficit cumulé 2024–2070</h3>
+    <p>Plus parlant que le seul chiffre de 2070 : c'est l'intégrale du déficit sur toute la période, en % du PIB × années. Il mesure l'effort total à fournir. Le scénario de référence COR correspond à environ −50 points de PIB·années cumulés.</p>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:0;">Le message de statut</h3>
+    <p>La banderole en haut du simulateur compare votre scénario au scénario de référence COR. Un score de 100 % signifie que vous avez <em>entièrement</em> résorbé le déficit cumulé. Un score de 50 % signifie que vous en avez éliminé la moitié.</p>
+  </div>
+
+  <hr>
+
+  <div style="color:var(--muted);font-size:.85rem;text-align:center;margin-top:32px;">
+    Simulateur fondé sur les rapports COR 2025 et 2026 · Données de projection : scénario central<br>
+    Ce simulateur est un outil pédagogique. Les chiffres sont des ordres de grandeur, pas des prévisions.
+  </div>
+
+</div>
+</body>
+</html>
