@@ -1447,7 +1447,7 @@ function computeBalance(y, p) {
     // 7. Chômage (effet à partir de 2032)
     const dChom = 7 - p.chom;
     const chomFactor = y>2032 ? Math.min(1,(y-2032)/10) : 0;
-    d += (dChom/2) * 0.28 * chomFactor;
+    d += (dChom/2) * 0.20 * chomFactor;
 
     return base + d - compCostPctPIB;
 }
