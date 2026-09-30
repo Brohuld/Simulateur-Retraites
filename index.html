@@ -896,8 +896,9 @@
         }
         .comp-ref-tick {
             position: absolute;
-            /* (0.18+2)/4 = 54.5% ; correction thumb ≈ 8px sur largeur totale */
-            left: calc(54.5% - 8px * (1 - 2 * 0.545));
+            /* réf. = TRI uniforme à coût nul, génération 1980 : +1,20 %
+               (1.20+2)/4 = 80% ; correction thumb ≈ 8px sur largeur totale */
+            left: calc(80% - 8px * (1 - 2 * 0.80));
             top: 100%;
             display: flex;
             flex-direction: column;
@@ -1099,20 +1100,20 @@
                     <div class="comp-slider-row">
                         <span class="comp-slider-label">D1 (bas sal.)</span>
                         <div class="comp-slider-wrap">
-                            <input type="range" id="comp-d1" min="-2" max="2" step="0.05" value="0"
+                            <input type="range" id="comp-d1" min="-2" max="2" step="0.05" value="1.2"
                                    oninput="onCompSlider()">
                             <span class="comp-ref-tick"><span class="comp-ref-tick-label">réf.</span></span>
                         </div>
-                        <span class="comp-tri-val" id="comp-d1-val">+0.0%</span>
+                        <span class="comp-tri-val" id="comp-d1-val">+1.20%</span>
                     </div>
                     <div class="comp-slider-row">
                         <span class="comp-slider-label">D10 (haut sal.)</span>
                         <div class="comp-slider-wrap">
-                            <input type="range" id="comp-d10" min="-2" max="2" step="0.05" value="0"
+                            <input type="range" id="comp-d10" min="-2" max="2" step="0.05" value="1.2"
                                    oninput="onCompSlider()">
                             <span class="comp-ref-tick"><span class="comp-ref-tick-label">réf.</span></span>
                         </div>
-                        <span class="comp-tri-val" id="comp-d10-val">+0.0%</span>
+                        <span class="comp-tri-val" id="comp-d10-val">+1.20%</span>
                     </div>
                     <div class="comp-results">
                         <div class="comp-result-box">
@@ -1340,7 +1341,7 @@
                 (τ × salaire × durée carrière) et des pensions reçues (TR × salaire × durée retraite).
                 Paramètres par décile : taux de cotisation τ (~18–29 % selon génération, COR 2026 p.134) ·
                 taux de remplacement brut (COR 2026 : D1 = 82 %, D5 = 73 %, D10 = 43 %) ·
-                espérance de vie différenciée par CSP (DREES 2013 + INSEE 2020-22) ·
+                espérance de vie des hommes par génération (INSEE 2023, à 65 ans), écart D1–D10 de 8 ans estimé (DREES 2013) ·
                 âge d'entrée estimé (D1 = 19 ans, D5 = 22 ans, D10 = 25 ans). (* 2020 : projection prospective.)
             </div>
 
@@ -1960,16 +1961,16 @@ function update() {
 // Textes d'interprétation par génération (les TRI affichés sont calculés dynamiquement par updateTriChart)
 const TRI_GEN_DATA = {
     "1960": {
-        interp: "Tous les déciles bénéficient d'un TRI positif. La retraite à 61 ans avec des cotisations faibles (~18 %) a rendu le système très généreux pour toutes les catégories. Le pic se situe en D5–D6 (classe moyenne supérieure), où un bon taux de remplacement se combine à une espérance de vie favorable."
+        interp: "La génération la plus favorisée : TRI compris entre +2,2 % et +3,1 % selon le décile. Départ à 61 ans, cotisations faibles (~18 %) et retraite longue : un homme né en 1960 qui atteint 65 ans vit encore 21 ans en moyenne (INSEE). Le pic se situe en D5–D6."
     },
     "1980": {
-        interp: "Interprétation : pour la génération 1980 par exemple, D1 (ouvrier) est pénalisé par une espérance de vie courte (~77 ans) qui ne compense pas son taux de remplacement de 82 % — seulement 13 ans de retraite pour ~45 ans de cotisations. À l'autre extrême, D9–D10 (cadres) ont une espérance de vie plus longue mais un taux de remplacement faible (43 %) insuffisant pour compenser. <span style=\"font-weight:700;color:var(--orange)\">C'est la classe médiane (D4–D5) qui tire le meilleur parti du système.</span>"
+        interp: "Interprétation : pour la génération 1980, tous les déciles ont un TRI positif, mais inégal. D1 (ouvrier) a une espérance de vie plus courte (~85 ans contre ~93 ans pour D10), ce qui limite la durée de sa retraite malgré un taux de remplacement de 82 %. D9–D10 (cadres) vivent plus longtemps mais leur taux de remplacement faible (43 %) les place en bas de l'échelle. <span style=\"font-weight:700;color:var(--orange)\">C'est la classe médiane (D4–D5) qui tire le meilleur parti du système.</span>"
     },
     "2000": {
-        interp: "Le gain d'espérance de vie (+7–8 ans vs 1980) redresse tous les profils en territoire positif, malgré des cotisations plus élevées (~28 %). D1 en bénéficie proportionnellement le plus : chaque année supplémentaire compte davantage quand la retraite ne durait que 13 ans. La bosse centrale (D4–D5) persiste."
+        interp: "TRI légèrement inférieur à celui de la génération 1980 pour tous les déciles : le gain d'espérance de vie (environ +2 ans à 65 ans, INSEE) ne compense pas tout à fait des cotisations plus élevées (~28 % contre ~25 %). La bosse centrale (D4–D5) persiste."
     },
     "2020": {
-        interp: "Projection très incertaine. Si l'espérance de vie continue à progresser (+11 ans vs 1980), tous les profils resteraient en territoire positif malgré des cotisations plus élevées (~29 %). La courbe s'aplatit : le système deviendrait moins inégalitaire en termes actuariels — à condition que les écarts d'EV entre CSP ne s'aggravent pas."
+        interp: "Projection très incertaine. Départ à 65 ans et cotisations les plus élevées (~29 %) : c'est la génération au TRI le plus faible, même si elle vivrait en moyenne jusqu'à ~93 ans (projection INSEE). Tous les profils resteraient positifs, D10 se rapprochant de zéro — à condition que les écarts d'espérance de vie entre catégories sociales ne s'aggravent pas."
     }
 };
 
@@ -1979,14 +1980,16 @@ const TRI_GEN_DATA = {
 // D1=19 ans (ouvrier), D5=22 ans (médian), D10=25 ans (cadre sup.)
 const TRI_AGE_ENTREE = [19, 19.75, 20.5, 21.25, 22, 22.6, 23.2, 23.8, 24.4, 25];
 
-// Espérance de vie par décile et par génération — interpolation linéaire entre
-// ancres D1 / D5 / D10 (hommes, DREES 2013 + INSEE 2022)
-const TRI_EV = {
-    "1960": [77, 78, 79, 80, 81, 81.8, 82.6, 83.4, 84.2, 85],
-    "1980": [77, 78, 79, 80, 81, 81.8, 82.6, 83.4, 84.2, 85],
-    "2000": [84, 85, 86, 86.8, 87.6, 88.4, 89.2, 90, 90.8, 91.6],
-    "2020": [88, 89, 90, 90.8, 91.6, 92.4, 93.2, 94, 94.8, 95.6],
-};
+// Âge moyen de décès par décile et par génération (hommes).
+// D5 = 65 ans + espérance de vie à 65 ans de la génération (INSEE, Insee Première n° 1927, 2023,
+// scénario central) : 1960 → 86,2 · 1980 → 88,7 · 2000 → 90,8 · 2020 → 92,7.
+// Écart entre déciles (−4 ans pour D1, +4 ans pour D10) : estimation d'après DREES 2013, identique
+// pour toutes les générations.
+const TRI_EV_ECART = [-4, -3, -2, -1, 0, 0.8, 1.6, 2.4, 3.2, 4];
+const TRI_EV_D5    = { "1960": 86.2, "1980": 88.7, "2000": 90.8, "2020": 92.7 };
+const TRI_EV = Object.fromEntries(Object.entries(TRI_EV_D5).map(
+    ([gen, d5]) => [gen, TRI_EV_ECART.map(e => Math.round((d5 + e) * 10) / 10)]
+));
 
 // TR brut de référence par décile — interpolation linéaire entre ancres COR
 // (D1, D5, D10) à l'âge de départ de référence de chaque génération
@@ -2343,8 +2346,8 @@ function resetAll() {
     if (compActive) compActive.checked = false;
     const compBody = document.getElementById('comp-body');
     if (compBody) compBody.classList.add('disabled');
-    document.getElementById('comp-d1').value  = 0;
-    document.getElementById('comp-d10').value = 0;
+    document.getElementById('comp-d1').value  = 1.2;
+    document.getElementById('comp-d10').value = 1.2;
     refreshAllBubbles();
     update();
 }
