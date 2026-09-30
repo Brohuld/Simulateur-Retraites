@@ -1957,21 +1957,18 @@ function update() {
 // TRI ACTUARIEL PAR GÉNÉRATION (4ème colonne équité)
 // ═══════════════════════════════════════════════════════════
 
+// Textes d'interprétation par génération (les TRI affichés sont calculés dynamiquement par updateTriChart)
 const TRI_GEN_DATA = {
     "1960": {
-        tris: [1.08, 1.22, 1.43, 1.62, 1.79, 1.82, 1.64, 1.26, 1.29, 1.29],
         interp: "Tous les déciles bénéficient d'un TRI positif. La retraite à 61 ans avec des cotisations faibles (~18 %) a rendu le système très généreux pour toutes les catégories. Le pic se situe en D5–D6 (classe moyenne supérieure), où un bon taux de remplacement se combine à une espérance de vie favorable."
     },
     "1980": {
-        tris: [-0.19, 0.06, 0.21, 0.41, 0.56, 0.51, 0.46, 0.15, -0.07, -0.26],
         interp: "Interprétation : pour la génération 1980 par exemple, D1 (ouvrier) est pénalisé par une espérance de vie courte (~77 ans) qui ne compense pas son taux de remplacement de 82 % — seulement 13 ans de retraite pour ~45 ans de cotisations. À l'autre extrême, D9–D10 (cadres) ont une espérance de vie plus longue mais un taux de remplacement faible (43 %) insuffisant pour compenser. <span style=\"font-weight:700;color:var(--orange)\">C'est la classe médiane (D4–D5) qui tire le meilleur parti du système.</span>"
     },
     "2000": {
-        tris: [0.96, 0.87, 0.88, 0.91, 1.17, 0.99, 0.83, 0.50, 0.27, 0.08],
         interp: "Le gain d'espérance de vie (+7–8 ans vs 1980) redresse tous les profils en territoire positif, malgré des cotisations plus élevées (~28 %). D1 en bénéficie proportionnellement le plus : chaque année supplémentaire compte davantage quand la retraite ne durait que 13 ans. La bosse centrale (D4–D5) persiste."
     },
     "2020": {
-        tris: [1.19, 1.08, 1.13, 1.14, 1.18, 0.97, 0.82, 0.62, 0.28, 0.04],
         interp: "Projection très incertaine. Si l'espérance de vie continue à progresser (+11 ans vs 1980), tous les profils resteraient en territoire positif malgré des cotisations plus élevées (~29 %). La courbe s'aplatit : le système deviendrait moins inégalitaire en termes actuariels — à condition que les écarts d'EV entre CSP ne s'aggravent pas."
     }
 };
@@ -1999,6 +1996,9 @@ const TRI_TR_REF = {
     "2000": [82, 80, 78, 75, 73, 67, 61, 55, 49, 43],
     "2020": [79, 77, 75, 72, 70, 64, 58, 52, 46, 41],
 };
+
+// Âge légal du droit en vigueur : le curseur d'âge s'applique comme un écart à cette valeur
+const TRI_REF_LEGAL = 64;
 
 // Âge et taux de cotisation de référence par génération
 const TRI_GEN_PARAMS = {
@@ -2039,7 +2039,11 @@ function updateTriChart(p) {
     const evArr    = TRI_EV[gen];
     const trRefArr = TRI_TR_REF[gen];
 
-    const ageDelta     = (p.age - ref_age) * 5;   // même logique que simTR col. 3
+    // Le curseur d'âge est un écart par rapport au droit en vigueur (64 ans),
+    // appliqué à l'âge de référence de chaque génération.
+    const shift        = p.age - TRI_REF_LEGAL;
+    const ageDepart    = ref_age + shift;
+    const ageDelta     = shift * 5;   // même logique que simTR col. 3
     const idxBonus     = 11 * p.index;
     const tauEffective = tau_base + p.cotis_sal + p.cotis_emp;
 
@@ -2047,7 +2051,7 @@ function updateTriChart(p) {
         const trAdj = i < 5
             ? Math.min(100, Math.max(20, trRefArr[i] + ageDelta + idxBonus))
             : Math.min(100, Math.max(20, trRefArr[i] + ageDelta + Math.round(idxBonus * 0.7)));
-        return computeTRIbisect(ae, p.age, evArr[i], trAdj, tauEffective);
+        return computeTRIbisect(ae, ageDepart, evArr[i], trAdj, tauEffective);
     });
 
     triGenChart.data.datasets[0].data            = tris;
@@ -2225,7 +2229,9 @@ function updateCompensation(p) {
     const { ref_age, tau_base } = TRI_GEN_PARAMS[gen];
     const evArr    = TRI_EV[gen];
     const trRefArr = TRI_TR_REF[gen];
-    const ageDelta  = (p.age - ref_age) * 5;
+    const shift     = p.age - TRI_REF_LEGAL;
+    const ageDepart = ref_age + shift;
+    const ageDelta  = shift * 5;
     const idxBonus  = 11 * p.index;
     const tauEff    = tau_base + p.cotis_sal + p.cotis_emp; // cotisations affectent le TRI
 
@@ -2238,7 +2244,7 @@ function updateCompensation(p) {
         const trCurrent = Math.min(100, Math.max(20, trRefArr[i] + ageDelta));
         const triTarget = triD1 + (triD10 - triD1) * i / 9;
         triTargetLine.push(parseFloat(triTarget.toFixed(3)));
-        const trNeeded  = findTRforTRI(ae, p.age, evArr[i], tauEff, triTarget);
+        const trNeeded  = findTRforTRI(ae, ageDepart, evArr[i], tauEff, triTarget);
         trNeededArr.push(trNeeded);
         if (trNeeded > 100) impossible = true;
         totalDelta += (trNeeded - trCurrent) / 100 * COMP_SALAIRES_ANNUELS[i] * COMP_N_PAR_DECILE;
