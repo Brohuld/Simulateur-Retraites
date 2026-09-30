@@ -411,7 +411,7 @@
 
       <div class="example">
         <strong>Pourquoi le TRI varie selon les déciles ?</strong><br>
-        D1 commence à travailler jeune (vers 19 ans), a une carrière longue, et une espérance de vie plus courte — le système ne lui est pas très favorable en rendement pur. D10 commence à travailler tard (études longues), vit plus longtemps à la retraite — même avec un taux de remplacement plus faible, son TRI peut être meilleur.
+        D1 commence à travailler jeune (vers 19 ans), a une carrière longue et une espérance de vie plus courte : son rendement est inférieur à celui des salaires moyens. D10 commence à travailler tard (études longues) et vit plus longtemps à la retraite, mais son taux de remplacement faible (43 %) lui donne le rendement le plus bas.
       </div>
     </div>
   </div>
@@ -582,31 +582,31 @@
     </div>
     <div class="lever-desc">Le taux de rendement que l'on souhaite garantir (ou imposer) à chaque extrémité de l'échelle des revenus.</div>
 
-    <p><strong>TRI D1 positif :</strong> on garantit aux travailleurs modestes un retour sur cotisations supérieur à zéro. Cela nécessite de verser un complément de pension — un coût pour le système.</p>
+    <p><strong>TRI D1 relevé :</strong> on fixe pour les travailleurs modestes une cible supérieure à leur TRI actuel (environ +1,3 % pour la génération 1980). Cela nécessite de verser un complément de pension — un coût pour le système.</p>
 
-    <p><strong>TRI D10 négatif :</strong> on demande aux hauts revenus d'accepter un rendement inférieur à ce qu'ils auraient "droit" en pur calcul actuariel. Leur pension est volontairement réduite — ce qui génère une économie pour le système. C'est un mécanisme de solidarité explicite.</p>
+    <p><strong>TRI D10 abaissé :</strong> on fixe pour les hauts revenus une cible inférieure à leur TRI actuel (environ +0,7 % pour la génération 1980). Leur pension est volontairement réduite — ce qui génère une économie pour le système. C'est un mécanisme de solidarité explicite.</p>
 
     <p>Le coût net (ou l'économie nette) de cette redistribution est affiché dans le simulateur et intégré au solde global.</p>
 
     <div class="example">
-      <strong>La situation actuelle (curseurs à zéro) :</strong><br>
-      Sans redistribution, le graphique du simulateur révèle une inégalité de fait : D1 affiche un TRI <strong>négatif</strong> (−0,2 % environ), tandis que D5 à D8 sont positifs, et D9–D10 repassent légèrement négatifs.<br><br>
-      Pourquoi D1 est-il pénalisé ? Les travailleurs modestes commencent à travailler jeunes, ont des carrières longues — et une <strong>espérance de vie plus courte</strong>. Résultat : ils cotisent beaucoup, mais touchent leur retraite pendant moins longtemps. En pur calcul financier, le système ne leur est pas favorable.<br><br>
-      Pourquoi D9–D10 sont-ils aussi légèrement négatifs ? Malgré une espérance de vie plus longue (qui devrait améliorer leur TRI), leur <strong>taux de remplacement est faible</strong> (43 % pour D10) car le système plafonne les droits au-delà d'un certain salaire. Ils contribuent donc plus au financement collectif qu'ils ne récupèrent en proportion.<br><br>
-      Les déciles D4 à D7 — les salaires intermédiaires — sont les grands bénéficiaires du système actuel en termes de rendement pur.<br><br>
-      <strong>Les curseurs d'équité permettent de corriger ces déséquilibres</strong> en fixant des cibles de rendement différentes : par exemple, garantir un TRI minimum positif à D1, ou demander un effort plus explicite à D10.
+      <strong>La situation actuelle (compensation désactivée) :</strong><br>
+      Sans redistribution, le graphique du simulateur (génération 1980) montre un rendement positif pour tous, mais inégal : environ +1,3 % pour D1, +1,6 % pour D5 et +0,7 % pour D10.<br><br>
+      Pourquoi D1 est-il en dessous des salaires moyens ? Les travailleurs modestes commencent à travailler jeunes, ont des carrières longues — et une <strong>espérance de vie plus courte</strong>. Résultat : ils cotisent longtemps, mais touchent leur retraite pendant moins d'années.<br><br>
+      Pourquoi D9–D10 ont-ils le rendement le plus bas ? Malgré une espérance de vie plus longue (qui devrait améliorer leur TRI), leur <strong>taux de remplacement est faible</strong> (43 % pour D10) car le système plafonne les droits au-delà d'un certain salaire. Ils contribuent donc plus au financement collectif qu'ils ne récupèrent en proportion.<br><br>
+      Les déciles D4 à D6 — les salaires intermédiaires — sont les grands bénéficiaires du système actuel en termes de rendement pur.<br><br>
+      <strong>Les curseurs d'équité permettent de corriger ces déséquilibres</strong> en fixant des cibles de rendement différentes : par exemple, relever le TRI de D1, ou demander un effort plus explicite à D10. Par défaut, les deux curseurs sont placés sur la valeur « réf. » (+1,20 %) : c'est le TRI identique pour tous les déciles qui ne coûte ni ne rapporte rien au système.
     </div>
     <div style="margin:16px 0;text-align:center;">
-      <p style="color:var(--muted);font-size:.85rem;margin-bottom:8px;">Exemple — TRI par décile, génération 1980, scénario de référence (curseurs à zéro)</p>
+      <p style="color:var(--muted);font-size:.85rem;margin-bottom:8px;">Exemple — TRI par décile, génération 1980, scénario de référence (compensation désactivée)</p>
       <img src="tri-exemple.png" alt="Graphique TRI par décile — génération 1980" style="width:260px;border-radius:10px;border:1px solid var(--border);">
     </div>
 
-    <p>On peut choisir de corriger ces inégalités en jouant sur les curseurs d'équité. Dans l'exemple ci-dessous, le TRI de D1 a été fixé à +0,55 % et celui de D10 à −0,15 %. Le coût global est neutre pour le système, mais correspond à une baisse de "rentabilité" pour les déciles du milieu, qui financent en partie la redistribution.</p>
+    <p>On peut choisir de corriger ces inégalités en jouant sur les curseurs d'équité. Dans l'exemple ci-dessous, le TRI de D1 a été fixé à +1,60 % et celui de D10 à +0,95 %. Le coût global est neutre pour le système, mais correspond à une baisse de "rentabilité" pour les déciles du milieu, qui financent en partie la redistribution.</p>
 
     <div style="margin:16px 0;display:flex;gap:16px;align-items:flex-start;justify-content:center;flex-wrap:wrap;">
       <div style="text-align:center;">
         <p style="color:var(--muted);font-size:.85rem;margin-bottom:8px;">Réglage des curseurs</p>
-        <img src="tri-exemple%203.png" alt="Curseurs TRI D1=+0,55% D10=-0,15%" style="width:260px;border-radius:10px;border:1px solid var(--border);">
+        <img src="tri-exemple%203.png" alt="Curseurs TRI D1=+1,60% D10=+0,95%" style="width:260px;border-radius:10px;border:1px solid var(--border);">
       </div>
       <div style="text-align:center;">
         <p style="color:var(--muted);font-size:.85rem;margin-bottom:8px;">TRI résultant par décile</p>
@@ -620,8 +620,8 @@
     </div>
 
     <div class="lever-effect">
-      <span class="tag tag-green">D10 négatif → recette pour le système</span>
-      <span class="tag tag-red">D1 positif → coût pour le système</span>
+      <span class="tag tag-green">D10 abaissé → recette pour le système</span>
+      <span class="tag tag-red">D1 relevé → coût pour le système</span>
       <span class="tag tag-blue">Effet net variable selon les curseurs</span>
     </div>
   </div>
