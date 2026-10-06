@@ -8,7 +8,7 @@
 
 | Levier | État |
 |---|---|
-| Âge légal, durée de cotisation, montée en charge | Recalé en v3 (voir `calculs-par-decile.md`, section 2 bis) |
+| Âge légal, durée de cotisation, montée en charge | Recalé en v3 (voir `calculs-par-decile.md`, section 2 bis, et la section 9 ci-dessous) |
 | Solde migratoire | **Recalé** (section 1 ci-dessous) |
 | Indexation des pensions | **Recalé** (section 2) |
 | Taux de cotisation salarié et employeur | **Recalé** (section 3) |
@@ -393,9 +393,9 @@ Référence et coefficients sans source. Le signe des cotisations était discuta
 |---|---|---|
 | Référence | 0 | 90,3 % |
 | Âge légal 65 ans | + 0,7 % | 90,8 % |
-| Âge légal 67 ans | + 1,8 % | 91,5 % |
-| 45 ans de cotisation | − 1,1 % | 89,6 % |
-| 65 ans et 45 ans (Philippe) | − 0,5 % | 90,0 % |
+| Âge légal 67 ans | + 2,0 % | 91,6 % |
+| 45 ans de cotisation | − 0,6 % | 89,9 % |
+| 65 ans et 45 ans (Philippe) | 0,0 % | 90,3 % |
 | Âge légal 62 ans | − 1,2 % | 89,5 % |
 | Indexation − 1 point par an | − 10,8 % | 83,1 % |
 | Gel des pensions | − 20,0 % | 76,9 % |
@@ -415,7 +415,7 @@ Calcul pour l'indexation à − 1 point par an : 90,3 × (1 − 0,74 × 10,8 %) 
 
 ### Correction faite en même temps : la surcote
 
-Le moteur donnait une surcote de 5 % par an à ceux qui attendent l'âge légal alors qu'ils ont déjà leur durée complète. Ce n'est pas la règle : la surcote ne compte que les années travaillées **après l'âge légal et après la durée complète**. Dans le simulateur, chacun part dès qu'il a le taux plein : la surcote est donc toujours nulle. Les valeurs de référence (taux de remplacement, TRI, tableaux de `calculs-par-decile.md`) ne changent pas, car personne n'avait de surcote avec les règles actuelles. Seuls les scénarios qui relèvent l'âge légal changent : avec 67 ans, la pension moyenne augmente de 1,8 % au lieu de 7,8 %.
+Le moteur donnait une surcote de 5 % par an à ceux qui attendent l'âge légal alors qu'ils ont déjà leur durée complète. Ce n'est pas la règle : la surcote ne compte que les années travaillées **après l'âge légal et après la durée complète**. Dans le simulateur, chacun part dès qu'il a le taux plein : la surcote est donc toujours nulle. Les valeurs de référence (taux de remplacement, TRI, tableaux de `calculs-par-decile.md`) ne changent pas, car personne n'avait de surcote avec les règles actuelles. Seuls les scénarios qui relèvent l'âge légal changent : avec 67 ans, la pension moyenne augmente de 2,0 % au lieu de 7,8 %.
 
 ---
 
@@ -501,4 +501,56 @@ La v2 retenait 3 762 Md€, à partir d'un déficit 2030 de 6,6 Md€ (le COR é
 
 **Solde 2035 de référence** : − 0,39 % × 3 870 = − 15,0 Md€ (v2 : − 16,3).
 
-**Exemple Philippe** (65 ans, 45 ans de cotisation), solde 2035 : + 6,7 Md€ en application immédiate, + 3,8 sur 4 ans, − 0,2 sur 8 ans, − 4,1 sur 12 ans, − 6,9 sur 16 ans, − 8,5 sur 20 ans. En 2070 : − 1,48 % du PIB.
+**Exemple Philippe** (65 ans, 45 ans de cotisation), solde 2035 : + 11,5 Md€ en application immédiate, + 7,9 sur 4 ans, + 3,0 sur 8 ans, − 1,8 sur 12 ans, − 5,1 sur 16 ans, − 7,1 sur 20 ans. En 2070 : − 1,28 % du PIB.
+
+---
+
+## 9. Départs à 67 ans (correction du 6 octobre 2026)
+
+### Le problème
+
+Le simulateur suppose des carrières continues depuis l'âge d'entrée. Le groupe entré le plus tard (25,3 ans, 40 % de la génération) n'atteint jamais les 43 ans de cotisation avant 67 ans : tous ses membres attendaient le taux plein automatique. Une fois retirés les 26 % qui partent à l'âge légal, 30 % de la génération partait à 67 ans.
+
+### Ce que disent les sources
+
+| Donnée | Valeur | Source |
+|---|---|---|
+| Départs à 67 ans, nouveaux retraités récents | 7,6 % des hommes, 10,5 % des femmes | RA 2026 p. 218 |
+| Départs au taux plein par l'âge, régime général, génération 1956 | 7 % | Drees, panorama 2025, fiche 17, graphique 2 |
+| Départs à l'âge d'annulation de la décote, génération 1953 | 10 % | Drees, panorama 2025, fiche 17, graphique 1 |
+| Âge moyen de départ, générations nées à partir de 1975 | 64,6 ans | RA 2026 p. 215 |
+
+### La correction
+
+Dans le groupe entré le plus tard, une partie a des années validées en plus de son emploi : trimestres avant la première année complète, chômage indemnisé, maladie, enfants. Elle atteint sa durée plus tôt. Deux paramètres :
+
+- **part qui attend 67 ans : 30 %** du groupe ;
+- **années validées en plus pour les 70 % restants : 2,5 ans**, soit un départ à 65,8 ans au lieu de 67.
+
+Ils sont choisis pour retrouver deux chiffres du COR :
+
+```
+départs à 67 ans = 74 % × 40 % × 30 % = 8,9 % de la génération (COR : environ 9 %)
+âge moyen = 26 % × 64 + 74 % × (5 % × 62,5 + 28 % × 63,1 + 27 % × 64,9 + 40 % × (30 % × 67 + 70 % × 65,8)) = 64,6 ans (COR : 64,6)
+```
+
+Les années validées en plus comptent pour la durée (régime de base) mais pas pour les points Agirc-Arrco, qui ne viennent que de l'emploi.
+
+### Ce qui change
+
+| Indicateur | Avant | Après |
+|---|---|---|
+| Âge moyen de départ, génération 1980 | 64,8 ans | 64,6 ans |
+| Part de départs à 67 ans | 30 % | 8,9 % |
+| Un an d'âge légal en plus (solde 2070) | + 0,38 point | + 0,38 point |
+| 45 ans de cotisation (solde 2070) | + 0,71 point | + 0,91 point |
+| 65 ans et 45 ans (solde 2070) | + 0,92 point | + 1,12 point |
+| TRI génération 1980, D1 / D10 | + 0,19 % / − 0,23 % | + 0,23 % / − 0,13 % |
+| TRI uniforme à coût nul (repère « réf. ») | + 0,12 % | + 0,18 % |
+
+L'effet de l'âge légal ne change pas : le groupe corrigé part après l'âge légal. L'effet de la durée augmente : les 70 % qui partaient à 65,8 ans sont désormais concernés par une hausse de la durée.
+
+### Hypothèses du dossier
+
+1. **Part de départs à 67 ans** des générations récentes appliquée à la génération 1980. Elle sera sans doute un peu plus élevée en réalité (entrée plus tardive, 43 ans exigés).
+2. **Même correction dans tous les déciles**, appliquée au seul groupe entré tard.

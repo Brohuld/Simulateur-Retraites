@@ -12,25 +12,25 @@ Salariés du privé, génération 1980, personne seule. Taux de remplacement : c
 
 | Groupe | Salaire net moyen de carrière (€ par mois) | Dernier salaire brut (€ par mois) | Pension brute (€ par mois) | Taux de remplacement : pension nette ÷ dernier salaire net | Taux de remplacement : pension brute ÷ salaire brut moyen de carrière | Âge de décès | Rendement des cotisations |
 |---|---|---|---|---|---|---|---|
-| D1 | 1 446 | 1 827 | 1 160 | 80 % | 64 % | 85,7 | + 0,19 % |
-| D2 | 1 580 | 2 147 | 1 258 | 71 % | 63 % | 86,5 | + 0,11 % |
-| D3 | 1 746 | 2 373 | 1 390 | 71 % | 63 % | 87,1 | + 0,14 % |
-| D4 | 1 908 | 2 633 | 1 531 | 70 % | 64 % | 87,6 | + 0,25 % |
-| D5 | 2 091 | 2 931 | 1 692 | 67 % | 64 % | 88,1 | + 0,20 % |
-| D6 | 2 316 | 3 303 | 1 892 | 67 % | 65 % | 88,5 | + 0,30 % |
-| D7 | 2 614 | 3 803 | 2 159 | 66 % | 65 % | 89,0 | + 0,34 % |
-| D8 | 3 045 | 4 540 | 2 419 | 62 % | 63 % | 89,5 | + 0,28 % |
-| D9 | 3 820 | 5 893 | 2 802 | 54 % | 58 % | 90,3 | − 0,04 % |
-| D10 | 5 593 | 9 094 | 3 734 | 47 % | 53 % | 91,2 | − 0,23 % |
+| D1 | 1 446 | 1 827 | 1 160 | 80 % | 64 % | 85,7 | + 0,23 % |
+| D2 | 1 580 | 2 147 | 1 258 | 71 % | 63 % | 86,5 | + 0,16 % |
+| D3 | 1 746 | 2 373 | 1 390 | 71 % | 63 % | 87,1 | + 0,19 % |
+| D4 | 1 908 | 2 633 | 1 531 | 70 % | 64 % | 87,6 | + 0,30 % |
+| D5 | 2 091 | 2 931 | 1 692 | 67 % | 64 % | 88,1 | + 0,25 % |
+| D6 | 2 316 | 3 303 | 1 892 | 67 % | 65 % | 88,5 | + 0,35 % |
+| D7 | 2 614 | 3 803 | 2 159 | 66 % | 65 % | 89,0 | + 0,40 % |
+| D8 | 3 045 | 4 540 | 2 419 | 62 % | 63 % | 89,5 | + 0,35 % |
+| D9 | 3 820 | 5 893 | 2 802 | 54 % | 58 % | 90,3 | + 0,08 % |
+| D10 | 5 593 | 9 094 | 3 734 | 47 % | 53 % | 91,2 | − 0,13 % |
 
 **Rendement des cotisations, toutes générations** (même méthode ; départ au taux plein ; âge de décès : espérance de vie des hommes de chaque génération, Insee, corrigée par décile)
 
 | Génération | D1 | D2 | D3 | D4 | D5 | D6 | D7 | D8 | D9 | D10 |
 |---|---|---|---|---|---|---|---|---|---|---|
 | 1960 | + 0,47 % | + 0,60 % | + 0,60 % | + 0,64 % | + 0,68 % | + 0,81 % | + 0,83 % | + 0,76 % | + 0,70 % | + 0,54 % |
-| 1980 | + 0,19 % | + 0,11 % | + 0,14 % | + 0,25 % | + 0,20 % | + 0,30 % | + 0,34 % | + 0,28 % | − 0,04 % | − 0,23 % |
-| 2000 | + 0,35 % | + 0,26 % | + 0,29 % | + 0,40 % | + 0,33 % | + 0,42 % | + 0,47 % | + 0,40 % | + 0,07 % | − 0,15 % |
-| 2020 | + 0,54 % | + 0,45 % | + 0,48 % | + 0,56 % | + 0,51 % | + 0,59 % | + 0,63 % | + 0,56 % | + 0,24 % | + 0,02 % |
+| 1980 | + 0,23 % | + 0,16 % | + 0,19 % | + 0,30 % | + 0,25 % | + 0,35 % | + 0,40 % | + 0,35 % | + 0,08 % | − 0,13 % |
+| 2000 | + 0,39 % | + 0,30 % | + 0,33 % | + 0,45 % | + 0,38 % | + 0,48 % | + 0,53 % | + 0,47 % | + 0,18 % | − 0,02 % |
+| 2020 | + 0,58 % | + 0,49 % | + 0,52 % | + 0,60 % | + 0,56 % | + 0,64 % | + 0,68 % | + 0,63 % | + 0,35 % | + 0,11 % |
 
 Valeurs affichées par le simulateur v3 (règles actuelles : âge légal 64 ans, 43 ans de cotisation ; génération 1960 : entrée à 19,25 ans, départ à 62,25 ans).
 
@@ -43,7 +43,7 @@ Valeurs affichées par le simulateur v3 (règles actuelles : âge légal 64 ans,
 **Pourquoi le rendement est le plus haut au milieu (D4 à D8) :**
 
 1. **En bas (D1-D3),** l'espérance de vie est la plus courte : la pension est versée moins longtemps. Le minimum de pension et les départs anticipés pour carrière longue compensent en partie.
-2. **En haut (D9-D10),** une partie des cotisations ne rapporte rien, car le régime de base ne verse rien au-dessus du plafond de la sécurité sociale. Et la pension dépend davantage de l'Agirc-Arrco, moins rentable que le régime de base. Entrés tard, beaucoup partent à 67 ans sans la durée complète. L'espérance de vie plus longue ne compense pas.
+2. **En haut (D9-D10),** une partie des cotisations ne rapporte rien, car le régime de base ne verse rien au-dessus du plafond de la sécurité sociale. Et la pension dépend davantage de l'Agirc-Arrco, moins rentable que le régime de base. Entrés tard, une partie (16 % de D10) attend 67 ans faute d'avoir la durée complète. L'espérance de vie plus longue ne compense pas.
 3. **Au milieu,** le salaire reste sous le plafond, et l'espérance de vie est proche de la moyenne ou au-dessus.
 
 ## 2. Méthode
@@ -103,6 +103,7 @@ Les 74 % restants se répartissent entre les quatre groupes ci-dessous.
 **Règle de départ** (législation actuelle) :
 
 - Départ au plus tard entre l'âge légal et l'âge où la durée requise est atteinte, sans dépasser 67 ans (taux plein automatique).
+- Dans le groupe entré le plus tard, 70 % ont 2,5 années validées sans emploi (périodes avant la première année complète, chômage, maladie, enfants) et atteignent leur durée plus tôt ; 30 % attendent 67 ans. Ces deux valeurs sont choisies pour retrouver deux chiffres du COR : l'âge moyen de départ des générations nées à partir de 1975 (64,6 ans, RA 2026 p. 215) et la part de départs à 67 ans (environ 9 %, RA 2026 p. 218). Sans ce calage, 30 % de la génération partirait à 67 ans (détail : `calibration-leviers.md`, section 9).
 - Retraite anticipée pour carrière longue : âge légal − 2 ans pour un début avant 20 ans, − 1 an pour un début avant 21 ans.
 
 | Groupe (fin d'études) | Entrée | Départ (64 ans, 43 ans de cotisation) |
@@ -110,14 +111,15 @@ Les 74 % restants se répartissent entre les quatre groupes ci-dessous.
 | 16 ans ou moins | 19,5 ans | 62,5 ans (carrière longue) |
 | 17-19 ans | 20,1 ans | 63,1 ans (carrière longue) |
 | 20-21 ans | 21,9 ans | 64,9 ans (durée atteinte) |
-| 22 ans ou plus | 25,3 ans | 67 ans (durée incomplète : 41,7 ans) |
+| 22 ans ou plus, 30 % du groupe | 25,3 ans | 67 ans (durée incomplète : 41,7 ans) |
+| 22 ans ou plus, 70 % du groupe | 25,3 ans, avec 2,5 années validées sans emploi | 65,8 ans (durée atteinte) |
 
 | | D1 | D2 | D3 | D4 | D5 | D6 | D7 | D8 | D9 | D10 |
 |---|---|---|---|---|---|---|---|---|---|---|
 | Âge moyen d'entrée | 21,8 | 21,9 | 21,9 | 21,9 | 22,0 | 22,2 | 22,4 | 22,8 | 23,4 | 24,1 |
-| Âge moyen de départ | 64,3 | 64,4 | 64,4 | 64,4 | 64,5 | 64,6 | 64,7 | 64,9 | 65,3 | 65,6 |
+| Âge moyen de départ | 64,2 | 64,2 | 64,3 | 64,3 | 64,3 | 64,4 | 64,4 | 64,6 | 64,9 | 65,2 |
 
-- **Âge moyen de départ de la génération : 64,8 ans.** Le COR projette 64,1 à 64,6 ans en 2070.
+- **Âge moyen de départ de la génération : 64,6 ans**, comme le COR pour les générations nées à partir de 1975. Part de départs à 67 ans : 8,9 %.
 - **Vérification sur le COR :** un an d'âge légal en plus recule l'âge moyen de 0,5 an. Cela améliore le solde de 0,38 point de PIB en 2070 (0,8 point par an d'âge moyen, RA 2026 p. 124). Le COR donne + 0,2 à + 0,4 point (séance du 26 mars 2026).
 - **Écart avec le COR :** le calcul donne 24,1 ans d'entrée pour D10 (profil cadre du COR : 22,75 ans) et 21,9 ans pour D2-D3 (profil non-cadre : 22,5 ans).
 

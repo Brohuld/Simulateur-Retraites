@@ -896,9 +896,9 @@
         }
         .comp-ref-tick {
             position: absolute;
-            /* réf. = TRI uniforme à coût nul, génération 1980 : +0,12 % (v3)
-               (0.12+2)/4 = 53% ; correction thumb ≈ 8px sur largeur totale */
-            left: calc(53% - 8px * (1 - 2 * 0.53));
+            /* réf. = TRI uniforme à coût nul, génération 1980 : +0,18 % (v3)
+               (0.18+2)/4 = 54,5 % ; correction thumb ≈ 8px sur largeur totale */
+            left: calc(54.5% - 8px * (1 - 2 * 0.545));
             top: 100%;
             display: flex;
             flex-direction: column;
@@ -1127,20 +1127,20 @@
                     <div class="comp-slider-row">
                         <span class="comp-slider-label">D1 (bas sal.)</span>
                         <div class="comp-slider-wrap">
-                            <input type="range" id="comp-d1" min="-2" max="2" step="0.01" value="0.12"
+                            <input type="range" id="comp-d1" min="-2" max="2" step="0.01" value="0.18"
                                    oninput="onCompSlider()">
                             <span class="comp-ref-tick"><span class="comp-ref-tick-label">réf.</span></span>
                         </div>
-                        <span class="comp-tri-val" id="comp-d1-val">+0,12&nbsp;%</span>
+                        <span class="comp-tri-val" id="comp-d1-val">+0,18&nbsp;%</span>
                     </div>
                     <div class="comp-slider-row">
                         <span class="comp-slider-label">D10 (haut sal.)</span>
                         <div class="comp-slider-wrap">
-                            <input type="range" id="comp-d10" min="-2" max="2" step="0.01" value="0.12"
+                            <input type="range" id="comp-d10" min="-2" max="2" step="0.01" value="0.18"
                                    oninput="onCompSlider()">
                             <span class="comp-ref-tick"><span class="comp-ref-tick-label">réf.</span></span>
                         </div>
-                        <span class="comp-tri-val" id="comp-d10-val">+0,12&nbsp;%</span>
+                        <span class="comp-tri-val" id="comp-d10-val">+0,18&nbsp;%</span>
                     </div>
                     <div class="comp-results">
                         <div class="comp-result-box">
@@ -2067,13 +2067,13 @@ const TRI_GEN_DATA = {
         interp: "La génération la mieux servie : TRI de +0,5 % (D1) à +0,8 % (D7). Elle a cotisé moins que les suivantes (environ 25 % du salaire en moyenne sur la carrière, contre 28 %) et a pu partir à 62 ans. Comme pour toutes les générations, ce sont les salaires du milieu de l'échelle (D5 à D8) qui obtiennent le meilleur rendement."
     },
     "1980": {
-        interp: "Interprétation : pour la génération 1980, le TRI va de −0,2 % (D10) à +0,3 % (D7). <span style=\"font-weight:700;color:var(--orange)\">Les hauts revenus sont les moins bien servis</span> : ils paient des cotisations au-dessus du plafond de la Sécurité sociale qui n'ouvrent pas de droits au régime de base, et, entrés plus tard dans la vie active (vers 25 ans pour plus des deux tiers de D10), plus de la moitié partent à 67 ans sans la durée complète. En bas de l'échelle, l'espérance de vie plus courte pèse, mais les départs anticipés pour carrière longue (la moitié de D1 a commencé avant 21 ans) la compensent en partie. Le COR trouve un rendement un peu plus élevé pour son profil non-cadre (voir hypotheses-COR.md)."
+        interp: "Interprétation : pour la génération 1980, le TRI va de −0,1 % (D10) à +0,4 % (D7). <span style=\"font-weight:700;color:var(--orange)\">Les hauts revenus sont les moins bien servis</span> : ils paient des cotisations au-dessus du plafond de la Sécurité sociale qui n'ouvrent pas de droits au régime de base, et ils sont entrés plus tard dans la vie active (vers 25 ans pour plus des deux tiers de D10) : 16 % de D10 attendent 67 ans faute d'avoir la durée complète. En bas de l'échelle, l'espérance de vie plus courte pèse, mais les départs anticipés pour carrière longue (la moitié de D1 a commencé avant 21 ans) la compensent en partie. Le COR trouve un rendement un peu plus élevé pour son profil non-cadre (voir hypotheses-COR.md)."
     },
     "2000": {
-        interp: "TRI un peu plus élevé que pour la génération 1980 (de −0,2 % pour D10 à +0,5 % pour D7) : à règles égales, le gain d'espérance de vie (environ +2 ans, Insee) allonge la retraite. Même forme : le milieu de l'échelle est le mieux servi, le haut de l'échelle le moins."
+        interp: "TRI un peu plus élevé que pour la génération 1980 (de 0,0 % pour D10 à +0,5 % pour D7) : à règles égales, le gain d'espérance de vie (environ +2 ans, Insee) allonge la retraite. Même forme : le milieu de l'échelle est le mieux servi, le haut de l'échelle le moins."
     },
     "2020": {
-        interp: "Projection très incertaine, au-delà de l'horizon du COR (dont les profils s'arrêtent à la génération 2000). À règles inchangées, le TRI remonterait encore un peu (0,0 % à +0,6 %) grâce aux gains d'espérance de vie (~93 ans en moyenne, projection Insee), à condition que les écarts d'espérance de vie entre niveaux de vie ne s'aggravent pas."
+        interp: "Projection très incertaine, au-delà de l'horizon du COR (dont les profils s'arrêtent à la génération 2000). À règles inchangées, le TRI remonterait encore un peu (+0,1 % à +0,7 %) grâce aux gains d'espérance de vie (~93 ans en moyenne, projection Insee), à condition que les écarts d'espérance de vie entre niveaux de vie ne s'aggravent pas."
     }
 };
 
@@ -2143,20 +2143,42 @@ const AGE_TAUX_PLEIN_AUTO = 67;   // à 67 ans, taux plein quelle que soit la du
 // Hypothèse du dossier : même part dans chaque décile.
 const PART_AGE_LEGAL = 0.26;
 const DUREE_REF = 43;
+// Groupe entré le plus tard (25,3 ans) : en carrière continue, aucun n'aurait sa durée avant 67 ans, et 30 % de la
+// génération partirait au taux plein automatique. Calage sur deux cibles (calibration-leviers.md, section 9) :
+// - 9 % de départs au taux plein automatique (COR, RA 2026 p. 218 : 7,6 % des hommes et 10,5 % des femmes partent à 67 ans) ;
+// - âge moyen de départ de 64,6 ans pour les générations nées à partir de 1975 (COR, RA 2026 p. 215).
+// Résultat : 30 % du groupe attend 67 ans ; 70 % a 2,5 années validées en plus de son emploi (périodes avant la
+// première année complète, chômage, maladie, enfants…) et atteint sa durée plus tôt.
+const TARDIFS = [{ w: 0.30, bonus: 0 }, { w: 0.70, bonus: 2.5 }];
+function variantesGroupe(k) { return k === 3 ? TARDIFS : [{ w: 1, bonus: 0 }]; }
 
-// Âge de départ : le plus tard entre l'âge d'ouverture (abaissé pour carrière longue) et l'âge où la durée est atteinte,
-// sans dépasser 67 ans (taux plein automatique), ni partir avant l'âge d'ouverture.
-// Carrière longue : début avant 20 ans → âge légal − 2 ; avant 21 ans → âge légal − 1 (bornes décalées avec l'âge légal).
-function ageDepart(e, aod, duree) {
-    const ouverture = e < 20 ? aod - 2 : (e < 21 ? aod - 1 : aod);
-    return Math.max(ouverture, Math.min(e + duree, AGE_TAUX_PLEIN_AUTO));
+// Règles de départ. Les paramètres facultatifs servent aux programmes des candidats (voir PROGRAMMES) ;
+// absents, ils donnent les règles actuelles :
+//   p.cl       : avance de l'âge d'ouverture pour carrière longue [début avant 20 ans, avant 21 ans] (actuel : [2, 1])
+//   p.dureeCL  : durée exigée pour ceux qui ont commencé avant 20 ans (actuel : la même que les autres)
+//   p.tpAuto   : âge du taux plein automatique, quelle que soit la durée (actuel : 67 ans)
+// bonus : années validées en plus de l'emploi (groupe entré tard, voir TARDIFS).
+function ouvertureDroits(e, p) {
+    const cl = p.cl || [2, 1];
+    return e < 20 ? p.age - cl[0] : (e < 21 ? p.age - cl[1] : p.age);
+}
+function dureeGroupe(e, p) {
+    return (e < 20 && p.dureeCL) ? p.dureeCL : p.duree;
+}
+// Âge de départ : le plus tard entre l'âge d'ouverture et l'âge où la durée est atteinte,
+// sans attendre au-delà du taux plein automatique.
+function ageDepart(e, p, bonus) {
+    const tp = p.tpAuto || AGE_TAUX_PLEIN_AUTO;
+    const b = bonus || 0;
+    return Math.max(ouvertureDroits(e, p), Math.min(e - b + dureeGroupe(e, p), tp));
 }
 // Pension relative à une carrière complète de 43 ans : durée incomplète (proratisation) ; surcote de 5 %/an
 // seulement pour les années travaillées après l'âge légal ET après la durée complète (règle du régime général).
 // Avec la règle de départ du simulateur (départ dès le taux plein), la surcote est toujours nulle.
-function facteurPension(e, dep, duree, baseShare, aod) {
-    const L = dep - e;
-    const base = Math.min(1, L / duree) * (1 + 0.05 * Math.max(0, dep - Math.max(aod, e + duree)));
+function facteurPension(e, dep, duree, baseShare, aod, bonus) {
+    const b = bonus || 0;
+    const L = dep - e;                       // années d'emploi (points Agirc-Arrco)
+    const base = Math.min(1, (L + b) / duree) * (1 + 0.05 * Math.max(0, dep - Math.max(aod, e - b + duree)));
     const aa = L / DUREE_REF;
     return baseShare * base + (1 - baseShare) * aa;
 }
@@ -2164,7 +2186,9 @@ function facteurPension(e, dep, duree, baseShare, aod) {
 function deltaAgeMoyen(p) {
     let s = 0;
     ENTREE_GROUPES.forEach((e, k) => {
-        s += PART_GROUPES[k] * (ageDepart(e, p.age, p.duree) - ageDepart(e, DEFAULTS.age, DEFAULTS.duree));
+        variantesGroupe(k).forEach(v => {
+            s += PART_GROUPES[k] * v.w * (ageDepart(e, p, v.bonus) - ageDepart(e, DEFAULTS, v.bonus));
+        });
     });
     return (1 - PART_AGE_LEGAL) * s + PART_AGE_LEGAL * (p.age - DEFAULTS.age);
 }
@@ -2173,15 +2197,29 @@ function deltaAgeMoyen(p) {
 function sousProfils(gen, i, p) {
     const G = TRI_GEN_PARAMS[gen];
     if (gen === '1960') return [{ w: 1, e: G.entree, dep: G.depart, f: 1 }];
-    const profils = ENTREE_GROUPES.map((e, k) => {
-        const dep = ageDepart(e, p.age, p.duree);
-        return { w: (1 - PART_AGE_LEGAL) * ENTREE_PART[i][k], e, dep, f: facteurPension(e, dep, p.duree, BASE_PART[gen][i], p.age) };
+    const profils = [];
+    ENTREE_GROUPES.forEach((e, k) => {
+        variantesGroupe(k).forEach(v => {
+            const dep = ageDepart(e, p, v.bonus);
+            profils.push({ w: (1 - PART_AGE_LEGAL) * ENTREE_PART[i][k] * v.w, e, dep,
+                           f: facteurPension(e, dep, dureeGroupe(e, p), BASE_PART[gen][i], p.age, v.bonus) });
+        });
     });
     // Départs à l'âge légal quelle que soit la durée (entrée à l'âge moyen du décile ; pension au prorata, sans décote)
     const eMoy = ENTREE_GROUPES.reduce((a, e, k) => a + e * ENTREE_PART[i][k], 0);
     profils.push({ w: PART_AGE_LEGAL, e: eMoy, dep: p.age, f: facteurPension(eMoy, p.age, p.duree, BASE_PART[gen][i], p.age) });
     return profils;
 }
+
+// ── Programmes des candidats (v4, en préparation) ──
+// Traduction des propositions retraites en réglages du simulateur. Sources et hypothèses : programmes-candidats.md.
+const PROGRAMMES = {
+    actuel:     { nom: 'Droit actuel',         age: 64, duree: 43 },
+    melenchon:  { nom: 'Mélenchon',            age: 60, duree: 40, cl: [0, 0] },
+    lepen:      { nom: 'Le Pen',               age: 62, duree: 42, cl: [2, 0], dureeCL: 40 },
+    philippe:   { nom: 'Philippe',             age: 65, duree: 45 },
+    retailleau: { nom: 'Retailleau',           age: 63, duree: 43, cl: [0, 0], tpAuto: 65 },
+};
 function facteurPensionDecile(gen, i, p) {
     return sousProfils(gen, i, p).reduce((a, sp) => a + sp.w * sp.f, 0);
 }
@@ -2521,8 +2559,8 @@ function resetAll() {
     if (compActive) compActive.checked = false;
     const compBody = document.getElementById('comp-body');
     if (compBody) compBody.classList.add('disabled');
-    document.getElementById('comp-d1').value  = 0.12;
-    document.getElementById('comp-d10').value = 0.12;
+    document.getElementById('comp-d1').value  = 0.18;
+    document.getElementById('comp-d10').value = 0.18;
     refreshAllBubbles();
     update();
 }

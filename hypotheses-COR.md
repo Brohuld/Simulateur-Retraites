@@ -94,6 +94,11 @@ L'entrée correspond à la première année avec plus de trois trimestres cotis�
 
 Ces profils, mesurés sur la génération 1962, sont **les mêmes pour toutes les générations** : le salaire à chaque âge suit seulement la RMPT (Annexe p. 11). Le salaire est supposé constant, par rapport à la RMPT, en fin de carrière.
 
+**Âges de départ projetés** (utilisés pour caler les départs du simulateur) :
+
+- Âge moyen de départ : 64,6 ans pour les générations nées à partir de 1975 (RA 2026 p. 215).
+- Départs à 67 ans parmi les nouveaux retraités récents : 7,6 % des hommes, 10,5 % des femmes (RA 2026 p. 218).
+
 ## 6. Taux de remplacement
 
 **Définition du COR** (Annexe p. 22) : pension nette à la liquidation ÷ salaire net moyen des 12 derniers mois.
