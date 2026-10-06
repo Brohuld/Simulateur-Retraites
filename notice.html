@@ -172,6 +172,18 @@
   }
 
   /* Example box */
+  .warning {
+    background: #2a1a08;
+    border: 1px solid #92400e;
+    border-left: 4px solid var(--warn);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin: 20px 0;
+  }
+  .warning-title { color: var(--warn); font-weight: 700; display: block; margin-bottom: 8px; }
+  .warning p { margin-bottom: 10px; }
+  .warning ul { margin: 0 0 10px 20px; }
+  .warning li { margin-bottom: 6px; }
   .example {
     background: #1a2744;
     border-left: 3px solid var(--accent);
@@ -212,6 +224,11 @@
     font-weight: 600;
   }
   .tag-green { background: #064e3b; color: #34d399; }
+  .fiab-list { list-style: none; padding: 0; margin: 0; }
+  .fiab-list li { padding: 12px 0; border-top: 1px solid var(--border); color: var(--text); }
+  .fiab-list li:first-child { border-top: none; padding-top: 0; }
+  .fiab-list .fiab-detail { display: block; color: var(--muted); font-size: .92rem; margin-top: 4px; }
+  .fiab-list .tag { display: inline-block; margin-left: 6px; font-size: .75rem; padding: 2px 8px; vertical-align: 1px; }
   .tag-red { background: #450a0a; color: #fca5a5; }
   .tag-blue { background: #1e3a5f; color: #93c5fd; }
   .tag-orange { background: #431407; color: #fdba74; }
@@ -307,6 +324,8 @@
       <li><a href="#leviers-macro">Les leviers macroéconomiques</a>
         <ol>
           <li class="toc-sub"><a href="#age">Âge légal de départ</a></li>
+          <li class="toc-sub"><a href="#duree">Durée de cotisation</a></li>
+          <li class="toc-sub"><a href="#rythme">Montée en charge</a></li>
           <li class="toc-sub"><a href="#cotis-sal">Cotisations salariales</a></li>
           <li class="toc-sub"><a href="#cotis-pat">Cotisations patronales</a></li>
           <li class="toc-sub"><a href="#indexation">Indexation des pensions</a></li>
@@ -318,6 +337,9 @@
       </li>
       <li><a href="#equite">Les leviers d'équité</a></li>
       <li><a href="#resultats">Comment lire les résultats ?</a></li>
+      <li><a href="#fiabilite">Fiabilité des données et des calculs</a></li>
+      <li><a href="#versions">Historique des versions</a></li>
+      <li><a href="#sources">Sources</a></li>
     </ol>
   </nav>
 
@@ -332,7 +354,18 @@
     2. <strong>Est-ce équitable entre générations et entre niveaux de revenus ?</strong> (tout le monde a-t-il un retour proportionnel à ce qu'il a versé ?)
   </div>
 
-  <p>Le simulateur ne prétend pas à une précision absolue — les projections à 50 ans comportent une marge d'incertitude importante. Les résultats sont présentés <strong>sur le scénario central du COR</strong> (productivité +0,7 %/an, chômage 7 % à long terme) ; les leviers "productivité" et "chômage" permettent d'explorer les variantes. Son objectif est de donner des ordres de grandeur et d'illustrer les tensions entre équilibre financier et justice sociale.</p>
+  <div class="warning">
+    <span class="warning-title">⚠️ Avertissement : les limites de ce simulateur</span>
+    <p><strong>Le solde financier est bien aligné sur le COR.</strong> La trajectoire de référence reprend les chiffres publiés par le COR (rapport de juin 2026). Chaque levier, pris seul, reproduit les variantes du COR à environ 0,05 point de PIB près en 2045 et en 2070. Pour comparer des leviers et situer une réforme à l'horizon 2045-2070, c'est une approximation fiable.</p>
+    <p><strong>Trois limites sur le solde :</strong></p>
+    <ul>
+      <li><strong>Leviers combinés :</strong> le COR teste un levier à la fois ; le simulateur additionne leurs effets. Plus on combine de leviers, moins le résultat est sûr.</li>
+      <li><strong>Années 2030 à 2045 pendant une réforme :</strong> elles dépendent surtout de la montée en charge, une hypothèse du dossier. Les montants en milliards de 2035 sont des ordres de grandeur, pas des prévisions.</li>
+      <li><strong>Pas d'effets sur l'économie :</strong> le simulateur ne compte pas l'effet récessif d'une baisse des pensions. Le COR prévient que les ajustements réels devraient être plus forts.</li>
+    </ul>
+    <p><strong>Les résultats par décile sont plus fragiles.</strong> Le COR ne publie rien par décile : taux de remplacement et TRI par décile sont reconstitués par le dossier. Les grandes tendances sont solides : le milieu de l'échelle est le mieux servi, les plus hauts salaires le moins bien. Mais sur les profils types du COR, le moteur sous-estime le taux de remplacement de 2 points (non-cadre) à 4-5 points (SMIC), et le TRI du non-cadre de 0,5 point. Cet écart est aussi grand que les différences de TRI entre déciles : le classement fin entre déciles voisins n'est pas fiable.</p>
+    <p style="margin-bottom:0;">Le simulateur reprend le scénario central du COR (productivité + 0,7 % par an, chômage 7 % à long terme). Le détail de chaque source et de chaque hypothèse est dans la section <a href="#fiabilite" style="color:var(--warn);">Fiabilité des données et des calculs</a>.</p>
+  </div>
 
   <hr>
 
@@ -352,10 +385,10 @@
         <div class="gauge-label" style="left:50%; position:absolute;">← 0 % du PIB →</div>
       </div>
 
-      <p style="margin-top:12px;">Le scénario de référence COR 2026 prévoit un déficit de <strong>−2,4 % du PIB en 2070</strong>, soit environ 80 milliards d'euros aux prix d'aujourd'hui. Le système est actuellement proche de l'équilibre mais se dégrade progressivement avec le vieillissement démographique.</p>
+      <p style="margin-top:12px;">Le scénario de référence COR 2026 prévoit un déficit de <strong>−2,4 % du PIB en 2070</strong>, soit environ 72 milliards d'euros rapportés au PIB de 2025 (2 994 milliards). Le système est actuellement proche de l'équilibre mais se dégrade progressivement avec le vieillissement démographique.</p>
 
       <div class="example">
-        <strong>Exemple :</strong> Si le solde passe de −2,4 % à −1,2 % du PIB en 2070, on a divisé le déficit par deux. Cela représente une économie d'environ 40 milliards d'euros par an.
+        <strong>Exemple :</strong> Si le solde passe de −2,4 % à −1,2 % du PIB en 2070, on a divisé le déficit par deux. Cela représente une économie d'environ 36 milliards d'euros par an, rapportée au PIB de 2025.
       </div>
     </div>
   </div>
@@ -371,21 +404,21 @@
       <div class="card-row">
         <div class="card">
           <div style="color:#34d399;font-weight:700;font-size:1.1rem;">D1 — Bas salaires</div>
-          <div style="font-size:1.8rem;font-weight:700;margin:8px 0;">~82 %</div>
-          <div style="color:var(--muted);font-size:.85rem;">Salaire d'env. 1 600 €/mois. Le taux est élevé grâce au minimum contributif.</div>
+          <div style="font-size:1.8rem;font-weight:700;margin:8px 0;">~80 %</div>
+          <div style="color:var(--muted);font-size:.85rem;">Dernier salaire d'env. 1 830 € brut par mois. Le taux est relevé par le minimum de pension (minimum contributif).</div>
         </div>
         <div class="card">
           <div style="color:#60a5fa;font-weight:700;font-size:1.1rem;">D5 — Salaires médians</div>
-          <div style="font-size:1.8rem;font-weight:700;margin:8px 0;">~73 %</div>
-          <div style="color:var(--muted);font-size:.85rem;">Salaire d'env. 2 100 €/mois. Régime général, sans dispositif spécifique.</div>
+          <div style="font-size:1.8rem;font-weight:700;margin:8px 0;">~67 %</div>
+          <div style="color:var(--muted);font-size:.85rem;">Dernier salaire d'env. 2 930 € brut par mois. Régime général et Agirc-Arrco, sans dispositif spécifique.</div>
         </div>
         <div class="card">
           <div style="color:#f59e0b;font-weight:700;font-size:1.1rem;">D10 — Hauts salaires</div>
-          <div style="font-size:1.8rem;font-weight:700;margin:8px 0;">~43 %</div>
-          <div style="color:var(--muted);font-size:.85rem;">Salaire d'env. 9 500 €/mois. Le plafond de la Sécu plafonne les droits.</div>
+          <div style="font-size:1.8rem;font-weight:700;margin:8px 0;">~47 %</div>
+          <div style="color:var(--muted);font-size:.85rem;">Dernier salaire d'env. 9 090 € brut par mois. Au-dessus du plafond de la Sécurité sociale, le régime de base ne verse plus rien, et la carrière est très ascendante.</div>
         </div>
         <div class="card" style="display:flex;align-items:center;">
-          <div style="color:var(--muted);font-size:.9rem;">Ces valeurs sont celles du scénario de référence COR pour la génération 1980 partant à 64 ans après 43 ans de carrière.</div>
+          <div style="color:var(--muted);font-size:.9rem;">Pension nette ÷ dernier salaire net, génération 1980, départ au taux plein (65,5 ans) après 43 ans de carrière. Ces valeurs sont calculées à partir des règles de calcul des pensions et vérifiées sur les profils types du COR 2026 : le COR ne publie pas de taux par décile.</div>
         </div>
       </div>
     </div>
@@ -411,7 +444,7 @@
 
       <div class="example">
         <strong>Pourquoi le TRI varie selon les déciles ?</strong><br>
-        D1 commence à travailler jeune (vers 19 ans), a une carrière longue et une espérance de vie plus courte, mais son taux de remplacement élevé (82 %) compense : son rendement est proche de celui des salaires moyens. D10 commence à travailler tard (études longues) et vit plus longtemps à la retraite, mais son taux de remplacement faible (43 %) lui donne le rendement le plus bas.
+        Rapporté à ce qu'ils ont cotisé, tous les déciles reçoivent une pension voisine, sauf les plus hauts salaires. Ce qui fait la différence, c'est surtout la <strong>durée de la retraite</strong>. D1 vit environ 5 ans de moins que D10, mais la moitié de ses membres a commencé à travailler avant 21 ans et peut partir plus tôt grâce à la retraite anticipée pour carrière longue. D10 vit plus longtemps, mais une partie de ses cotisations, au-dessus du plafond de la Sécurité sociale, n'ouvre pas de droits au régime de base ; entrés tard dans la vie active, beaucoup partent à 67 ans sans la durée complète : son rendement est le plus bas. Le milieu de l'échelle (D4 à D8) est le mieux servi.
       </div>
     </div>
   </div>
@@ -430,14 +463,53 @@
       <span class="lever-name">Âge légal de départ</span>
       <span class="cor-ref">Réf. : 64 ans</span>
     </div>
-    <div class="lever-desc">L'âge minimum auquel on peut liquider sa retraite à taux plein (sous réserve d'avoir le nombre de trimestres requis).</div>
-    <p>Reculer l'âge de départ améliore le solde de deux façons simultanées : les actifs cotisent plus longtemps, et les retraités perçoivent leur pension pendant moins d'années. C'est le levier le plus puissant à court terme, mais il a un coût social : il pénalise les travailleurs ayant commencé jeune et ceux aux métiers pénibles.</p>
+    <div class="lever-desc">L'âge minimum auquel on peut partir à la retraite. Ceux qui ont commencé à travailler avant 20 ou 21 ans peuvent partir un ou deux ans plus tôt (retraite anticipée pour carrière longue).</div>
+    <p>On part au plus tard entre deux dates : l'âge légal, et l'âge auquel on a cotisé la durée requise. Reculer l'âge légal ne retarde donc que ceux qui avaient déjà leur durée, c'est-à-dire surtout ceux qui ont <strong>commencé à travailler tôt</strong>. Pour les autres, c'est la durée qui décide, et l'âge légal ne change rien.</p>
+    <p>Il retarde aussi tous ceux qui partent dès l'âge légal sans avoir leur durée : départs avec décote, invalidité, inaptitude. Ils représentent 26 % des départs (Drees, génération 1953).</p>
+    <p>Le simulateur répartit chaque décile en quatre groupes selon l'âge de fin d'études (Dares, Insee), plus ce groupe qui part à l'âge légal. Avec les règles actuelles, l'âge moyen de départ de la génération 1980 serait de 64,8 ans. Un an d'âge légal en plus le recule de 0,5 an et améliore le solde de 0,38 point de PIB en 2070, dans le haut de la fourchette du COR (+0,2 à +0,4 point).</p>
     <div class="example">
-      <strong>Exemple :</strong> Passer de 64 à 67 ans améliore le solde de l'ordre de +1 % du PIB à l'horizon 2070. C'est significatif — mais cela représente aussi 3 années de vie active supplémentaires pour tous les travailleurs.
+      <strong>Exemple :</strong> Passer de 64 à 67 ans recule l'âge moyen de départ d'environ 1,9 an et améliore le solde d'environ +1,5 % du PIB en 2070. Pour ceux qui ont commencé tôt, c'est 2 à 3 ans de travail en plus.
     </div>
     <div class="lever-effect">
-      <span class="tag tag-green">↑ Solde : fort</span>
-      <span class="tag tag-blue">↓ TRI D1 : pénalise les carrières longues</span>
+      <span class="tag tag-green">↑ Solde</span>
+      <span class="tag tag-blue">↓ TRI des carrières commencées tôt</span>
+    </div>
+  </div>
+
+  <!-- Durée -->
+  <div class="lever-card">
+    <div class="lever-header">
+      <span class="lever-icon" id="duree">⏳</span>
+      <span class="lever-name">Durée de cotisation</span>
+      <span class="cor-ref">Réf. : 43 ans (172 trimestres)</span>
+    </div>
+    <div class="lever-desc">La durée qu'il faut avoir cotisée pour une retraite à taux plein, sans décote.</div>
+    <p>Allonger la durée retarde surtout ceux qui ont <strong>commencé tard</strong> (études longues) : ils atteignent l'âge légal avant d'avoir leur durée. Une limite : à 67 ans, le taux plein est acquis quelle que soit la durée. Au-delà, la pension est simplement réduite au prorata des années manquantes.</p>
+    <p>Le COR ne chiffre pas ce levier séparément. Le simulateur le calcule avec la même méthode que l'âge légal : effet sur l'âge moyen de départ, puis 0,8 point de PIB par an d'âge moyen (COR, rapport 2026).</p>
+    <div class="example">
+      <strong>Exemple :</strong> Passer à 45 ans de cotisation recule l'âge moyen de départ d'environ 0,9 an et améliore le solde d'environ +0,7 % du PIB en 2070. Combiné à un âge légal de 65 ans (proposition d'Édouard Philippe), le recul atteint 1,15 an et l'amélioration +0,9 % du PIB : avec 45 ans de durée, l'âge légal ne retarde plus que ceux qui partent sans leur durée.
+    </div>
+    <div class="lever-effect">
+      <span class="tag tag-green">↑ Solde</span>
+      <span class="tag tag-blue">↓ TRI des carrières commencées tard</span>
+    </div>
+  </div>
+
+  <!-- Montée en charge -->
+  <div class="lever-card">
+    <div class="lever-header">
+      <span class="lever-icon" id="rythme">🪜</span>
+      <span class="lever-name">Montée en charge</span>
+      <span class="cor-ref">Réf. : immédiate</span>
+    </div>
+    <div class="lever-desc">Le nombre d'années pour appliquer entièrement le changement d'âge légal et de durée.</div>
+    <p>Une réforme ne s'applique jamais d'un coup : l'âge et la durée montent génération par génération. La réforme de 2023 relevait l'âge de 3 mois et la durée d'un trimestre par génération. À ce rythme, passer de 43 à 45 ans de cotisation prend 8 ans.</p>
+    <p>Ce curseur ne change pas l'effet à long terme : il retarde le moment où il apparaît. Il ne modifie pas non plus le TRI des générations affichées : nées en 1980 ou après, elles partent après la fin de la montée en charge.</p>
+    <div class="example">
+      <strong>Exemple :</strong> âge légal 65 ans et 45 ans de cotisation. Le solde 2035 passe de −15,0 Md€ (règles actuelles) à +6,7 Md€ avec une application immédiate, −0,2 Md€ sur 8 ans, −8,5 Md€ sur 20 ans. En 2070, le résultat est le même dans tous les cas (−1,48 % du PIB).
+    </div>
+    <div class="lever-effect">
+      <span class="tag tag-orange">⏱ Retarde l'effet sur le solde</span>
     </div>
   </div>
 
@@ -451,7 +523,8 @@
     <div class="lever-desc">La part du salaire brut prélevée directement sur la fiche de paie du salarié pour financer les retraites.</div>
     <p>Augmenter les cotisations salariales apporte des recettes immédiates au système, mais réduit le salaire net des actifs (moins de pouvoir d'achat). Inversement, les baisser améliore le pouvoir d'achat mais creuse le déficit.</p>
     <div class="example">
-      <strong>Exemple :</strong> Une hausse de +1 point de cotisations (ex : passer de 11 % à 12 %) représente environ 5 à 6 milliards d'euros de recettes supplémentaires par an pour le système.
+      <strong>Calcul :</strong> le curseur ajoute des points de cotisation sur l'ensemble des revenus bruts d'activité (salariés du privé, fonctionnaires, indépendants), comme le COR. Ces revenus valent 43 % du PIB : 1 point rapporte donc 0,43 point de PIB, environ 13 milliards d'euros par an. Une partie est perdue, car la baisse du salaire net réduit la consommation et l'emploi : il reste environ 93 % de l'effet (modèles I-MIP et OFCE, COR, mars 2026). Résultat : +0,40 point de PIB par point de cotisation.<br><br>
+      <strong>Repère :</strong> pour équilibrer le système en 2070 par les seules cotisations, le COR calcule qu'il faudrait 5,6 points de plus.
     </div>
     <div class="lever-effect">
       <span class="tag tag-green">↑ Solde si hausse</span>
@@ -468,7 +541,10 @@
       <span class="cor-ref">Réf. : taux actuel</span>
     </div>
     <div class="lever-desc">La part versée par l'employeur sur chaque salaire, en sus du salaire brut du salarié.</div>
-    <p>Contrairement aux cotisations salariales, elles ne réduisent pas directement le salaire net — mais elles augmentent le coût du travail pour l'entreprise, ce qui peut peser sur l'emploi ou les salaires à long terme. L'effet sur le solde est donc légèrement amoindri par ces effets indirects.</p>
+    <p>Contrairement aux cotisations salariales, elles ne réduisent pas directement le salaire net — mais elles augmentent le coût du travail pour l'entreprise, ce qui peut peser sur l'emploi ou les salaires à long terme. L'effet sur le solde est donc amoindri par ces effets indirects.</p>
+    <div class="example">
+      <strong>Calcul :</strong> même assiette que les cotisations salariales (1 point = 0,43 point de PIB, environ 13 milliards d'euros). Les modèles consultés par le COR (I-MIP et OFCE, mars 2026) n'en gardent qu'environ 80 % après les pertes d'emploi, contre 93 % pour une hausse salariale. Résultat : +0,34 point de PIB par point de cotisation.
+    </div>
     <div class="lever-effect">
       <span class="tag tag-green">↑ Solde si hausse (effet moindre qu'en salarial)</span>
       <span class="tag tag-orange">⚠ Coût du travail : risque sur l'emploi</span>
@@ -483,11 +559,16 @@
       <span class="cor-ref">Réf. : sur les prix</span>
     </div>
     <div class="lever-desc">La règle qui détermine comment les pensions évoluent chaque année une fois liquidées.</div>
-    <p>Actuellement, les pensions sont revalorisées selon l'inflation (les prix). Deux autres options existent :</p>
-    <p><strong>Désindexation (gel) :</strong> les pensions ne bougent plus. Le pouvoir d'achat des retraités s'érode progressivement par rapport aux actifs, mais le système économise. Effet financier croissant avec le temps.</p>
-    <p><strong>Indexation sur les salaires :</strong> les pensions suivent l'évolution du niveau de vie général. Le pouvoir d'achat des retraités est préservé, mais le coût pour le système augmente.</p>
+    <p>Le curseur fixe l'<strong>écart annuel entre la revalorisation des pensions et l'inflation</strong>, en point par an :</p>
+    <ul>
+      <li><strong>0</strong> : sur les prix, la règle actuelle ;</li>
+      <li><strong>− 2 pt</strong> : gel des pensions, avec une inflation de 2 % par an ;</li>
+      <li><strong>+ 0,7 pt</strong> : à peu près sur les salaires (croissance réelle des salaires de 0,7 % par an, COR).</li>
+    </ul>
+    <p><strong>Mécanisme :</strong> une sous-indexation ne touche pas la pension au départ, mais la réduit chaque année qui suit. L'effet grandit donc avec l'ancienneté des retraités, puis se stabilise vers 2060, quand tous les retraités sont partis après la mesure.</p>
+    <p><strong>Calcul :</strong> la masse des pensions est répartie selon l'ancienneté de la retraite (tables de mortalité Insee), puis l'écart de revalorisation est appliqué à chaque ancienneté. La variation de la masse est multipliée par le poids des pensions dans le PIB (14,5 % en 2070, COR 2026).</p>
     <div class="example">
-      <strong>Exemple :</strong> Un gel total des pensions pendant 46 ans (2024–2070) améliorerait le solde d'environ +0,5 % du PIB en 2070 — mais les retraités de 2070 auraient perdu en pouvoir d'achat relatif l'équivalent de plusieurs décennies de croissance salariale.
+      <strong>Exemple :</strong> des pensions revalorisées de 1 point de moins que l'inflation chaque année à partir de 2027 réduisent la masse des pensions de 10,8 % en 2070. Le solde s'améliore de 0,46 point de PIB en 2030, 1,34 en 2045 et 1,57 en 2070. Un gel donne + 2,9 points en 2070. Pour comparaison, le COR calcule qu'une baisse de 8,6 % de toutes les pensions équilibrerait le système en moyenne jusqu'en 2070.
     </div>
     <div class="lever-effect">
       <span class="tag tag-green">↑ Solde si désindexation</span>
@@ -504,13 +585,15 @@
       <span class="cor-ref">Réf. : 1,45 enfant/femme</span>
     </div>
     <div class="lever-desc">L'indice conjoncturel de fécondité — le nombre moyen d'enfants par femme en âge de procréer.</div>
-    <p>C'est le levier au <strong>délai d'action le plus long</strong> : un enfant né aujourd'hui n'entrera sur le marché du travail que dans 18 à 22 ans. Son effet sur le solde du système n'est donc visible qu'à partir de 2042–2045. C'est un investissement sur la démographie future, pas une solution à court terme.</p>
+    <p>C'est le levier au <strong>délai d'action le plus long</strong> : un enfant né aujourd'hui n'entrera sur le marché du travail que dans 18 à 22 ans. Son effet sur le solde du système n'est donc visible qu'à partir du milieu des années 2040. C'est un investissement sur la démographie future, pas une solution à court terme.</p>
+    <p><strong>Mécanisme :</strong> les dépenses de retraite ne changent pas avant 2070 (les enfants nés après 2025 ne seront pas encore retraités). Ce qui change, c'est le PIB : plus de naissances, c'est plus d'actifs à partir des années 2040, donc des dépenses plus faibles en part du PIB.</p>
+    <p><strong>Calcul :</strong> le simulateur reprend les deux variantes du COR 2026. Avec 1,7 enfant par femme, le solde 2070 s'améliore de 0,91 point de PIB ; avec 1,2, il se dégrade de 0,98 point. L'écart est nul jusqu'en 2044, puis croît en ligne droite. Le simulateur retient la moyenne, ± 0,95 point en 2070 pour ± 0,25 enfant, et prolonge en ligne droite au-delà de ces deux valeurs.</p>
     <div class="example">
-      <strong>Exemple :</strong> Remonter la fécondité à 1,8 enfant/femme (niveau de 2010) n'aurait aucun effet sur le solde avant 2042, mais améliorerait significativement l'équilibre à l'horizon 2060–2070.
+      <strong>Exemple :</strong> remonter la fécondité à 1,8 enfant par femme (hypothèse du COR en 2025) ne change rien avant 2044, puis améliore le solde de 0,82 point de PIB en 2060 et de 1,33 point en 2070.
     </div>
     <div class="lever-effect">
-      <span class="tag tag-green">↑ Solde à long terme (après 2042)</span>
-      <span class="tag tag-orange">⚠ Aucun effet avant 2042</span>
+      <span class="tag tag-green">↑ Solde à long terme (après 2044)</span>
+      <span class="tag tag-orange">⚠ Aucun effet avant 2044</span>
     </div>
   </div>
 
@@ -522,10 +605,13 @@
       <span class="cor-ref">Réf. : +150 000/an</span>
     </div>
     <div class="lever-desc">Le nombre net d'entrées sur le territoire (entrées moins sorties) chaque année.</div>
-    <p>Les nouveaux arrivants en âge de travailler cotisent immédiatement, ce qui améliore le solde à court terme. Mais ils vieillissent aussi et prendront leur retraite : l'effet positif se dilue progressivement. La migration est un <strong>soutien utile mais limité</strong> — elle ne résout pas structurellement le problème du vieillissement.</p>
+    <p>Les arrivants sont surtout des adultes en âge de travailler : ils augmentent le nombre de cotisants et la richesse nationale bien avant d'ouvrir des droits à la retraite. Selon le COR, l'effet sur le solde est presque nul avant 2030, puis il <strong>augmente avec le temps</strong> : la population active et le PIB s'écartent de plus en plus du scénario de référence.</p>
+    <div class="example">
+      <strong>Variantes du COR 2026 :</strong> avec 230 000 personnes par an au lieu de 150 000, le solde serait amélioré d'environ 0,45 point de PIB en 2045 et 1,05 point en 2070 ; avec 70 000, il serait dégradé d'environ 0,47 et 0,97 point. Le simulateur reprend la moyenne de ces écarts ; au-delà de ± 80 000, il les prolonge en ligne droite (hypothèse du dossier).
+    </div>
     <div class="lever-effect">
-      <span class="tag tag-green">↑ Solde à court terme</span>
-      <span class="tag tag-orange">↘ Effet décroissant à long terme</span>
+      <span class="tag tag-green">↑ Solde, de plus en plus avec le temps</span>
+      <span class="tag tag-orange">⏱ Effet quasi nul avant 2030</span>
     </div>
   </div>
 
@@ -539,7 +625,7 @@
     <div class="lever-desc">Le rythme auquel la valeur produite par heure de travail augmente chaque année.</div>
     <p>Une économie plus productive génère des salaires plus élevés, donc des cotisations plus élevées. C'est la <strong>principale variable de long terme</strong> : une différence de 0,5 point de croissance de la productivité, maintenue pendant 46 ans, change radicalement la situation du système en 2070. Le scénario COR 2026 retient 0,7 %/an — identique au COR 2025.</p>
     <div class="example">
-      <strong>Exemple :</strong> La moyenne des pays de l'OCDE tourne autour de +1,0 %/an sur longue période. Si la France atteignait ce rythme (contre 0,7 % dans le scénario central), le déficit 2070 serait réduit d'environ 0,3 à 0,5 point de PIB. C'est utile, mais insuffisant pour résorber seul le déficit.
+      <strong>Calcul :</strong> le simulateur reprend les variantes du COR 2026. Avec 1,0 % par an au lieu de 0,7 %, le solde s'améliore de 0,26 point de PIB en 2045 et de 0,7 point en 2070 ; avec 0,4 %, il se dégrade de 0,2 et 0,68 point. Le simulateur retient la moyenne (0,23 point en 2045, 0,69 en 2070 pour 0,3 point de productivité) et prolonge en ligne droite au-delà.
     </div>
     <div class="lever-effect">
       <span class="tag tag-green">↑ Solde progressivement</span>
@@ -555,10 +641,13 @@
       <span class="cor-ref">Réf. : 7 %</span>
     </div>
     <div class="lever-desc">La part de la population active sans emploi.</div>
-    <p>Un chômage plus faible signifie plus de personnes qui cotisent. L'effet est rapide (quelques années) mais plafonné : on ne peut pas descendre indéfiniment en dessous du "plein emploi". Le scénario central COR retient 7 %, ce qui est déjà inférieur au niveau actuel — une hypothèse volontariste.</p>
+    <p>Un chômage plus faible signifie plus de personnes qui cotisent. L'effet est rapide (quelques années) mais plafonné : on ne peut pas descendre indéfiniment en dessous du "plein emploi". Le scénario central COR retient 7 % à partir de 2040, contre 7,7 % observé en 2025.</p>
+    <div class="example">
+      <strong>Calcul :</strong> le simulateur reprend les variantes du COR 2026. Avec 5 % de chômage, le solde s'améliore de 0,3 point de PIB en 2045 et de 0,22 point en 2070 ; avec 10 %, il se dégrade de 0,5 et 0,3 point. Par point de chômage, cela fait en moyenne 0,16 point de PIB en 2045 et 0,11 en 2070. L'effet monte de 2027 à 2040, date où le chômage atteint sa cible, puis diminue un peu jusqu'en 2070, comme dans les projections du COR.
+    </div>
     <div class="lever-effect">
       <span class="tag tag-green">↑ Solde si baisse du chômage</span>
-      <span class="tag tag-blue">Effet visible à partir de 2030–2035</span>
+      <span class="tag tag-blue">Effet maximal vers 2040–2045</span>
     </div>
   </div>
 
@@ -582,41 +671,40 @@
     </div>
     <div class="lever-desc">Le taux de rendement que l'on souhaite garantir (ou imposer) à chaque extrémité de l'échelle des revenus.</div>
 
-    <p><strong>TRI D1 relevé :</strong> on fixe pour les travailleurs modestes une cible supérieure à leur TRI actuel (environ +1,4 % pour la génération 1980). Cela nécessite de verser un complément de pension — un coût pour le système.</p>
+    <p><strong>TRI D1 relevé :</strong> on fixe pour les travailleurs modestes une cible supérieure à leur TRI actuel (environ +0,2 % pour la génération 1980). Cela nécessite de verser un complément de pension — un coût pour le système.</p>
 
-    <p><strong>TRI D10 abaissé :</strong> on fixe pour les hauts revenus une cible inférieure à leur TRI actuel (environ +0,5 % pour la génération 1980). Leur pension est volontairement réduite — ce qui génère une économie pour le système. C'est un mécanisme de solidarité explicite.</p>
+    <p><strong>TRI D10 abaissé :</strong> on fixe pour les hauts revenus une cible inférieure à leur TRI actuel (environ −0,2 % pour la génération 1980). Leur pension est volontairement réduite — ce qui génère une économie pour le système. C'est un mécanisme de solidarité explicite.</p>
 
     <p>Le coût net (ou l'économie nette) de cette redistribution est affiché dans le simulateur et intégré au solde global.</p>
 
     <div class="example">
       <strong>La situation actuelle (compensation désactivée) :</strong><br>
-      Sans redistribution, le graphique du simulateur (génération 1980) montre un rendement positif pour tous, mais inégal : environ +1,4 % à +1,5 % de D1 à D6, puis une baisse jusqu'à +0,5 % pour D10.<br><br>
-      Pourquoi D1 n'est-il pas au-dessus des autres, malgré son taux de remplacement élevé ? Les travailleurs modestes commencent à travailler jeunes, ont des carrières longues — et une <strong>espérance de vie plus courte</strong> (environ 5 ans de moins que D10 à 65 ans, selon l'INSEE). Résultat : ils cotisent longtemps, mais touchent leur retraite pendant moins d'années.<br><br>
-      Pourquoi D9–D10 ont-ils le rendement le plus bas ? Malgré une espérance de vie plus longue (qui devrait améliorer leur TRI), leur <strong>taux de remplacement est faible</strong> (43 % pour D10) car le système plafonne les droits au-delà d'un certain salaire. Ils contribuent donc plus au financement collectif qu'ils ne récupèrent en proportion.<br><br>
-      En termes de rendement pur, les hauts revenus sont donc les moins bien servis par le système actuel ; les autres déciles sont à peu près au même niveau.<br><br>
-      <strong>Les curseurs d'équité permettent de corriger ces déséquilibres</strong> en fixant des cibles de rendement différentes : par exemple, relever le TRI de D1, ou demander un effort plus explicite à D10. Par défaut, les deux curseurs sont placés sur la valeur « réf. » (+1,10 %) : c'est le TRI identique pour tous les déciles qui ne coûte ni ne rapporte rien au système.
+      Sans redistribution, le graphique du simulateur (génération 1980) montre des rendements faibles et proches de zéro : de −0,2 % à +0,3 %. Les plus élevés sont au milieu de l'échelle (D4 à D8) ; le haut de l'échelle (D9, D10) est le moins bien servi.<br><br>
+      Pourquoi D1 et D2 ne sont-ils pas mieux servis ? Les travailleurs modestes ont une <strong>espérance de vie plus courte</strong> (environ 5 ans de moins que D10 à 65 ans, selon l'Insee) : ils touchent leur retraite moins longtemps. Le minimum de pension et les départs anticipés pour carrière longue compensent en partie.<br><br>
+      Pourquoi D10 a-t-il le rendement le plus bas ? Au-dessus du plafond de la Sécurité sociale, il paie des cotisations qui n'ouvrent <strong>aucun droit au régime de base</strong>, et sa pension dépend davantage de l'Agirc-Arrco, moins rentable. Entrés tard dans la vie active, plus de la moitié partent à 67 ans sans la durée complète. Son espérance de vie plus longue ne suffit pas à compenser.<br><br>
+      <strong>Les curseurs d'équité permettent de corriger ces écarts</strong> en fixant des cibles de rendement différentes : par exemple, relever le TRI de D1, ou demander un effort plus explicite à D10. Par défaut, les deux curseurs sont placés sur la valeur « réf. » (+0,12 %) : c'est le TRI identique pour tous les déciles qui ne coûte ni ne rapporte rien au système.
     </div>
     <div style="margin:16px 0;text-align:center;">
       <p style="color:var(--muted);font-size:.85rem;margin-bottom:8px;">Exemple — TRI par décile, génération 1980, scénario de référence (compensation désactivée)</p>
-      <img src="tri-exemple.png" alt="Graphique TRI par décile — génération 1980" style="width:260px;border-radius:10px;border:1px solid var(--border);">
+      <img src="tri-exemple.png" alt="Graphique TRI par décile — génération 1980" style="width:100%;max-width:520px;border-radius:10px;border:1px solid var(--border);">
     </div>
 
-    <p>On peut choisir de corriger ces inégalités en jouant sur les curseurs d'équité. Dans l'exemple ci-dessous, le TRI de D1 a été fixé à +1,60 % et celui de D10 à +0,80 %. Le coût global est quasi neutre pour le système (−0,8 Md€/an), mais correspond à une baisse de "rentabilité" pour les déciles du milieu, qui financent en partie la redistribution.</p>
+    <p>On peut choisir de corriger ces inégalités en jouant sur les curseurs d'équité. Dans l'exemple ci-dessous, le TRI de D1 a été fixé à +0,40 % et celui de D10 à −0,10 %. Le coût global est quasi neutre pour le système (−1,9 Md€ par an), mais correspond à une baisse de rendement pour les déciles du milieu (D5 à D8), qui financent la redistribution.</p>
 
     <div style="margin:16px 0;display:flex;gap:16px;align-items:flex-start;justify-content:center;flex-wrap:wrap;">
       <div style="text-align:center;">
         <p style="color:var(--muted);font-size:.85rem;margin-bottom:8px;">Réglage des curseurs</p>
-        <img src="tri-exemple%203.png" alt="Curseurs TRI D1=+1,60% D10=+0,80%" style="width:260px;border-radius:10px;border:1px solid var(--border);">
+        <img src="tri-exemple%203.png" alt="Curseurs TRI D1 = +0,40 % D10 = −0,10 %" style="width:260px;border-radius:10px;border:1px solid var(--border);">
       </div>
       <div style="text-align:center;">
         <p style="color:var(--muted);font-size:.85rem;margin-bottom:8px;">TRI résultant par décile</p>
-        <img src="tri-exemple%202.png" alt="Graphique TRI résultant avec redistribution" style="width:260px;border-radius:10px;border:1px solid var(--border);">
+        <img src="tri-exemple%202.png" alt="Graphique TRI résultant avec redistribution" style="width:100%;max-width:520px;border-radius:10px;border:1px solid var(--border);">
       </div>
     </div>
 
     <div class="highlight" style="border-color:#f59e0b;margin-top:16px;">
-      <strong>⚠️ Limite du modèle — minima sociaux</strong><br>
-      En réalité, les retraités D1 bénéficient du <strong>minimum contributif (MICO)</strong>, un plancher de pension fixe (~740 €/mois en 2024) qui protège partiellement leur pension des variations macroéconomiques. Le simulateur modélise le TRI de D1 comme proportionnel au salaire, ce qui est une approximation : pour un vrai D1, le MICO "décroche" du salaire et crée un effet de plancher non linéaire. Les dynamiques affichées pour D1 sont donc indicatives — elles capturent la tendance générale mais sous-estiment légèrement la résistance des petites pensions à certains leviers (désindexation notamment).
+      <strong>⚠️ Limite du modèle — minimum de pension</strong><br>
+      Le minimum contributif (893,65 € brut par mois en 2025 avec la majoration) est pris en compte dans le taux de remplacement de référence de D1. En revanche, quand on bouge les curseurs, le simulateur fait varier la pension de D1 en proportion, comme celle des autres déciles, alors qu'un vrai minimum de pension agit comme un plancher. Les variations affichées pour D1 sont donc indicatives.
     </div>
 
     <div class="lever-effect">
@@ -637,6 +725,13 @@
   </div>
 
   <div class="card">
+    <h3 style="margin-top:0;">Le niveau de vie des retraités en 2070</h3>
+    <p>C'est le niveau de vie moyen des retraités rapporté à celui de l'ensemble de la population. Il était de 100,2 % en 2023 ; le COR prévoit 90,3 % en 2070, parce que les pensions suivent les prix alors que les revenus d'activité suivent la productivité.</p>
+    <p><strong>Calcul :</strong> il dépend surtout de la pension moyenne rapportée au revenu d'activité moyen. D'après les variantes de productivité du COR, 1 % de pension relative en plus donne 0,74 % de niveau de vie relatif en plus. Le simulateur applique ce rapport aux leviers qui changent les pensions : âge légal et durée (pension moyenne des générations 1980 et 2000), indexation (masse des pensions en 2070). Productivité et chômage reprennent directement les variantes du COR. Cotisations, fécondité et solde migratoire n'ont pas d'effet : le COR ne publie rien pour les cotisations et juge l'effet des deux autres « très limité ».</p>
+    <p><strong>Exemples :</strong> pensions revalorisées de 1 point de moins que l'inflation : 83,1 % ; gel des pensions : 76,9 % ; âge légal 65 ans et 45 ans de cotisation : 90,0 %.</p>
+  </div>
+
+  <div class="card">
     <h3 style="margin-top:0;">Le déficit cumulé 2024–2070</h3>
     <p>Plus parlant que le seul chiffre de 2070 : c'est l'intégrale du déficit sur toute la période, en % du PIB × années. Il mesure l'effort total à fournir. Le scénario de référence COR correspond à environ −50 points de PIB·années cumulés.</p>
   </div>
@@ -648,8 +743,159 @@
 
   <hr>
 
+  <!-- ======================================= -->
+  <h2 id="fiabilite">Fiabilité des données et des calculs</h2>
+
+  <p>Les chiffres du simulateur n'ont pas tous la même solidité. Ils sont classés en trois catégories selon leur origine. L'impact indique ce qu'une erreur sur la donnée changerait&nbsp;:</p>
+  <ul>
+    <li><span class="tag tag-red">Impact fort</span>&nbsp;: touche le solde ou le TRI de presque tous les scénarios&nbsp;;</li>
+    <li><span class="tag tag-orange">Impact moyen</span>&nbsp;: touche un seul levier ou un seul indicateur&nbsp;;</li>
+    <li><span class="tag tag-blue">Impact faible</span>&nbsp;: touche l'affichage, ou change le résultat de moins de 0,05 point de PIB.</li>
+  </ul>
+
+  <div class="card">
+    <h3 style="margin-top:0;">1. Sources officielles</h3>
+    <p style="color:var(--muted);">COR, Insee, Drees, Dares, législation. Utilisées telles quelles.</p>
+    <ul class="fiab-list">
+      <li><strong>Solde de référence 2024–2070</strong><span class="tag tag-red">Impact fort</span><span class="fiab-detail">COR, rapport 2026&nbsp;: solde en 2024, 2030, 2038, 2045, 2048, 2050 et 2070. Toute la courbe de référence en dépend.</span></li>
+      <li><strong>Effet de l'âge de départ sur le solde</strong><span class="tag tag-red">Impact fort</span><span class="fiab-detail">COR 2026&nbsp;: 3 ans d'âge moyen de départ en plus améliorent le solde 2070 de 2,4 points de PIB, soit 0,8 point par an. Base des leviers âge légal et durée.</span></li>
+      <li><strong>Règles de calcul des pensions</strong><span class="tag tag-red">Impact fort</span><span class="fiab-detail">Législation 2026&nbsp;: régime général, Agirc-Arrco, minimum contributif, CSG. Base des taux de remplacement et du TRI.</span></li>
+      <li><strong>Salaires par décile</strong><span class="tag tag-red">Impact fort</span><span class="fiab-detail">Insee, salaires du privé en 2024. Base des taux de remplacement et du TRI par décile.</span></li>
+      <li><strong>Espérance de vie</strong><span class="tag tag-red">Impact fort</span><span class="fiab-detail">Insee&nbsp;: à 65 ans par génération, et selon le niveau de vie (2012-2016). Base de la durée de retraite dans le TRI.</span></li>
+      <li><strong>Profils types, taux de remplacement et TRI publiés par le COR</strong><span class="tag tag-red">Impact fort</span><span class="fiab-detail">Ils servent à vérifier le moteur de calcul. Reproduits&nbsp;: le profil cadre (taux de remplacement et TRI) et le TRI au SMIC. Écarts non expliqués&nbsp;: taux de remplacement sous-estimé de 2 points pour le non-cadre et de 4 à 5 points au SMIC&nbsp;; TRI du non-cadre sous-estimé de 0,5 point (voir catégorie 3).</span></li>
+      <li><strong>Variantes de sensibilité du COR</strong><span class="tag tag-orange">Impact moyen</span><span class="fiab-detail">Solde migratoire, fécondité, productivité, chômage&nbsp;: chaque levier reprend les écarts publiés pour 2045 et 2070. Lecture sur graphique, précise à ± 0,05 point de PIB environ.</span></li>
+      <li><strong>Assiette des cotisations</strong><span class="tag tag-orange">Impact moyen</span><span class="fiab-detail">COR 2026&nbsp;: les revenus d'activité valent 43&nbsp;% du PIB, donc 1 point de cotisation ≈ 0,43 point de PIB (environ 13&nbsp;Md€).</span></li>
+      <li><strong>Dépenses de pension</strong><span class="tag tag-orange">Impact moyen</span><span class="fiab-detail">COR 2026&nbsp;: 14,1&nbsp;% du PIB en 2025, 15,3&nbsp;% en 2070, dont 95&nbsp;% de pensions. Base du levier indexation.</span></li>
+      <li><strong>Niveau de vie des retraités</strong><span class="tag tag-orange">Impact moyen</span><span class="fiab-detail">COR 2026&nbsp;: 90,3&nbsp;% en 2070, et ses variantes de productivité et de chômage.</span></li>
+      <li><strong>Âges d'entrée dans la vie active</strong><span class="tag tag-orange">Impact moyen</span><span class="fiab-detail">Dares (âge de fin d'études selon la catégorie sociale, 2023), Drees (âge moyen de début de carrière), Insee (catégories sociales par décile). Influent sur l'âge de départ et le TRI par décile.</span></li>
+      <li><strong>Part des départs à l'âge légal</strong><span class="tag tag-orange">Impact moyen</span><span class="fiab-detail">Drees&nbsp;: 26&nbsp;% des assurés partent dès l'âge légal, quelle que soit leur durée. Donnée de la génération 1953 (Drees, édition 2025).</span></li>
+      <li><strong>Ratio cotisants / retraités</strong><span class="tag tag-blue">Impact faible</span><span class="fiab-detail">Insee, Sécurité sociale, COR 2026 (2030 à 2060 lus sur un graphique). Illustration, sans effet sur les calculs.</span></li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:0;">2. Sources sérieuses non officielles</h3>
+    <p style="color:var(--muted);">Travaux d'équipes de recherche ou sites spécialisés, cités par le COR ou reprenant des barèmes officiels.</p>
+    <ul class="fiab-list">
+      <li><strong>Effets des cotisations sur l'économie</strong><span class="tag tag-orange">Impact moyen</span><span class="fiab-detail">Modèles I-MIP et OFCE présentés au COR en mars 2026&nbsp;: il reste 93&nbsp;% de la recette d'une hausse des cotisations salariales et 80&nbsp;% d'une hausse patronale. Ces résultats n'engagent que les équipes qui les ont produits&nbsp;; la DG Trésor ne publie pas cette donnée. Une erreur de 10 points sur ces parts change l'effet d'environ 0,04 point de PIB par point de cotisation.</span></li>
+      <li><strong>Barèmes 2026 repris de sites spécialisés</strong><span class="tag tag-blue">Impact faible</span><span class="fiab-detail">Taux de cotisation (Légisocial) et seuils de CSG des retraités (Moneyvox). Ce sont des barèmes officiels, mais recopiés par des sites privés.</span></li>
+      <li><strong>Ratio cotisants / retraités de 1960 à 1990</strong><span class="tag tag-blue">Impact faible</span><span class="fiab-detail">Rapport du Sénat de 1997 citant la Sécurité sociale. Illustration seulement.</span></li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:0;">3. Approximations du dossier</h3>
+    <p style="color:var(--muted);">Hypothèses, interpolations et reconstitutions faites pour ce simulateur, quand aucune source ne donne le chiffre. Le détail de chaque calcul est dans les notes du dossier (calibration-leviers.md, calculs-par-decile.md, hypotheses-COR.md).</p>
+    <ul class="fiab-list">
+      <li><strong>Additivité des leviers</strong><span class="tag tag-red">Impact fort</span><span class="fiab-detail">Le COR teste une hypothèse à la fois. Quand plusieurs curseurs bougent, le simulateur additionne leurs effets. Sans effet pour un seul curseur, l'erreur grandit avec le nombre de leviers combinés.</span></li>
+      <li><strong>Effet de l'âge légal et de la durée</strong><span class="tag tag-red">Impact fort</span><span class="fiab-detail">Chacun part dès qu'il a le taux plein&nbsp;; 26&nbsp;% de chaque décile part à l'âge légal&nbsp;; carrières continues, sans chômage. Vérification&nbsp;: un an d'âge légal en plus donne +&nbsp;0,38 point de PIB en 2070, dans la fourchette des modèles présentés au COR (+&nbsp;0,2 à +&nbsp;0,4).</span></li>
+      <li><strong>Montée en charge</strong><span class="tag tag-red">Impact fort</span><span class="fiab-detail">L'effet d'une réforme sur le solde est supposé croître en ligne droite sur 18 ans, le temps que les retraités se renouvellent&nbsp;; avec une montée en charge, seule une partie des départs suit les nouvelles règles. Forte influence sur le solde des années 2030 à 2045 (exemple Philippe en 2035&nbsp;: de +&nbsp;6,7&nbsp;Md€ à −&nbsp;8,5&nbsp;Md€ selon la durée choisie), aucune en 2070.</span></li>
+      <li><strong>TRI par décile</strong><span class="tag tag-red">Impact fort</span><span class="fiab-detail">Le COR ne publie rien par décile. Le dossier reconstitue les carrières de D4 à D9 (mélange des profils non-cadre et cadre), les âges d'entrée par décile et applique les écarts d'espérance de vie des hommes à toutes les générations. Sur les profils types du COR, le moteur trouve un TRI du non-cadre inférieur de 0,5 point à celui du COR, sans explication trouvée.</span></li>
+      <li><strong>Indexation des pensions</strong><span class="tag tag-orange">Impact moyen</span><span class="fiab-detail">Calcul mécanique&nbsp;: répartition des pensions selon l'ancienneté de la retraite (départ à 65 ans, mortalité 2012-2016), inflation de 2&nbsp;% pour situer le gel, seules les pensions déjà versées sont touchées. Effet probablement un peu sous-estimé en 2070, car la retraite s'allongera.</span></li>
+      <li><strong>Prolongements au-delà des variantes du COR</strong><span class="tag tag-orange">Impact moyen</span><span class="fiab-detail">Au-delà des valeurs testées par le COR (par exemple moins de 70 000 ou plus de 230 000 migrants par an, fécondité au-dessus de 1,7), l'effet est prolongé en ligne droite. Les deux variantes du COR (hausse et baisse) sont moyennées.</span></li>
+      <li><strong>Niveau de vie des retraités</strong><span class="tag tag-orange">Impact moyen</span><span class="fiab-detail">Le rapport de 0,74 entre pension relative et niveau de vie relatif vient des variantes de productivité du COR&nbsp;; le simulateur l'applique aussi à l'âge et à l'indexation. Cotisations, fécondité et migration n'ont pas d'effet. Ne touche que cet indicateur.</span></li>
+      <li><strong>Effets non comptés</strong><span class="tag tag-orange">Impact moyen</span><span class="fiab-detail">Le simulateur ne compte pas l'effet sur l'économie d'une baisse des pensions (le COR le juge récessif à court terme), ni les changements de comportement (épargne, report volontaire du départ).</span></li>
+      <li><strong>Évolution entre les années publiées</strong><span class="tag tag-blue">Impact faible</span><span class="fiab-detail">Entre deux années publiées par le COR, l'écart évolue en ligne droite. Erreur estimée à ± 0,05 point de PIB.</span></li>
+      <li><strong>PIB 2035</strong><span class="tag tag-blue">Impact faible</span><span class="fiab-detail">Estimé à 3 870&nbsp;Md€ en prolongeant le rythme 2025-2030 du COR (+&nbsp;2,6&nbsp;% par an). Sert seulement à convertir le solde 2035 en milliards d'euros.</span></li>
+      <li><strong>Rémunération moyenne du profil cadre</strong><span class="tag tag-blue">Impact faible</span><span class="fiab-detail">Estimée entre 3 000 et 3 400&nbsp;€ brut par mois, car le COR ne la publie pas en euros. Ne sert qu'à vérifier le moteur sur le profil cadre.</span></li>
+    </ul>
+  </div>
+
+  <hr>
+
+  <!-- ======================================= -->
+  <h2 id="versions">Historique des versions</h2>
+
+  <div class="card">
+    <h3 style="margin-top:0;">Version 3 — 6 octobre 2026</h3>
+    <p>Tous les calculs ont été revus pour s'appuyer sur des sources vérifiables, en priorité le rapport du COR de juin 2026.</p>
+    <p><strong>Nouveaux curseurs</strong></p>
+    <ul>
+      <li><strong>Âge légal et durée de cotisation</strong> sont désormais deux curseurs séparés.</li>
+      <li><strong>Montée en charge&nbsp;:</strong> choisissez si une réforme s'applique d'un coup ou progressivement, sur 20 ans au plus.</li>
+    </ul>
+    <p><strong>Des leviers plus proches du COR</strong></p>
+    <ul>
+      <li><strong>Solde migratoire, fécondité, productivité, chômage&nbsp;:</strong> leurs effets reprennent maintenant les chiffres du COR. Celui du solde migratoire était auparavant 4 à 5 fois trop faible.</li>
+      <li><strong>Cotisations&nbsp;:</strong> 1 point de cotisation rapporte environ 13 milliards d'euros par an, contre 3 à 4 auparavant. Une hausse patronale rapporte un peu moins qu'une hausse salariale, car elle pèse davantage sur l'emploi.</li>
+      <li><strong>Indexation des pensions&nbsp;:</strong> le curseur se règle désormais en écart à l'inflation, du gel des pensions (− 2 points par an) à une indexation proche des salaires (+ 0,7 point). Un gel améliore le solde 2070 de 2,9 points de PIB, contre 0,5 auparavant.</li>
+      <li><strong>Niveau de vie des retraités&nbsp;:</strong> la référence 2070 passe à 90,3&nbsp;%, le chiffre du COR.</li>
+      <li><strong>Scénario de référence et ratio cotisants / retraités&nbsp;:</strong> mis à jour avec le rapport du COR de 2026.</li>
+    </ul>
+    <p><strong>Une équité calculée autrement</strong></p>
+    <ul>
+      <li><strong>Taux de remplacement par décile&nbsp;:</strong> ils sont maintenant calculés avec les règles réelles (régime général, Agirc-Arrco) et les salaires de l'Insee. Pour la génération 1980&nbsp;: 80&nbsp;% pour D1, 67&nbsp;% pour D5, 47&nbsp;% pour D10. Les valeurs précédentes (82&nbsp;%, 73&nbsp;%, 43&nbsp;%) n'avaient pas de source.</li>
+      <li><strong>Âge de début de carrière&nbsp;:</strong> il dépend maintenant de la durée des études dans chaque décile. La moitié de D1 a commencé à travailler avant 21 ans, contre un sur dix en D10.</li>
+      <li><strong>Départs à l'âge légal&nbsp;:</strong> un quart des assurés part dès l'âge légal, même sans avoir toutes ses années de cotisation.</li>
+      <li><strong>Rendement (TRI)&nbsp;:</strong> il compte toutes les cotisations réellement payées et des pensions qui suivent les prix, et non plus les salaires.</li>
+    </ul>
+    <p><strong>Ce que cela change&nbsp;:</strong> les rendements baissent d'environ 1 point. Ce sont désormais les salaires du milieu de l'échelle (D4 à D8) qui sont les mieux servis, et les plus hauts salaires les moins bien. Génération 1980&nbsp;: D1 passe de +1,38&nbsp;% à +0,19&nbsp;%, D10 de +0,53&nbsp;% à −0,23&nbsp;%.</p>
+    <p><strong>Dans ce guide&nbsp;:</strong> un avertissement sur les limites du simulateur, une section sur la fiabilité des données et une liste des sources. Les nombres s'affichent au format français.</p>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:0;">Version 2 — 1<sup>er</sup> octobre 2026</h3>
+    <p>Cette version corrige le calcul du rendement (TRI) par décile et par génération.</p>
+    <ul>
+      <li><strong>Âge de départ&nbsp;:</strong> chaque génération part de son propre âge légal (61 ans pour la génération 1960, 65 ans pour 2020), et le curseur les décale toutes ensemble.</li>
+      <li><strong>Espérance de vie&nbsp;:</strong> elle vient maintenant de l'Insee, par génération et par niveau de vie (5,5 ans d'écart entre D1 et D10 à 65 ans, au lieu de 8 ans estimés).</li>
+    </ul>
+    <p><strong>Ce que cela change&nbsp;:</strong> le rendement devient positif pour tous les déciles et baisse d'une génération à l'autre. Les plus hauts salaires sont les moins bien servis.</p>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:0;">Version 1 — 23 juin 2026</h3>
+    <p>Première version publiée.</p>
+  </div>
+
+  <hr>
+
+  <!-- ======================================= -->
+  <h2 id="sources">Sources</h2>
+
+  <p>Les principaux documents utilisés. Les pages et les valeurs précises sont citées dans les notes du dossier (hypotheses-COR.md, calibration-leviers.md, calculs-par-decile.md).</p>
+
+  <div class="card">
+    <h3 style="margin-top:0;">Conseil d'orientation des retraites (COR)</h3>
+    <ul>
+      <li><a href="https://www.cor-retraites.fr/rapports-du-cor/rapport-annuel-cor-juin-2026-evolutions-perspectives-retraites-france" target="_blank" rel="noopener" style="color:#a5b4fc;">Rapport annuel, juin 2026</a> — <em>Évolutions et perspectives des retraites en France</em>. Source principale&nbsp;: scénario de référence, solde, variantes de sensibilité, profils types, taux de remplacement, TRI, niveau de vie, ratio cotisants / retraités.</li>
+      <li><a href="https://www.cor-retraites.fr/sites/default/files/2026-06/Annexe_m%C3%A9thodo_en_ligne_2026.pdf" target="_blank" rel="noopener" style="color:#a5b4fc;">Annexe méthodologique en ligne du rapport 2026</a> — solde année par année, définition des profils types, profils de salaire.</li>
+      <li><a href="https://www.cor-retraites.fr/sites/default/files/2025-06/RA_2025_def_publi.pdf" target="_blank" rel="noopener" style="color:#a5b4fc;">Rapport annuel, juin 2025</a> — ancien scénario de référence, affiché pour comparaison.</li>
+      <li><a href="https://www.cor-retraites.fr/sites/default/files/2026-03/Doc_02_Simul%20macro%C3%A9co%20leviers%20d'%C3%A9quilibre.pdf" target="_blank" rel="noopener" style="color:#a5b4fc;">Séance du 26 mars 2026, document n°&nbsp;2</a> — effets macroéconomiques des leviers d'équilibre (DG Trésor, I-MIP, OFCE).</li>
+      <li>Séance du 17 mai 2017, document n°&nbsp;10 — méthode du taux de rendement interne sur le cas type de non-cadre.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:0;">Insee</h3>
+    <ul>
+      <li><a href="https://www.insee.fr/fr/statistiques/8657156" target="_blank" rel="noopener" style="color:#a5b4fc;">Les salaires dans le secteur privé en 2024</a> (Insee Première n°&nbsp;2079) — salaires par décile et par catégorie sociale.</li>
+      <li><a href="https://www.insee.fr/fr/statistiques/6655536" target="_blank" rel="noopener" style="color:#a5b4fc;">Espérance de vie par génération</a> (Insee Première n°&nbsp;1927, 2023) — espérance de vie à 65 ans.</li>
+      <li><a href="https://www.insee.fr/fr/statistiques/3311422?sommaire=3311425" target="_blank" rel="noopener" style="color:#a5b4fc;">Tables de mortalité par niveau de vie, 2012-2016</a> — écarts d'espérance de vie entre déciles, répartition des retraités par ancienneté.</li>
+      <li><a href="https://www.insee.fr/fr/statistiques/2415121" target="_blank" rel="noopener" style="color:#a5b4fc;">Cotisants, retraités et rapport démographique tous régimes</a> — ratio cotisants / retraités observé.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:0;">Drees et Dares</h3>
+    <ul>
+      <li><a href="https://drees.solidarites-sante.gouv.fr/publications-communique-de-presse-documents-de-reference/250731_PANORAMAS-retraites" target="_blank" rel="noopener" style="color:#a5b4fc;">Drees, <em>Les retraités et les retraites</em>, édition 2025</a> — âge de début de carrière, minimum de pension, départs à l'âge légal.</li>
+      <li>Dares (M. Gouyon, S. Makhzoum), <em>Comment l'âge de sortie des études initiales s'articule-t-il avec le début de carrière professionnelle ?</em>, 9 mai 2023 — âge de fin d'études selon la catégorie sociale.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:0;">Autres sources</h3>
+    <ul>
+      <li><a href="https://www.legisocial.fr/reperes-sociaux/taux-cotisations-sociales-urssaf-2026.html" target="_blank" rel="noopener" style="color:#a5b4fc;">Légisocial, taux de cotisations 2026</a> et <a href="https://www.moneyvox.fr/impot/actualites/106683/assurance-retraite-agirc-arrco-voici-votre-taux-officiel-de-csg-2026-selon-vos-revenus" target="_blank" rel="noopener" style="color:#a5b4fc;">Moneyvox, seuils de CSG 2026</a> — barèmes officiels repris par des sites spécialisés.</li>
+      <li><a href="https://www.senat.fr/rap/l97-73-3/l97-73-33.html" target="_blank" rel="noopener" style="color:#a5b4fc;">Sénat, rapport n°&nbsp;73 tome III sur le PLFSS 1998</a> et <a href="https://evaluation.securite-sociale.fr/home/retraite/1-6-ratio-de-dependance-demograp.html" target="_blank" rel="noopener" style="color:#a5b4fc;">Sécurité sociale, ratio de dépendance démographique</a> — ratio cotisants / retraités de 1960 à 1990.</li>
+    </ul>
+  </div>
+
+  <hr>
+
   <div style="color:var(--muted);font-size:.85rem;text-align:center;margin-top:32px;">
-    Simulateur fondé sur les rapports COR 2025 et 2026 · Données de projection : scénario central<br>
+    Simulateur fondé sur le rapport annuel du COR de juin 2026 · Scénario central<br>
     Ce simulateur est un outil pédagogique. Les chiffres sont des ordres de grandeur, pas des prévisions.
   </div>
 

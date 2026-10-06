@@ -896,9 +896,9 @@
         }
         .comp-ref-tick {
             position: absolute;
-            /* réf. = TRI uniforme à coût nul, génération 1980 : +1,10 %
-               (1.10+2)/4 = 77.5% ; correction thumb ≈ 8px sur largeur totale */
-            left: calc(77.5% - 8px * (1 - 2 * 0.775));
+            /* réf. = TRI uniforme à coût nul, génération 1980 : +0,12 % (v3)
+               (0.12+2)/4 = 53% ; correction thumb ≈ 8px sur largeur totale */
+            left: calc(53% - 8px * (1 - 2 * 0.53));
             top: 100%;
             display: flex;
             flex-direction: column;
@@ -921,8 +921,9 @@
         .comp-tri-val {
             font-size: 12px;
             font-weight: 700;
-            width: 42px;
+            width: 54px;
             text-align: right;
+            white-space: nowrap;
             flex-shrink: 0;
         }
         .comp-results {
@@ -979,7 +980,7 @@
                     <span class="lever-name">🎯 Âge légal de départ</span>
                     <span class="lever-value" id="val-age">64 ans</span>
                 </div>
-                <div class="lever-desc">Actuellement 64 ans (réforme 2023). Chaque année supplémentaire réduit les dépenses et augmente les cotisations.</div>
+                <div class="lever-desc">Âge minimum pour partir (64 ans depuis la réforme 2023, pour les générations 1969 et suivantes). Il retarde surtout ceux qui ont commencé à travailler tôt.</div>
                 <div class="slider-wrap">
                     <div class="slider-bubble" id="bub-age">64 ans</div>
                     <input type="range" id="sl-age" min="60" max="70" step="0.5" value="64">
@@ -989,10 +990,36 @@
 
             <div class="lever">
                 <div class="lever-header">
+                    <span class="lever-name">⏳ Durée de cotisation</span>
+                    <span class="lever-value" id="val-duree">43 ans</span>
+                </div>
+                <div class="lever-desc">Durée requise pour une retraite à taux plein (43 ans, soit 172 trimestres). Elle retarde surtout ceux qui ont commencé tard ; à 67 ans, le taux plein est acquis quelle que soit la durée.</div>
+                <div class="slider-wrap">
+                    <div class="slider-bubble" id="bub-duree">43 ans</div>
+                    <input type="range" id="sl-duree" min="40" max="47" step="0.25" value="43">
+                    <div class="ref-mark" id="mark-duree"><div class="ref-line"></div><div class="ref-label">43 ans (réf.)</div></div>
+                </div>
+            </div>
+
+            <div class="lever">
+                <div class="lever-header">
+                    <span class="lever-name">🪜 Montée en charge</span>
+                    <span class="lever-value" id="val-rythme">Immédiate</span>
+                </div>
+                <div class="lever-desc">Nombre d'années pour appliquer entièrement le changement d'âge légal et de durée. Repère : la réforme de 2023 relevait l'âge de 3 mois et la durée d'un trimestre par génération.</div>
+                <div class="slider-wrap">
+                    <div class="slider-bubble" id="bub-rythme">Immédiate</div>
+                    <input type="range" id="sl-rythme" min="0" max="20" step="1" value="0">
+                    <div class="ref-mark" id="mark-rythme"><div class="ref-line"></div><div class="ref-label">Immédiate</div></div>
+                </div>
+            </div>
+
+            <div class="lever">
+                <div class="lever-header">
                     <span class="lever-name">💼 Cotisations salariales</span>
                     <span class="lever-value" id="val-cotis-sal">±0 pt</span>
                 </div>
-                <div class="lever-desc">Cotisations vieillesse à la charge du salarié (actuellement ~7,3%). Réduit le salaire net — effet récessif limité.</div>
+                <div class="lever-desc">Hausse du taux de cotisation retraite à la charge des actifs, sur l'ensemble des revenus d'activité. Au régime général, le salarié paie 7,3 % pour le régime de base. 1 point ≈ 13 Md€ par an ; il en reste 93 % après les effets sur l'économie (COR).</div>
                 <div class="slider-wrap">
                     <div class="slider-bubble" id="bub-cotis-sal">±0 pt</div>
                     <input type="range" id="sl-cotis-sal" min="-2" max="5" step="0.5" value="0">
@@ -1005,7 +1032,7 @@
                     <span class="lever-name">🏭 Cotisations patronales</span>
                     <span class="lever-value" id="val-cotis-emp">±0 pt</span>
                 </div>
-                <div class="lever-desc">Cotisations vieillesse à la charge de l'employeur (actuellement ~10,5%). Augmente le coût du travail — effet récessif plus fort.</div>
+                <div class="lever-desc">Hausse du taux de cotisation retraite à la charge des employeurs, sur l'ensemble des revenus d'activité. Au régime général, l'employeur paie 10,6 % pour le régime de base. 1 point ≈ 13 Md€ par an ; il en reste 80 % après les effets sur l'emploi (COR).</div>
                 <div class="slider-wrap">
                     <div class="slider-bubble" id="bub-cotis-emp">±0 pt</div>
                     <input type="range" id="sl-cotis-emp" min="-2" max="6" step="0.5" value="0">
@@ -1018,12 +1045,12 @@
                     <span class="lever-name">📊 Indexation des pensions</span>
                     <span class="lever-value" id="val-index">Sur les prix (actuel)</span>
                 </div>
-                <div class="lever-desc">Règle de revalorisation annuelle des pensions, de la désindexation totale (gel : améliore le solde mais réduit le niveau de vie des retraités) à l'indexation sur les salaires (préserve le niveau de vie mais coûte au système). Le scénario actuel indexe sur les prix.</div>
+                <div class="lever-desc">Écart annuel entre la revalorisation des pensions et l'inflation. 0 = sur les prix (règle actuelle) ; − 2 pt = gel des pensions (inflation de 2 %) ; + 0,7 pt ≈ sur les salaires. Une sous-indexation de 1 point par an améliore le solde 2070 d'environ 1,6 point de PIB.</div>
                 <div class="slider-wrap">
                     <div class="slider-bubble" id="bub-index">Prix</div>
-                    <input type="range" id="sl-index" min="-1" max="1" step="0.05" value="0">
+                    <input type="range" id="sl-index" min="-2" max="0.7" step="0.1" value="0">
                     <div class="ref-mark" id="mark-index"><div class="ref-line"></div><div class="ref-label">Prix (réf.)</div></div>
-                    <div class="ref-mark" style="--ref:0;bottom:0;left:calc(0 * (100% - var(--thumb)) + var(--thumb) / 2);transform:translateX(0);align-items:flex-start;"><div class="ref-line" style="background:#94a3b8;"></div><div class="ref-label" style="color:#94a3b8;white-space:normal;width:60px;text-align:left;line-height:1.2;">Désindexation<br>totale</div></div>
+                    <div class="ref-mark" style="--ref:0;bottom:0;left:calc(0 * (100% - var(--thumb)) + var(--thumb) / 2);transform:translateX(0);align-items:flex-start;"><div class="ref-line" style="background:#94a3b8;"></div><div class="ref-label" style="color:#94a3b8;white-space:normal;width:60px;text-align:left;line-height:1.2;">Gel</div></div>
                     <div class="ref-mark" style="--ref:1;bottom:0;left:calc(1 * (100% - var(--thumb)) + var(--thumb) / 2);"><div class="ref-line" style="background:#94a3b8;"></div><div class="ref-label" style="color:#94a3b8;">Salaires</div></div>
                 </div>
             </div>
@@ -1035,13 +1062,13 @@
                     <span class="lever-name">👶 Taux de fécondité</span>
                     <span class="lever-value" id="val-fec">1,45 enfant/femme</span>
                 </div>
-                <div class="lever-desc">Scénario COR 2026 : 1,45 à partir de 2028 (COR 2025 : 1,8). Observé en 2025 : 1,56 (plus bas depuis 1917). Effet décalé à partir de 2045.</div>
+                <div class="lever-desc">Scénario COR 2026 : 1,45 à partir de 2028 (COR 2025 : 1,8). Observé en 2025 : 1,56 (plus bas depuis 1917). Aucun effet avant le milieu des années 2040 ; 0,25 enfant de plus ou de moins change le solde 2070 d'environ ± 0,95 point de PIB (COR 2026).</div>
                 <div class="slider-wrap">
                     <div class="slider-bubble" id="bub-fec">1,45</div>
-                    <input type="range" id="sl-fec" min="1.4" max="2.1" step="0.05" value="1.45">
+                    <input type="range" id="sl-fec" min="1.2" max="2.1" step="0.05" value="1.45">
                     <div class="ref-mark" id="mark-fec"><div class="ref-line"></div><div class="ref-label">1,45 (réf.)</div></div>
-                    <div class="ref-mark" style="--ref:0.5714;bottom:0;left:calc(0.5714 * (100% - var(--thumb)) + var(--thumb) / 2);"><div class="ref-line" style="background:#94a3b8;"></div><div class="ref-label" style="color:#94a3b8;">COR 2025</div></div>
-                    <div class="ref-mark" style="--ref:0.2286;bottom:0;left:calc(0.2286 * (100% - var(--thumb)) + var(--thumb) / 2);"><div class="ref-line" style="background:#22d3ee;"></div><div class="ref-label" style="color:#22d3ee;">INSEE</div></div>
+                    <div class="ref-mark" style="--ref:0.6667;bottom:0;left:calc(0.6667 * (100% - var(--thumb)) + var(--thumb) / 2);"><div class="ref-line" style="background:#94a3b8;"></div><div class="ref-label" style="color:#94a3b8;">COR 2025</div></div>
+                    <div class="ref-mark" style="--ref:0.4;bottom:0;left:calc(0.4 * (100% - var(--thumb)) + var(--thumb) / 2);"><div class="ref-line" style="background:#22d3ee;"></div><div class="ref-label" style="color:#22d3ee;">INSEE</div></div>
                 </div>
             </div>
 
@@ -1050,7 +1077,7 @@
                     <span class="lever-name">🌍 Solde migratoire annuel</span>
                     <span class="lever-value" id="val-mig">+150 000 /an</span>
                 </div>
-                <div class="lever-desc">Scénario COR 2026 : +150 000/an dès 2026 (COR 2025 : +70 000/an). Réalité 2018-22 : +186 000/an. Les migrants sont d'abord cotisants, puis retraités.</div>
+                <div class="lever-desc">Scénario COR 2026 : +150 000/an dès 2026 (COR 2025 : +70 000/an). Réalité 2018-22 : +186 000/an. Effet croissant dans le temps : ± 80 000 personnes par an changent le solde 2070 d'environ ± 1 point de PIB (COR 2026).</div>
                 <div class="slider-wrap">
                     <div class="slider-bubble" id="bub-mig">+150k</div>
                     <input type="range" id="sl-mig" min="0" max="300000" step="10000" value="150000">
@@ -1079,7 +1106,7 @@
                     <span class="lever-name">📉 Taux de chômage (long terme)</span>
                     <span class="lever-value" id="val-chom">7,0 %</span>
                 </div>
-                <div class="lever-desc">Scénario COR 2026 : 7 % à partir de 2032 (hypothèse inchangée vs COR 2025 ; chômage observé en 2025 : 7,7 %). Un chômage plus faible = plus de cotisants actifs.</div>
+                <div class="lever-desc">Scénario COR 2026 : 7 % à partir de 2040 (chômage observé en 2025 : 7,7 %). Un chômage plus faible = plus de cotisants actifs.</div>
                 <div class="slider-wrap">
                     <div class="slider-bubble" id="bub-chom">7,0%</div>
                     <input type="range" id="sl-chom" min="3" max="11" step="0.5" value="7">
@@ -1100,25 +1127,25 @@
                     <div class="comp-slider-row">
                         <span class="comp-slider-label">D1 (bas sal.)</span>
                         <div class="comp-slider-wrap">
-                            <input type="range" id="comp-d1" min="-2" max="2" step="0.05" value="1.1"
+                            <input type="range" id="comp-d1" min="-2" max="2" step="0.01" value="0.12"
                                    oninput="onCompSlider()">
                             <span class="comp-ref-tick"><span class="comp-ref-tick-label">réf.</span></span>
                         </div>
-                        <span class="comp-tri-val" id="comp-d1-val">+1.10%</span>
+                        <span class="comp-tri-val" id="comp-d1-val">+0,12&nbsp;%</span>
                     </div>
                     <div class="comp-slider-row">
                         <span class="comp-slider-label">D10 (haut sal.)</span>
                         <div class="comp-slider-wrap">
-                            <input type="range" id="comp-d10" min="-2" max="2" step="0.05" value="1.1"
+                            <input type="range" id="comp-d10" min="-2" max="2" step="0.01" value="0.12"
                                    oninput="onCompSlider()">
                             <span class="comp-ref-tick"><span class="comp-ref-tick-label">réf.</span></span>
                         </div>
-                        <span class="comp-tri-val" id="comp-d10-val">+1.10%</span>
+                        <span class="comp-tri-val" id="comp-d10-val">+0,12&nbsp;%</span>
                     </div>
                     <div class="comp-results">
                         <div class="comp-result-box">
                             <div class="comp-result-label">Coût annuel (impact sur le solde)</div>
-                            <div class="comp-result-val" id="comp-cost">0 Mds€/an</div>
+                            <div class="comp-result-val" id="comp-cost">0 Md€/an</div>
                         </div>
                     </div>
                     <div class="comp-impossible" id="comp-impossible" style="display:none;">
@@ -1189,7 +1216,7 @@
                     <div class="balance-horizon">Équilibre à 10 ans</div>
                     <div class="balance-year">2035</div>
                     <div class="balance-amount" id="balance-amount">—</div>
-                    <div class="balance-unit">Mds €</div>
+                    <div class="balance-unit">Md€</div>
                     <div class="balance-pct" id="balance-pct">—</div>
                     <div class="balance-divider"></div>
                     <div class="balance-ref-label">Scénario COR 2026</div>
@@ -1214,9 +1241,9 @@
                     <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border)">
                         <div style="font-size:10px;color:var(--muted);margin-bottom:6px;font-weight:700;text-transform:uppercase;letter-spacing:.07em">Repères</div>
                         <div style="font-size:11px;color:#64748b;line-height:1.8">
-                            2022 (observé) : <b style="color:#94a3b8">97%</b><br>
-                            Scénario COR réf. : <b style="color:#94a3b8">87,5%</b><br>
-                            Avec loyers imputés (2022) : <b style="color:#94a3b8">105%</b>
+                            2023 (observé) : <b style="color:#94a3b8">100,2 %</b><br>
+                            Scénario COR 2026 en 2070 : <b style="color:#94a3b8">90,3 %</b><br>
+                            Avec loyers imputés (2023) : <b style="color:#94a3b8">106,5 %</b>
                         </div>
                     </div>
                 </div>
@@ -1231,15 +1258,15 @@
             <div class="tr-section-header">
                 <div>
                     <div class="chart-title">Le taux de remplacement : le montant de la retraite par rapport au dernier salaire</div>
-                    <div style="font-size:12px;color:var(--muted);margin-top:5px;">Pour trois profils de revenus de la génération 1980 (départ à 64 ans) — scénario COR de référence vs votre simulation</div>
+                    <div style="font-size:12px;color:var(--muted);margin-top:5px;">Pour trois profils de revenus de la génération 1980 (départ au taux plein, 65,5 ans ; salaires de fin de carrière) — référence vs votre simulation</div>
                 </div>
                 <div class="tr-note">
-                    Seuls <b style="color:#e2e8f0">l'âge de départ</b> et <b style="color:#e2e8f0">l'indexation</b> agissent directement sur le taux de remplacement individuel.
-                    Les 5 autres curseurs jouent sur l'équilibre macro du système, pas sur la pension individuelle.
+                    Seuls <b style="color:#e2e8f0">l'âge légal</b> et <b style="color:#e2e8f0">la durée de cotisation</b> agissent sur le taux de remplacement au moment du départ : pension réduite quand on part à 67 ans sans la durée complète, points Agirc-Arrco en plus quand on travaille plus longtemps.
+                    <b style="color:#e2e8f0">L'indexation</b> agit ensuite, pendant la retraite : elle est prise en compte dans le rendement (TRI, colonne de droite).
                 </div>
             </div>
             <div style="display:flex;flex-wrap:wrap;gap:8px 16px;margin-bottom:14px;font-size:11px;color:var(--muted);">
-                <span style="display:flex;align-items:center;gap:6px;"><span style="width:16px;height:3px;background:rgba(99,102,241,0.7);border-radius:2px;display:inline-block;"></span>Référence COR 2025</span>
+                <span style="display:flex;align-items:center;gap:6px;"><span style="width:16px;height:3px;background:rgba(99,102,241,0.7);border-radius:2px;display:inline-block;"></span>Référence (calcul calé sur le COR 2026)</span>
                 <span style="display:flex;align-items:center;gap:6px;"><span style="width:16px;height:3px;background:#10b981;border-radius:2px;display:inline-block;"></span>Votre simulation</span>
             </div>
             <div style="position:relative;width:100%;height:200px;">
@@ -1247,21 +1274,21 @@
             </div>
             <div class="tr-stat-row">
                 <div class="tr-stat">
-                    <div class="tr-stat-label">D1 — bas salaire (~1 600 €/mois brut)</div>
-                    <div class="tr-stat-val" id="tr-val-d1">82%</div>
-                    <div style="font-size:11px;color:var(--muted);margin-top:2px;">réf. 82%</div>
+                    <div class="tr-stat-label">D1 — bas salaire (~1 830 €/mois brut)</div>
+                    <div class="tr-stat-val" id="tr-val-d1">80%</div>
+                    <div style="font-size:11px;color:var(--muted);margin-top:2px;">réf. 80%</div>
                     <div class="tr-stat-delta neu" id="tr-delta-d1">inchangé</div>
                 </div>
                 <div class="tr-stat">
-                    <div class="tr-stat-label">D5 — médian (~2 650 €/mois brut)</div>
-                    <div class="tr-stat-val" id="tr-val-d5">73%</div>
-                    <div style="font-size:11px;color:var(--muted);margin-top:2px;">réf. 73%</div>
+                    <div class="tr-stat-label">D5 — médian (~2 930 €/mois brut)</div>
+                    <div class="tr-stat-val" id="tr-val-d5">67%</div>
+                    <div style="font-size:11px;color:var(--muted);margin-top:2px;">réf. 67%</div>
                     <div class="tr-stat-delta neu" id="tr-delta-d5">inchangé</div>
                 </div>
                 <div class="tr-stat">
-                    <div class="tr-stat-label">D10 — haut salaire (~9 500 €/mois brut)</div>
-                    <div class="tr-stat-val" id="tr-val-d10">43%</div>
-                    <div style="font-size:11px;color:var(--muted);margin-top:2px;">réf. 43%</div>
+                    <div class="tr-stat-label">D10 — haut salaire (~9 090 €/mois brut)</div>
+                    <div class="tr-stat-val" id="tr-val-d10">47%</div>
+                    <div style="font-size:11px;color:var(--muted);margin-top:2px;">réf. 47%</div>
                     <div class="tr-stat-delta neu" id="tr-delta-d10">inchangé</div>
                 </div>
             </div>
@@ -1277,8 +1304,7 @@
             </div>
             <div class="ratio-legend">
                 <div class="ratio-legend-item"><span class="ratio-legend-dot" style="background:#6366f1;"></span>Données observées</div>
-                <div class="ratio-legend-item"><span class="ratio-legend-dot" style="background:#475569;"></span>Estimation interpolée (non officielle)</div>
-                <div class="ratio-legend-item"><span class="ratio-legend-dot" style="background:#f59e0b;"></span>Projection officielle COR</div>
+                <div class="ratio-legend-item"><span class="ratio-legend-dot" style="background:#f59e0b;"></span>Estimation et projection COR 2026</div>
             </div>
             <div style="position:relative;width:100%;height:220px;">
                 <canvas id="ratio-chart"></canvas>
@@ -1291,21 +1317,21 @@
                 </div>
                 <div class="ratio-box">
                     <div class="ratio-box-year">2025</div>
-                    <div class="ratio-box-value">1,80 : 1</div>
-                    <div class="ratio-box-note">Dernière estimation COR</div>
+                    <div class="ratio-box-value">1,8 : 1</div>
+                    <div class="ratio-box-note">Estimation COR 2026</div>
                 </div>
                 <div class="ratio-box">
                     <div class="ratio-box-year">2070</div>
-                    <div class="ratio-box-value">1,41 : 1</div>
-                    <div class="ratio-box-note">Projection COR — scénario de référence</div>
+                    <div class="ratio-box-value">1,3 : 1</div>
+                    <div class="ratio-box-note">Projection COR 2026 — scénario de référence</div>
                 </div>
             </div>
             <div class="ratio-sources">
                 Sources : Insee, <a href="https://www.insee.fr/fr/statistiques/2415121" target="_blank">Cotisants, retraités et rapport démographique tous régimes</a> (2004–2023) ·
-                <a href="https://www.cor-retraites.fr/sites/default/files/2025-06/RA_2025_def_publi.pdf" target="_blank">Rapport annuel du COR — Juin 2025</a> ·
+                Rapport annuel du COR — juin 2026, p. 72-73 (figure 2.3) ·
                 Sénat, <a href="https://www.senat.fr/rap/l97-73-3/l97-73-33.html" target="_blank">PLFSS 1998, rapport n°73 tome III</a> (données 1960–1990, source DSS/DEES) ·
                 <a href="https://evaluation.securite-sociale.fr/home/retraite/1-6-ratio-de-dependance-demograp.html" target="_blank">DSS — Ratio de dépendance démographique</a>.
-                Les valeurs 2030/2040/2050/2060 sont une interpolation illustrative, pas une donnée officielle point par point.
+                2025 et 2070 : chiffres du texte du COR ; 2030 à 2060 : lecture graphique de la figure 2.3 (précision ± 0,02).
             </div>
         </div>
 
@@ -1323,7 +1349,7 @@
                 <div class="tr-note">
                     Le <b style="color:#e2e8f0">TRI</b> (Taux de Rendement Interne) est le rendement implicite du système selon votre profil de revenu.
                     Un TRI <b style="color:#10b981">positif</b> signifie que le système verse plus en pensions qu'il n'a coûté en cotisations — un TRI
-                    <b style="color:#ef4444">négatif</b> l'inverse. Seul <b style="color:#e2e8f0">l'âge de départ</b> impacte directement ce calcul.
+                    <b style="color:#ef4444">négatif</b> l'inverse. <b style="color:#e2e8f0">L'âge légal</b>, <b style="color:#e2e8f0">la durée de cotisation</b>, <b style="color:#e2e8f0">les cotisations</b> et <b style="color:#e2e8f0">l'indexation des pensions</b> agissent sur ce calcul (la génération 1960, déjà à la retraite, ne réagit qu'à l'indexation).
                 </div>
             </div>
             <div class="tri-gen-btns">
@@ -1338,11 +1364,12 @@
             <div class="tri-interp" id="tri-interp"></div>
             <div class="tri-method">
                 <b style="color:#64748b;">Méthode :</b> le TRI est le taux <i>r</i> qui égalise la valeur actuelle des cotisations versées
-                (τ × salaire × durée carrière) et des pensions reçues (TR × salaire × durée retraite).
-                Paramètres par décile : taux de cotisation τ (~18–29 % selon génération, COR 2026 p.134) ·
-                taux de remplacement brut (COR 2026 : D1 = 82 %, D5 = 73 %, D10 = 43 %) ·
-                espérance de vie des hommes à 65 ans par génération (INSEE 2023) et par niveau de vie (INSEE 2012-2016) ·
-                âge d'entrée estimé (D1 = 19 ans, D5 = 22 ans, D10 = 25 ans). (* 2020 : projection prospective.)
+                et des pensions reçues, en euros relatifs aux salaires de chaque année (comme le COR). Paramètres par décile, calculés à partir des règles
+                du régime général et de l'Agirc-Arrco et calés sur les profils types du COR 2026 : salaire (Insee 2024) · cotisations réelles (≈ 25 % pour la génération 1960, ≈ 28 % ensuite) ·
+                taux de remplacement · revalorisation des pensions sur les prix · âges d'entrée par décile en quatre groupes selon l'âge de fin d'études (Dares 2023, Insee 2024, calés sur la Drees),
+                départ au plus tard entre l'âge légal (ou carrière longue) et la durée atteinte, taux plein automatique à 67 ans ; 26 % partent à l'âge légal quelle que soit la durée (décote, invalidité, inaptitude : Drees) (génération 1960 : 19,25 → 62,25 ans) ·
+                espérance de vie des hommes par génération (Insee 2023) et par niveau de vie (Insee 2012-2016). Allègements de charges non comptés, comme le COR.
+                Détail : calculs-par-decile.md et hypotheses-COR.md. (* 2020 : projection prospective.)
             </div>
 
         </div>
@@ -1370,7 +1397,8 @@ const YEARS = [2024,2026,2028,2030,2032,2034,2036,2038,2040,2043,2046,2050,2054,
 // Points officiels : 2024=-0,1 ; 2030=-0,2 ; 2045=-0,9 ; 2070=-2,4 (% PIB)
 // 2030 et 2045 sont identiques à COR 2025 — seul 2070 diverge.
 function baseline(y) {
-    const pts = [[2024,-0.1],[2030,-0.2],[2045,-0.9],[2070,-2.4]];
+    // Points du COR 2026 : 2024, 2030, 2038, 2048, 2050, 2070 (Annexe, tableau A2.1) ; 2045 (RA 2026 p. 7).
+    const pts = [[2024,-0.1],[2030,-0.2],[2038,-0.5],[2045,-0.9],[2048,-1.1],[2050,-1.2],[2070,-2.4]];
     for (let i = 0; i < pts.length-1; i++) {
         if (y >= pts[i][0] && y <= pts[i+1][0]) {
             const t = (y - pts[i][0]) / (pts[i+1][0] - pts[i][0]);
@@ -1393,62 +1421,71 @@ function baselineCOR2025(y) {
     return -1.4;
 }
 
-const DEFAULTS = { age:64, cotis_sal:0, cotis_emp:0, index:0, fec:1.45, mig:150000, prod:0.7, chom:7 };
+const DEFAULTS = { age:64, duree:43, rythme:0, cotis_sal:0, cotis_emp:0, index:0, fec:1.45, mig:150000, prod:0.7, chom:7 };
 
-// TR par décile — référence COR 2025 (génération 1980, carrière 43 ans, départ 64 ans)
-const TR_REF = [82, 73, 43]; // D1, D5, D10
+// Taux de remplacement net (pension nette ÷ dernier salaire net), génération 1980, départ au taux plein (65,5 ans).
+// Calculé par le moteur du dossier, calé sur le COR 2026 — voir calculs-par-decile.md.
+const TR_REF = [80, 67, 47]; // D1, D5, D10
 
 // Coût de la compensation équité exprimé en % du PIB — mis à jour par updateCompensation() avant chaque calcul de solde
 let compCostPctPIB = 0;
 // TR cibles [D1, D5, D10] calculés par la compensation — null si inactive
 let compSimTR = null;
 
+// Revenus bruts d'activité en % du PIB : 43 % (ressources 13,9 % du PIB ÷ taux de prélèvement 32,1 % en 2025, RA 2026 p. 7 et 81).
+const COTIS_PT_PIB = 0.43;
+
 function computeBalance(y, p) {
     const base = baseline(y);
-    const T = (y - 2024) / (2070 - 2024); // 0→1
     let d = 0;
 
-    // 1. Age légal
-    const dAge = p.age - 64;
-    const ageFactor = Math.min(1, Math.max(0, (y-2024)/18));
-    d += dAge * 0.42 * ageFactor;
+    // 1. Âge légal et durée de cotisation : effet via l'âge moyen de départ.
+    // COR (RA 2026 p. 124) : 3,0 ans d'âge moyen de départ en plus = 2,4 points de PIB en 2070, soit 0,8 point par an.
+    // Vérification : un an d'âge légal en plus donne ici +0,38 point (COR, séance du 26 mars 2026 : +0,2 à +0,4).
+    const dAge = deltaAgeMoyen(p);
+    d += dAge * 0.8 * rampeReforme(y, p.rythme);
 
-    // 2. Cotisations salariales (moins récessif : baisse consommation)
-    if (y > 2024) {
-        d += p.cotis_sal * 0.088;
-        d -= p.cotis_sal * 0.012 * T;
+    // 2. Cotisations : 1 point sur l'ensemble des revenus bruts d'activité = 0,43 point de PIB avant effets sur l'économie
+    // (COR, RA 2026 p. 124 : + 5,6 points de prélèvement pour combler 2,4 points de PIB en 2070).
+    // Après effets sur l'économie (COR, séance du 26 mars 2026, doc n° 2, modèles I-MIP et OFCE) :
+    // il reste 93 % de l'effet pour une hausse salariale, 80 % pour une hausse patronale. À partir de 2027.
+    // Détail : calibration-leviers.md, section 3.
+    if (y >= 2027) {
+        d += p.cotis_sal * COTIS_PT_PIB * 0.93;
+        d += p.cotis_emp * COTIS_PT_PIB * 0.80;
     }
-    // 2b. Cotisations patronales (plus récessif : hausse coût du travail)
-    if (y > 2024) {
-        d += p.cotis_emp * 0.132;
-        d -= p.cotis_emp * 0.038 * T;
-    }
 
-    // 3. Indexation (coût/gain sur le solde, croissant dans le temps)
-    // p.index ∈ [-1,1] : -1 = désindexation totale (gel), 0 = prix (actuel, neutre), +1 = salaires
-    d += -0.54 * p.index * T;
+    // 3. Indexation : p.index = écart annuel entre la revalorisation des pensions et l'inflation (point par an).
+    // Calcul mécanique : variation de la masse des pensions (selon l'ancienneté de la retraite) × part des pensions dans le PIB.
+    // Première revalorisation concernée : janvier 2027. Détail : calibration-leviers.md, section 2.
+    d -= variationMassePensions(p.index, y - 2026) / 100 * partPensionsPIB(y);
 
-    // 4. Fécondité (décalage démographique, effet à partir de 2042)
+    // 4. Fécondité — calée sur les variantes du COR 2026 (1,7 et 1,2 enfant par femme autour de 1,45) :
+    // écart de solde nul jusqu'en 2044, puis croissant à peu près en ligne droite jusqu'à ± 0,95 point en 2070
+    // (moyenne de + 0,91 et − 0,98, RA 2026 p. 24 et figure 2.18 p. 111). Détail : calibration-leviers.md, section 4.
     const dFec = p.fec - 1.45;
-    const fecFactor = Math.max(0, (y-2042)/(2070-2042));
-    d += dFec * 3.2 * fecFactor;
+    d += (dFec / 0.25) * 0.95 * Math.max(0, (y - 2044) / 26);
 
-    // 5. Migration (effet positif court terme, atténué long terme)
+    // 5. Solde migratoire — calé sur les variantes du COR 2026 (± 80 000 personnes par an autour de 150 000) :
+    // écart de solde ≈ ± 0,46 point de PIB en 2045 et ± 1,01 point en 2070 (moyenne des deux variantes, RA 2026 p. 24),
+    // effet quasi nul avant 2030 puis croissant à peu près en ligne droite (figure 2.20). Détail : calibration-leviers.md.
     const dMig = p.mig - 150000;
-    if (y > 2024) {
-        const migRamp = Math.min(1, (y-2024)/8);
-        const migDecay = 1 - 0.25*T;
-        d += (dMig/50000) * 0.2 * migRamp * migDecay;
-    }
+    d += (dMig / 80000) * 1.01 * Math.max(0, Math.min(1, (y - 2027) / 43));
 
-    // 6. Productivité (cumulatif dès 2024 — salaires → cotisations)
+    // 6. Productivité — variantes du COR 2026 (1,0 % et 0,4 % autour de 0,7 %) : écart de solde
+    // + 0,26 / − 0,2 point en 2045, + 0,7 / − 0,68 en 2070 (RA 2026 p. 24). Moyenne par 0,3 point : 0,23 en 2045, 0,69 en 2070.
+    // Ligne brisée : 0 en 2027, 0,23 en 2045, 0,69 en 2070. Détail : calibration-leviers.md, section 6.
     const dProd = p.prod - 0.7;
-    d += (dProd/0.3) * 0.72 * T;
+    const kProd = y <= 2027 ? 0 : y <= 2045 ? 0.23 * (y - 2027) / 18 : 0.23 + 0.46 * (y - 2045) / 25;
+    d += (dProd / 0.3) * kProd;
 
-    // 7. Chômage (effet à partir de 2032)
+    // 7. Chômage — variantes du COR 2026 (5 % et 10 % à partir de 2040, au lieu de 7 %) : écart de solde
+    // + 0,3 / − 0,5 point en 2045, + 0,22 / − 0,3 en 2070 (RA 2026 p. 24 et figure 2.21 p. 114).
+    // Par point de chômage : 0,158 en 2045, 0,105 en 2070. Montée de 2027 à 2040, puis palier jusqu'en 2045, puis baisse.
+    // Détail : calibration-leviers.md, section 7.
     const dChom = 7 - p.chom;
-    const chomFactor = y>2032 ? Math.min(1,(y-2032)/10) : 0;
-    d += (dChom/2) * 0.20 * chomFactor;
+    const kChom = y <= 2027 ? 0 : y <= 2040 ? 0.158 * (y - 2027) / 13 : y <= 2045 ? 0.158 : 0.158 - 0.053 * (y - 2045) / 25;
+    d += dChom * kChom;
 
     return base + d - compCostPctPIB;
 }
@@ -1464,13 +1501,73 @@ function computeCumulativeBalance(p) {
     return cumul;
 }
 
+// Part de l'effet de long terme atteinte l'année y.
+// Sans montée en charge (N = 0), l'effet sur le solde croît en ligne droite sur 18 ans à partir de 2024
+// (renouvellement progressif des retraités). Avec une montée en charge sur N ans, la réforme ne s'applique
+// qu'à une fraction min(1, u/N) des départs u années après 2024 : l'effet est la moyenne de cette fraction
+// sur les 18 dernières années.
+// ── Indexation des pensions (moteur-calcul/indexation_stock.py) ──
+// Part de la masse des pensions versée à des retraités partis depuis a années (a = 0 à 45) :
+// départ à 65 ans, survie Insee 2012-2016 (moyenne hommes / femmes), pension ancienne × (1 − 0,74 %)^a.
+const POIDS_ANCIENNETE = [0.0497, 0.0488, 0.0480, 0.0471, 0.0463, 0.0453, 0.0444, 0.0435, 0.0425, 0.0414, 0.0404, 0.0393, 0.0381, 0.0369, 0.0356, 0.0343, 0.0329, 0.0313, 0.0297, 0.0280, 0.0262, 0.0243, 0.0224, 0.0203, 0.0182, 0.0161, 0.0140, 0.0120, 0.0101, 0.0083, 0.0066, 0.0052, 0.0039, 0.0029, 0.0021, 0.0014, 0.0010, 0.0006, 0.0004, 0.0002, 0, 0, 0, 0, 0, 0];
+// Variation de la masse des pensions (%) après n revalorisations à « ecart » point par an de l'inflation.
+function variationMassePensions(ecart, n) {
+    if (n <= 0 || ecart === 0) return 0;
+    const e = ecart / 100;
+    let v = 0;
+    POIDS_ANCIENNETE.forEach((w, a) => { v += w * (Math.pow(1 + e, Math.min(a, n)) - 1); });
+    return 100 * v;
+}
+// Pensions de retraite en % du PIB : dépenses du COR (14,1 % en 2025 et 2030, 14,2 % en 2045, 15,3 % en 2070 ;
+// RA 2026 p. 66-68) × part des pensions dans les dépenses (401 Md€ sur 422 Md€ en 2025, RA 2026 p. 66).
+function partPensionsPIB(y) {
+    const pts = [[2025, 14.1], [2030, 14.1], [2045, 14.2], [2070, 15.3]];
+    let dep = pts[pts.length - 1][1];
+    if (y <= 2025) dep = 14.1;
+    for (let k = 0; k < pts.length - 1; k++) {
+        const [y0, v0] = pts[k], [y1, v1] = pts[k + 1];
+        if (y >= y0 && y <= y1) { dep = v0 + (v1 - v0) * (y - y0) / (y1 - y0); break; }
+    }
+    return dep * 401 / 422;
+}
+
+function rampeReforme(y, N) {
+    const t = Math.round(y - 2024);
+    if (t <= 0) return 0;
+    const phi = u => (N <= 0 ? 1 : Math.min(1, u / N));
+    let s = 0;
+    for (let k = 0; k < Math.min(t, 18); k++) s += phi(t - k);
+    return s / 18;
+}
+
+// Niveau de vie moyen des retraités rapporté à celui de l'ensemble de la population, en 2070 (%).
+// Référence COR 2026 : 90,3 % (RA 2026 p. 12 et 152). Détail : calibration-leviers.md, section 5.
+const NV_REF_2070 = 90.3;
+// Élasticité du niveau de vie relatif à la pension relative : 0,74, tirée des variantes de productivité du COR
+// (pension relative 50,0 % ou 45,1 % au lieu de 47,9 % → niveau de vie + 3,1 ou − 3,7 points ; RA 2026 p. 199-200).
+const NV_ELASTICITE = 0.74;
+
+// Variation moyenne de la pension (%) due à l'âge légal et à la durée : moyenne des dix déciles,
+// générations 1980 et 2000 (retraités de 2070).
+function variationPensionAge(p) {
+    let v = 0;
+    for (const gen of ['1980', '2000'])
+        for (let i = 0; i < 10; i++)
+            v += facteurPensionDecile(gen, i, p) / facteurPensionDecile(gen, i, DEFAULTS) - 1;
+    return 100 * v / 20;
+}
+
 function computeLivingStd(p) {
-    let s = 87.5;
-    s += (p.age - 64) * 0.9;         // later retirement → slightly better pension
-    s += 9 * p.index; // wages indexation (+1) preserves living standard; désindexation (-1) degrades it
-    s += (0.7 - p.prod) * 11.5;      // higher wages = retirees (price-indexed) fall behind more
-    s -= p.cotis_sal * 0.45;         // hausse cotis salariales = baisse salaire net actif
-    s -= p.cotis_emp * 0.20;         // hausse cotis patronales = pression sur salaires/emploi
+    // Leviers qui changent la pension relative : âge et durée, indexation (masse des pensions en 2070).
+    const dPension = variationPensionAge(p) + variationMassePensions(p.index, 44);
+    let s = NV_REF_2070 * (1 + NV_ELASTICITE * dPension / 100);
+    // Productivité (COR, p. 199-200) : 0,4 % → + 3,1 points ; 1,0 % → − 3,7 points.
+    const dProd = p.prod - 0.7;
+    s += dProd < 0 ? -dProd / 0.3 * 3.1 : -dProd / 0.3 * 3.7;
+    // Chômage (COR, p. 194-195) : 5 % → − 0,9 point ; 10 % → + 0,9 point.
+    const dChom = p.chom - 7;
+    s += dChom < 0 ? dChom / 2 * 0.9 : dChom / 3 * 0.9;
+    // Cotisations, fécondité, migration : effet non publié par le COR ou « très limité » → 0 (hypothèse du dossier).
     return Math.min(115, Math.max(58, s));
 }
 
@@ -1541,7 +1638,7 @@ const myChart = new Chart(ctx, {
                 bodyColor: '#94a3b8',
                 padding: 12,
                 callbacks: {
-                    label: c => `${c.dataset.label}: ${c.parsed.y >= 0 ? '+' : ''}${c.parsed.y.toFixed(2)}% du PIB`
+                    label: c => `${c.dataset.label} : ${snf(c.parsed.y, 2)} % du PIB`
                 }
             }
         },
@@ -1555,7 +1652,7 @@ const myChart = new Chart(ctx, {
                 ticks: {
                     color:'#475569',
                     font:{ size:11 },
-                    callback: v => (v>=0?'+':'')+v.toFixed(1)+'%'
+                    callback: v => snf(v, 1) + ' %'
                 },
                 min: -3, max: 1.8,
                 border: { dash:[3,3] }
@@ -1629,7 +1726,7 @@ const trChart = new Chart(trCtx, {
                 bodyColor: '#94a3b8',
                 padding: 10,
                 callbacks: {
-                    label: c => `${c.dataset.label} : ${c.parsed.y}%`
+                    label: c => `${c.dataset.label} : ${String(c.parsed.y).replace('.', ',')} %`
                 }
             }
         },
@@ -1656,14 +1753,13 @@ const trChart = new Chart(trCtx, {
 // ═══════════════════════════════════════════════════════════
 // RATIO COTISANTS / RETRAITÉS (statique, hors leviers)
 // ═══════════════════════════════════════════════════════════
-// Sources : Insee (2415121, série 2004-2023) ; Rapport annuel COR juin 2025 (2025 et 2070) ;
-// Sénat PLFSS 1998, rapport n°73-III, source DSS/DEES (1960-1990).
-// Les valeurs 2030/2040/2050/2060 sont une interpolation illustrative (pas une donnée officielle).
+// Sources : Insee (2415121, série 2004-2023) ; Sénat PLFSS 1998, rapport n°73-III, source DSS/DEES (1960-1990) ;
+// COR, rapport annuel juin 2026 p. 72-73 : 1,8 en 2025 et 1,3 en 2070 (texte), 2030 à 2060 lus sur la figure 2.3.
 
 const ratioCtx = document.getElementById('ratio-chart').getContext('2d');
-const ratioLabels = ['1960','1970','1980','1990','2000','2010','2020','2025','2030‡','2040‡','2050‡','2060‡','2070†'];
-const ratioData   = [4.69, 3.13, 2.79, 2.1, 2.1, 1.78, 1.75, 1.8, 1.7, 1.55, 1.47, 1.42, 1.41];
-const ratioColors = ['#6366f1','#6366f1','#6366f1','#6366f1','#6366f1','#6366f1','#6366f1','#6366f1','#475569','#475569','#475569','#475569','#f59e0b'];
+const ratioLabels = ['1960','1970','1980','1990','2000','2010','2020','2025','2030','2040','2050','2060','2070'];
+const ratioData   = [4.69, 3.13, 2.79, 2.1, 2.1, 1.78, 1.75, 1.8, 1.75, 1.64, 1.55, 1.45, 1.3];
+const ratioColors = ['#6366f1','#6366f1','#6366f1','#6366f1','#6366f1','#6366f1','#6366f1','#f59e0b','#f59e0b','#f59e0b','#f59e0b','#f59e0b','#f59e0b'];
 
 new Chart(ratioCtx, {
     type: 'bar',
@@ -1716,6 +1812,8 @@ new Chart(ratioCtx, {
 function getParams() {
     return {
         age:       parseFloat(document.getElementById('sl-age').value),
+        duree:     parseFloat(document.getElementById('sl-duree').value),
+        rythme:    parseInt(document.getElementById('sl-rythme').value),
         cotis_sal: parseFloat(document.getElementById('sl-cotis-sal').value),
         cotis_emp: parseFloat(document.getElementById('sl-cotis-emp').value),
         index:     parseFloat(document.getElementById('sl-index').value),
@@ -1751,7 +1849,13 @@ function setupRefMarks() {
     });
 }
 
-function fmt(v) { return (v>=0?'+':'')+v.toFixed(2)+'%'; }
+// Format français : virgule décimale, signe moins typographique, espace insécable avant %.
+function nf(v, d) {
+    const r = Math.abs(v) < 0.5 * Math.pow(10, -d) ? 0 : v;
+    return r.toFixed(d).replace('.', ',').replace('-', '−');
+}
+function snf(v, d) { return (Math.abs(v) < 0.5 * Math.pow(10, -d) || v >= 0 ? '+' : '') + nf(v, d); }
+function fmt(v) { return snf(v, 2) + '\u00a0%'; }
 
 function colorClass(v) {
     return v >= -0.05 ? 'green' : v >= -0.6 ? 'orange' : 'red';
@@ -1759,11 +1863,11 @@ function colorClass(v) {
 
 // Libellé descriptif de la position du curseur d'indexation (-1 → +1)
 function indexLabel(n) {
-    if (n <= -0.95) return 'Désindexation totale (gel)';
-    if (n >= 0.95)  return 'Sur les salaires';
+    const v = n.toFixed(1).replace('.', ',');
+    if (n <= -1.95) return 'Gel (inflation − 2 pt)';
+    if (n >= 0.65)  return '≈ Sur les salaires (inflation + 0,7 pt)';
     if (Math.abs(n) < 0.05) return 'Sur les prix (actuel)';
-    if (n < 0) return 'Désindexation partielle (' + n.toFixed(1) + ')';
-    return 'Partielle vers les salaires (+' + n.toFixed(1) + ')';
+    return 'Inflation ' + (n > 0 ? '+ ' : '− ') + v.replace('-', '') + ' pt';
 }
 
 function update() {
@@ -1774,10 +1878,12 @@ function update() {
 
     // ── Labels + bubbles
     const age = p.age;
-    const ageLabel = (age%1===0?age:age.toFixed(1))+' ans';
-    const fmtPt = v => (v>=0?'+':'')+v.toFixed(1)+' pt';
+    const ageLabel = (age%1===0?age:nf(age, 1))+' ans';
+    const fmtPt = v => snf(v, 1)+' pt';
 
     document.getElementById('val-age').textContent       = ageLabel;
+    document.getElementById('val-rythme').textContent    = p.rythme === 0 ? 'Immédiate' : 'Sur ' + p.rythme + ' ans';
+    document.getElementById('val-duree').textContent     = (p.duree%1===0?p.duree:p.duree.toFixed(2).replace('.',','))+' ans';
     document.getElementById('val-cotis-sal').textContent = fmtPt(p.cotis_sal);
     document.getElementById('val-cotis-emp').textContent = fmtPt(p.cotis_emp);
     document.getElementById('val-index').textContent     = indexLabel(p.index);
@@ -1787,9 +1893,9 @@ function update() {
     document.getElementById('val-chom').textContent      = p.chom.toFixed(1).replace('.',',')+' %';
 
     // ── Balance box at 10 years (2035)
-    // PIB France 2030 ≈ 3 300 Mds€ (déduit du rapport COR: -6,6Mds = -0,2% PIB)
-    // PIB 2035 ≈ 3 300 × 1,027^5 ≈ 3 762 Mds€ (croissance nominale ~2,7%/an)
-    const PIB_2035 = 3762;
+    // PIB 2025 = 422,2 Md€ ÷ 14,1 % = 2 994 Md€ (RA 2026 p. 66) ; PIB 2030 ≈ 6,8 Md€ ÷ 0,2 % = 3 400 Md€ (RA 2026 p. 7),
+    // soit + 2,6 % par an en valeur, prolongé jusqu'en 2035 : 3 400 × 1,026^5 ≈ 3 870 Md€.
+    const PIB_2035 = 3870;
     const bal2035      = computeBalance(2035, p);
     const bal2035_ref  = computeBalance(2035, DEFAULTS);
     const mds          = bal2035      * PIB_2035 / 100;
@@ -1801,14 +1907,14 @@ function update() {
     const refEl     = document.getElementById('balance-ref');
     const ref2025El = document.getElementById('balance-ref-2025');
 
-    const fmtMds = v => (v >= 0 ? '+' : '') + v.toFixed(1).replace('.', ',');
+    const fmtMds = v => snf(v, 1);
     amountEl.textContent = fmtMds(mds);
-    pctEl.textContent    = (bal2035 >= 0 ? '+' : '') + bal2035.toFixed(2).replace('.', ',') + '% du PIB';
-    refEl.textContent    = fmtMds(mds_ref) + ' Mds €';
+    pctEl.textContent    = snf(bal2035, 2) + '\u00a0% du PIB';
+    refEl.textContent    = fmtMds(mds_ref) + ' Md€';
 
     const bal2035_2025 = baselineCOR2025(2035);
     const mds_2025      = bal2035_2025 * PIB_2035 / 100;
-    ref2025El.textContent = 'COR 2025 : ' + fmtMds(mds_2025) + ' Mds €';
+    ref2025El.textContent = 'COR 2025 : ' + fmtMds(mds_2025) + ' Md€';
 
     box.className = 'balance-box ' + (mds >= 0 ? 'surplus' : 'deficit');
 
@@ -1832,9 +1938,9 @@ function update() {
     const nv = computeLivingStd(p);
     const nvBase = computeLivingStd(DEFAULTS);
     const nvDiff = nv - nvBase;
-    document.getElementById('kv-nv').textContent = nv.toFixed(1)+'%';
+    document.getElementById('kv-nv').textContent = nv.toFixed(1).replace('.', ',')+' %';
     document.getElementById('ks-nv').textContent =
-        'En % du niveau de vie moyen de la population — '+(nvDiff>=0?'+':'')+nvDiff.toFixed(1)+' pt vs scénario COR';
+        'En % du niveau de vie moyen de la population — '+(nvDiff>=0?'+':'−')+Math.abs(nvDiff).toFixed(1).replace('.', ',')+' pt par rapport au scénario COR';
 
     // ── Status banner — basé sur la réduction du déficit cumulé 2024-2070
     const banner = document.getElementById('status-banner');
@@ -1883,7 +1989,8 @@ function update() {
     // ── Breakdown
     const refVal = computeBalance(2070, DEFAULTS);
     const levers = [
-        { label:'🎯 Âge de départ',        key:'age'       },
+        { label:'🎯 Âge légal',            key:'age'       },
+        { label:'⏳ Durée de cotisation',  key:'duree'     },
         { label:'💼 Cotis. salariales',   key:'cotis_sal' },
         { label:'🏭 Cotis. patronales',   key:'cotis_emp' },
         { label:'📊 Indexation',          key:'index'     },
@@ -1899,26 +2006,22 @@ function update() {
         const eff = computeBalance(2070, solo) - refVal;
         const pct = Math.min(100, Math.abs(eff)/maxAbs*100);
         const col = eff > 0.005 ? '#10b981' : eff < -0.005 ? '#ef4444' : '#475569';
-        const sign = eff >= 0 ? '+' : '';
         return `<div class="effect-row">
             <span class="effect-label">${lv.label}</span>
             <div class="effect-bar-wrap">
                 <div class="effect-bar" style="width:${pct}%;background:${col};margin-left:${eff<0?0:50-pct/2}%"></div>
             </div>
-            <span class="effect-val" style="color:${col}">${sign}${eff.toFixed(2)} pt</span>
+            <span class="effect-val" style="color:${col}">${snf(eff, 2)} pt</span>
         </div>`;
     });
 
     document.getElementById('breakdown-list').innerHTML = rows.join('');
 
     // ── TR par décile
-    const ageDelta = (p.age - 64) * 5;
-    const idxBonus = 11 * p.index;
-    const simTR = compSimTR ? [...compSimTR] : [
-        Math.min(100, Math.max(30, TR_REF[0] + ageDelta + idxBonus)),
-        Math.min(100, Math.max(30, TR_REF[1] + ageDelta + idxBonus)),
-        Math.min(100, Math.max(20, TR_REF[2] + ageDelta + Math.round(idxBonus * 0.7)))
-    ];
+    // Âge légal et durée : variation moyenne de la pension du décile (durée incomplète, points Agirc-Arrco), génération 1980.
+    // L'indexation n'agit pas sur le taux au départ ; elle agit pendant la retraite (voir le TRI).
+    const simTR = compSimTR ? [...compSimTR] : [0, 4, 9].map((d, j) =>
+        Math.min(100, Math.max(20, TR_REF[j] * facteurPensionDecile('1980', d, p) / facteurPensionDecile('1980', d, DEFAULTS))));
     // Couleur des barres simulation : vert si amélioration, rouge si dégradation
     const trColors = simTR.map((v, i) =>
         v > TR_REF[i] + 0.5 ? 'rgba(16,185,129,0.6)' :
@@ -1961,24 +2064,21 @@ function update() {
 // Textes d'interprétation par génération (les TRI affichés sont calculés dynamiquement par updateTriChart)
 const TRI_GEN_DATA = {
     "1960": {
-        interp: "La génération la plus favorisée : TRI compris entre +2,1 % et +3,1 % selon le décile. Départ à 61 ans, cotisations faibles (~18 %) et retraite longue : un homme né en 1960 qui atteint 65 ans vit encore 21 ans en moyenne (INSEE). Les déciles D2 à D5 sont les mieux servis, D10 l'est le moins."
+        interp: "La génération la mieux servie : TRI de +0,5 % (D1) à +0,8 % (D7). Elle a cotisé moins que les suivantes (environ 25 % du salaire en moyenne sur la carrière, contre 28 %) et a pu partir à 62 ans. Comme pour toutes les générations, ce sont les salaires du milieu de l'échelle (D5 à D8) qui obtiennent le meilleur rendement."
     },
     "1980": {
-        interp: "Interprétation : pour la génération 1980, tous les déciles ont un TRI positif, autour de +1,4 % à +1,5 % de D1 à D6, puis en baisse jusqu'à +0,5 % pour D10. D1 (ouvrier) vit moins longtemps (~86 ans contre ~91 ans pour D10), mais son taux de remplacement élevé (82 %) compense. <span style=\"font-weight:700;color:var(--orange)\">Ce sont les hauts revenus (D9–D10) qui tirent le moins parti du système</span> : leur taux de remplacement faible (43 %) n'est pas compensé par leur espérance de vie plus longue."
+        interp: "Interprétation : pour la génération 1980, le TRI va de −0,2 % (D10) à +0,3 % (D7). <span style=\"font-weight:700;color:var(--orange)\">Les hauts revenus sont les moins bien servis</span> : ils paient des cotisations au-dessus du plafond de la Sécurité sociale qui n'ouvrent pas de droits au régime de base, et, entrés plus tard dans la vie active (vers 25 ans pour plus des deux tiers de D10), plus de la moitié partent à 67 ans sans la durée complète. En bas de l'échelle, l'espérance de vie plus courte pèse, mais les départs anticipés pour carrière longue (la moitié de D1 a commencé avant 21 ans) la compensent en partie. Le COR trouve un rendement un peu plus élevé pour son profil non-cadre (voir hypotheses-COR.md)."
     },
     "2000": {
-        interp: "TRI légèrement inférieur à celui de la génération 1980 pour tous les déciles : le gain d'espérance de vie (environ +2 ans à 65 ans, INSEE) ne compense pas tout à fait des cotisations plus élevées (~28 % contre ~25 %). Même forme : un plateau de D1 à D6, puis une baisse jusqu'à D10."
+        interp: "TRI un peu plus élevé que pour la génération 1980 (de −0,2 % pour D10 à +0,5 % pour D7) : à règles égales, le gain d'espérance de vie (environ +2 ans, Insee) allonge la retraite. Même forme : le milieu de l'échelle est le mieux servi, le haut de l'échelle le moins."
     },
     "2020": {
-        interp: "Projection très incertaine. Départ à 65 ans et cotisations les plus élevées (~29 %) : c'est la génération au TRI le plus faible, même si elle vivrait en moyenne jusqu'à ~93 ans (projection INSEE). Tous les profils resteraient positifs, D10 se rapprochant de zéro — à condition que les écarts d'espérance de vie entre niveaux de vie ne s'aggravent pas."
+        interp: "Projection très incertaine, au-delà de l'horizon du COR (dont les profils s'arrêtent à la génération 2000). À règles inchangées, le TRI remonterait encore un peu (0,0 % à +0,6 %) grâce aux gains d'espérance de vie (~93 ans en moyenne, projection Insee), à condition que les écarts d'espérance de vie entre niveaux de vie ne s'aggravent pas."
     }
 };
 
 // ── Paramètres de référence pour le calcul dynamique du TRI ──
 
-// Âge d'entrée dans la carrière par décile — interpolation linéaire entre
-// D1=19 ans (ouvrier), D5=22 ans (médian), D10=25 ans (cadre sup.)
-const TRI_AGE_ENTREE = [19, 19.75, 20.5, 21.25, 22, 22.6, 23.2, 23.8, 24.4, 25];
 
 // Âge moyen de décès par décile et par génération (hommes).
 // Moyenne de la génération = 65 ans + espérance de vie à 65 ans (INSEE, Insee Première n° 1927, 2023,
@@ -1991,71 +2091,145 @@ const TRI_EV = Object.fromEntries(Object.entries(TRI_EV_MOY).map(
     ([gen, moy]) => [gen, TRI_EV_ECART.map(e => Math.round((moy + e) * 10) / 10)]
 ));
 
-// TR brut de référence par décile — interpolation linéaire entre ancres COR
-// (D1, D5, D10) à l'âge de départ de référence de chaque génération
-const TRI_TR_REF = {
-    "1960": [85, 83, 81, 78, 76, 70, 64, 58, 52, 46],
-    "1980": [82, 80, 78, 75, 73, 67, 61, 55, 49, 43],
-    "2000": [82, 80, 78, 75, 73, 67, 61, 55, 49, 43],
-    "2020": [79, 77, 75, 72, 70, 64, 58, 52, 46, 41],
-};
-
-// Âge légal du droit en vigueur : le curseur d'âge s'applique comme un écart à cette valeur
+// Paramètres par génération et par décile — produits par moteur-calcul/parametres_simulateur.py (v3).
+// entree / depart : âges d'entrée et de départ au taux plein (COR, annexe 2026 fig. A2.2 ; 43 ans de carrière).
+// TRN : pension nette à la liquidation ÷ salaire brut moyen de carrière (%).
+// TAU : cotisations retraite totales (salarié + employeur, y compris celles qui n'ouvrent pas de droits) ÷ salaire brut (%).
+// ERO : perte de valeur annuelle de la pension par rapport aux salaires, avec une indexation sur les prix (%).
 const TRI_REF_LEGAL = 64;
-
-// Âge et taux de cotisation de référence par génération
 const TRI_GEN_PARAMS = {
-    "1960": { ref_age: 61, tau_base: 18 },
-    "1980": { ref_age: 64, tau_base: 25 },
-    "2000": { ref_age: 64, tau_base: 28 },
-    "2020": { ref_age: 65, tau_base: 29 },
+    "1960": { entree: 19.25, depart: 62.25,
+              TRN: [64.0, 64.1, 64.1, 62.6, 63.3, 64.0, 64.5, 61.2, 57.8, 54.3],
+              TAU: [25.0, 25.0, 25.0, 25.0, 25.0, 25.0, 25.08, 25.13, 25.01, 24.78],
+              ERO: [0.745, 0.745, 0.745, 0.745, 0.744, 0.744, 0.744, 0.752, 0.769, 0.794] },
+    "1980": { entree: 22.5, depart: 65.5,
+              TRN: [63.5, 60.2, 60.2, 60.7, 59.2, 59.7, 60.4, 58.1, 52.6, 48.0],
+              TAU: [27.8, 27.8, 27.8, 27.8, 27.8, 27.8, 27.8, 27.94, 27.83, 27.58],
+              ERO: [0.739, 0.739, 0.739, 0.739, 0.738, 0.738, 0.738, 0.744, 0.76, 0.785] },
+    "2000": { entree: 22.5, depart: 65.5,
+              TRN: [62.1, 58.8, 58.8, 59.3, 57.9, 58.5, 59.2, 56.8, 51.2, 46.2],
+              TAU: [27.98, 27.98, 27.98, 27.98, 27.98, 27.98, 27.98, 28.12, 28.01, 27.76],
+              ERO: [0.736, 0.736, 0.736, 0.736, 0.736, 0.736, 0.735, 0.741, 0.757, 0.782] },
+    "2020": { entree: 22.5, depart: 65.5,
+              TRN: [61.8, 58.6, 58.6, 59.1, 57.7, 58.3, 58.9, 56.6, 51.0, 46.0],
+              TAU: [27.98, 27.98, 27.98, 27.98, 27.98, 27.98, 27.98, 28.12, 28.01, 27.76],
+              ERO: [0.735, 0.736, 0.736, 0.736, 0.735, 0.735, 0.735, 0.741, 0.757, 0.781] },
 };
 
-// Calcul du TRI par bissection (même logique que Python)
-function computeTRIbisect(age_entree, age_depart, ev, tr_pct, tau_pct) {
+// Perte de valeur annuelle de la pension selon le curseur d'indexation (%) :
+// index = écart annuel à l'inflation (point par an) ; 0 = prix (référence), − 2 = gel, + 0,7 ≈ salaires.
+function eroIndex(ero, index) {
+    return ero - index;
+}
+
+// ── Âges d'entrée par décile (moteur-calcul/entree_par_decile.py) ──
+// Quatre groupes selon l'âge de fin d'études (Dares 2023), âge de première année complète validée,
+// calé sur la moyenne Drees (22,65 ans). Part de chaque groupe dans chaque décile : Insee 2024 + Dares.
+const ENTREE_GROUPES = [19.52, 20.14, 21.92, 25.29];
+const ENTREE_PART = [
+    [0.088, 0.409, 0.267, 0.236], [0.079, 0.390, 0.287, 0.244], [0.076, 0.381, 0.291, 0.252],
+    [0.073, 0.373, 0.290, 0.263], [0.071, 0.363, 0.287, 0.279], [0.067, 0.346, 0.280, 0.307],
+    [0.060, 0.315, 0.268, 0.356], [0.048, 0.263, 0.252, 0.437], [0.029, 0.183, 0.230, 0.559],
+    [0.009, 0.088, 0.188, 0.714]];
+const PART_GROUPES = [0.05, 0.28, 0.27, 0.40];   // ensemble de la génération 1980 (Dares, graphique 1)
+// Part du régime de base dans la pension, par décile (moteur)
+const BASE_PART = {
+    "1980": [0.758, 0.756, 0.756, 0.757, 0.759, 0.762, 0.764, 0.725, 0.626, 0.470],
+    "2000": [0.775, 0.773, 0.773, 0.774, 0.776, 0.778, 0.780, 0.741, 0.644, 0.489],
+    "2020": [0.779, 0.776, 0.776, 0.778, 0.779, 0.781, 0.783, 0.744, 0.646, 0.491] };
+const AGE_TAUX_PLEIN_AUTO = 67;   // à 67 ans, taux plein quelle que soit la durée
+// Part des assurés qui partent à l'âge légal quelle que soit leur durée : départs avec décote (11 %),
+// ex-invalides (8 %) et inaptes (7 %) — Drees, panorama 2025, fiche 17 (génération 1953).
+// Hypothèse du dossier : même part dans chaque décile.
+const PART_AGE_LEGAL = 0.26;
+const DUREE_REF = 43;
+
+// Âge de départ : le plus tard entre l'âge d'ouverture (abaissé pour carrière longue) et l'âge où la durée est atteinte,
+// sans dépasser 67 ans (taux plein automatique), ni partir avant l'âge d'ouverture.
+// Carrière longue : début avant 20 ans → âge légal − 2 ; avant 21 ans → âge légal − 1 (bornes décalées avec l'âge légal).
+function ageDepart(e, aod, duree) {
+    const ouverture = e < 20 ? aod - 2 : (e < 21 ? aod - 1 : aod);
+    return Math.max(ouverture, Math.min(e + duree, AGE_TAUX_PLEIN_AUTO));
+}
+// Pension relative à une carrière complète de 43 ans : durée incomplète (proratisation) ; surcote de 5 %/an
+// seulement pour les années travaillées après l'âge légal ET après la durée complète (règle du régime général).
+// Avec la règle de départ du simulateur (départ dès le taux plein), la surcote est toujours nulle.
+function facteurPension(e, dep, duree, baseShare, aod) {
+    const L = dep - e;
+    const base = Math.min(1, L / duree) * (1 + 0.05 * Math.max(0, dep - Math.max(aod, e + duree)));
+    const aa = L / DUREE_REF;
+    return baseShare * base + (1 - baseShare) * aa;
+}
+// Écart d'âge moyen de départ par rapport au droit actuel (ensemble de la génération)
+function deltaAgeMoyen(p) {
+    let s = 0;
+    ENTREE_GROUPES.forEach((e, k) => {
+        s += PART_GROUPES[k] * (ageDepart(e, p.age, p.duree) - ageDepart(e, DEFAULTS.age, DEFAULTS.duree));
+    });
+    return (1 - PART_AGE_LEGAL) * s + PART_AGE_LEGAL * (p.age - DEFAULTS.age);
+}
+// Sous-profils d'un décile : poids, âge d'entrée, âge de départ, facteur de pension.
+// La génération 1960 est déjà à la retraite : âge légal, durée et cotisations ne s'appliquent pas.
+function sousProfils(gen, i, p) {
+    const G = TRI_GEN_PARAMS[gen];
+    if (gen === '1960') return [{ w: 1, e: G.entree, dep: G.depart, f: 1 }];
+    const profils = ENTREE_GROUPES.map((e, k) => {
+        const dep = ageDepart(e, p.age, p.duree);
+        return { w: (1 - PART_AGE_LEGAL) * ENTREE_PART[i][k], e, dep, f: facteurPension(e, dep, p.duree, BASE_PART[gen][i], p.age) };
+    });
+    // Départs à l'âge légal quelle que soit la durée (entrée à l'âge moyen du décile ; pension au prorata, sans décote)
+    const eMoy = ENTREE_GROUPES.reduce((a, e, k) => a + e * ENTREE_PART[i][k], 0);
+    profils.push({ w: PART_AGE_LEGAL, e: eMoy, dep: p.age, f: facteurPension(eMoy, p.age, p.duree, BASE_PART[gen][i], p.age) });
+    return profils;
+}
+function facteurPensionDecile(gen, i, p) {
+    return sousProfils(gen, i, p).reduce((a, sp) => a + sp.w * sp.f, 0);
+}
+// TRI d'un décile : moyenne des sous-profils ; mult = multiplicateur de pension (compensation)
+function triDecile(gen, i, p, mult) {
+    const G = TRI_GEN_PARAMS[gen];
+    const ev = TRI_EV[gen][i];
+    const tau = G.TAU[i] + (gen === '1960' ? 0 : p.cotis_sal + p.cotis_emp);
+    const ero = eroIndex(G.ERO[i], p.index);
+    let s = 0;
+    for (const sp of sousProfils(gen, i, p)) {
+        const tri = computeTRIbisect(sp.e, sp.dep, ev, Math.min(100, G.TRN[i] * sp.f * (mult || 1)), tau, ero);
+        if (tri === null) return null;
+        s += sp.w * tri;
+    }
+    return +s.toFixed(2);
+}
+
+// Calcul du TRI par bissection (même logique que moteur-calcul/ en Python)
+// La pension perd chaque année ero_pct % de sa valeur par rapport aux salaires.
+function computeTRIbisect(age_entree, age_depart, ev, tr_pct, tau_pct, ero_pct) {
     const Tc = Math.max(1, Math.round(age_depart - age_entree));
     const Tr = Math.round(ev - age_depart);
     if (Tr <= 0) return null;
     const tau = tau_pct / 100;
     const tr  = tr_pct  / 100;
+    const ero = (ero_pct || 0) / 100;
     const npv = r => {
         let s = 0;
         for (let t = 0; t < Tc; t++) s -= tau / Math.pow(1 + r, t);
-        for (let t = 0; t < Tr; t++) s += tr  / Math.pow(1 + r, Tc + t);
+        for (let t = 0; t < Tr; t++) s += tr * Math.pow(1 - ero, t) / Math.pow(1 + r, Tc + t);
         return s;
     };
     let lo = -0.20, hi = 0.30;
     if (npv(lo) < 0) return +(lo * 100).toFixed(2);
     if (npv(hi) > 0) return +(hi * 100).toFixed(2);
-    for (let i = 0; i < 150; i++) {
+    for (let i = 0; i < 60; i++) {
         const mid = (lo + hi) / 2;
         npv(mid) > 0 ? lo = mid : hi = mid;
     }
-    return +((lo + hi) / 2 * 100).toFixed(2);
+    return (lo + hi) / 2 * 100;
 }
 
 // Mise à jour du graphique TRI selon les sliders actifs
 function updateTriChart(p) {
     if (!triGenChart) return;
     const gen = currentTriGen;
-    const { ref_age, tau_base } = TRI_GEN_PARAMS[gen];
-    const evArr    = TRI_EV[gen];
-    const trRefArr = TRI_TR_REF[gen];
-
-    // Le curseur d'âge est un écart par rapport au droit en vigueur (64 ans),
-    // appliqué à l'âge de référence de chaque génération.
-    const shift        = p.age - TRI_REF_LEGAL;
-    const ageDepart    = ref_age + shift;
-    const ageDelta     = shift * 5;   // même logique que simTR col. 3
-    const idxBonus     = 11 * p.index;
-    const tauEffective = tau_base + p.cotis_sal + p.cotis_emp;
-
-    const tris = TRI_AGE_ENTREE.map((ae, i) => {
-        const trAdj = i < 5
-            ? Math.min(100, Math.max(20, trRefArr[i] + ageDelta + idxBonus))
-            : Math.min(100, Math.max(20, trRefArr[i] + ageDelta + Math.round(idxBonus * 0.7)));
-        return computeTRIbisect(ae, ageDepart, evArr[i], trAdj, tauEffective);
-    });
+    const tris = TRI_GEN_PARAMS[gen].TRN.map((_, i) => triDecile(gen, i, p, 1));
 
     triGenChart.data.datasets[0].data            = tris;
     triGenChart.data.datasets[0].backgroundColor = tris.map(v =>
@@ -2074,8 +2248,8 @@ let triGenChart = null;
     triGenChart = new Chart(triCanvas.getContext('2d'), {
         type: 'bar',
         data: {
-            labels: [1600,1900,2100,2350,2650,3200,3800,4800,6500,9500].map((s,i) =>
-                ['D'+(i+1), s.toLocaleString('fr-FR')+'€']),
+            labels: [1830,2000,2210,2410,2640,2930,3300,3850,4820,7030].map((s,i) =>
+                ['D'+(i+1), s.toLocaleString('fr-FR')+'\u00a0€']),
             datasets: [{
                 type: 'bar',
                 label: 'TRI actuel (%)',
@@ -2126,7 +2300,7 @@ let triGenChart = null;
                     callbacks: {
                         label: c => {
                             const v = c.parsed.y;
-                            return ' TRI : ' + (v >= 0 ? '+' : '') + v.toFixed(2) + ' %';
+                            return ' TRI : ' + snf(v, 2) + ' %';
                         }
                     }
                 }
@@ -2137,11 +2311,14 @@ let triGenChart = null;
                     ticks: { color: '#475569', font: { size: 10 }, maxRotation: 90, minRotation: 90, autoSkip: false }
                 },
                 y: {
+                    // bornes arrondies au dixième pour des graduations lisibles (0,1 % ; 0,2 % …)
+                    afterDataLimits: sc => { sc.min = Math.floor(sc.min * 10) / 10; sc.max = Math.ceil(sc.max * 10) / 10; },
                     grid: { color: 'rgba(255,255,255,0.04)' },
                     ticks: {
                         color: '#475569',
                         font: { size: 10 },
-                        callback: v => (v >= 0 ? '+' : '') + v.toFixed(1) + '%'
+                        // 2 décimales : les graduations peuvent tomber sur des demi-dixièmes (ex. 0,35 %)
+                        callback: v => snf(v, 2) + ' %'
                     }
                 }
             },
@@ -2181,16 +2358,18 @@ function selectTriGen(gen) {
 }
 
 // ── Compensation TRI ──────────────────────────────────────────
-const COMP_SALAIRES_ANNUELS = [1600,1900,2100,2350,2650,3200,3800,4800,6500,9500].map(s => s * 12);
+// Salaire brut moyen de carrière par décile (Insee 2024, voir calculs-par-decile.md)
+const COMP_SALAIRES_ANNUELS = [1826,1995,2205,2410,2641,2925,3302,3846,4819,7030].map(s => s * 12);
 const COMP_N_PAR_DECILE = 1_700_000;
 const COMP_PIB = 3000; // Mds€
 
 // Trouve le TR (peut dépasser 100%) qui donne le TRI cible
-function findTRforTRI(ae, ad, ev, tau_pct, tri_target) {
-    let lo = 0, hi = 200;
-    for (let i = 0; i < 100; i++) {
+// Multiplicateur de pension qui donne le TRI cible pour un décile
+function findMultForTRI(gen, i, p, tri_target) {
+    let lo = 0, hi = 3;
+    for (let k = 0; k < 40; k++) {
         const mid = (lo + hi) / 2;
-        const tri = computeTRIbisect(ae, ad, ev, mid, tau_pct);
+        const tri = triDecile(gen, i, p, mid);
         (tri === null ? -20 : tri) < tri_target ? lo = mid : hi = mid;
     }
     return (lo + hi) / 2;
@@ -2206,7 +2385,7 @@ function updateCompensation(p) {
     const triD10 = parseFloat(d10El.value);
     const isActive = activeEl ? activeEl.checked : false;
 
-    const fmtTRI = v => (v >= 0 ? '+' : '') + v.toFixed(2) + '%';
+    const fmtTRI = v => snf(v, 2) + '\u00a0%';
     document.getElementById('comp-d1-val').textContent  = fmtTRI(triD1);
     document.getElementById('comp-d10-val').textContent = fmtTRI(triD10);
     document.getElementById('comp-d1-val').style.color  = triD1  > 0 ? '#10b981' : triD1  < 0 ? '#ef4444' : '#94a3b8';
@@ -2216,7 +2395,7 @@ function updateCompensation(p) {
     if (!isActive) {
         compCostPctPIB = 0;
         compSimTR = null;
-        document.getElementById('comp-cost').textContent = '0 Mds€/an';
+        document.getElementById('comp-cost').textContent = '0 Md€/an';
         document.getElementById('comp-cost').style.color = '#e2e8f0';
         document.getElementById('comp-impossible').style.display = 'none';
         // Masquer la ligne cible sur le graphe TRI
@@ -2229,43 +2408,33 @@ function updateCompensation(p) {
     }
 
     const gen = currentTriGen;
-    const { ref_age, tau_base } = TRI_GEN_PARAMS[gen];
-    const evArr    = TRI_EV[gen];
-    const trRefArr = TRI_TR_REF[gen];
-    const shift     = p.age - TRI_REF_LEGAL;
-    const ageDepart = ref_age + shift;
-    const ageDelta  = shift * 5;
-    const idxBonus  = 11 * p.index;
-    const tauEff    = tau_base + p.cotis_sal + p.cotis_emp; // cotisations affectent le TRI
+    const G = TRI_GEN_PARAMS[gen];
 
     let totalDelta = 0;
     let impossible = false;
     const triTargetLine = [];
-    const trNeededArr = [];
+    const multArr = [];
 
-    TRI_AGE_ENTREE.forEach((ae, i) => {
-        const trCurrent = Math.min(100, Math.max(20, trRefArr[i] + ageDelta));
+    G.TRN.forEach((trn, i) => {
+        const trCurrent = trn * facteurPensionDecile(gen, i, p);
         const triTarget = triD1 + (triD10 - triD1) * i / 9;
         triTargetLine.push(parseFloat(triTarget.toFixed(3)));
-        const trNeeded  = findTRforTRI(ae, ageDepart, evArr[i], tauEff, triTarget);
-        trNeededArr.push(trNeeded);
-        if (trNeeded > 100) impossible = true;
-        totalDelta += (trNeeded - trCurrent) / 100 * COMP_SALAIRES_ANNUELS[i] * COMP_N_PAR_DECILE;
+        const mult = findMultForTRI(gen, i, p, triTarget);
+        multArr.push(mult);
+        if (trCurrent * mult > 100) impossible = true;
+        totalDelta += (mult - 1) * trCurrent / 100 * COMP_SALAIRES_ANNUELS[i] * COMP_N_PAR_DECILE;
     });
 
-    // TR cibles pour D1 (i=0), D5 (i=4), D10 (i=9) → injectés dans le graphe TR
-    compSimTR = [
-        Math.round(trNeededArr[0]),
-        Math.round(trNeededArr[4]),
-        Math.round(trNeededArr[9])
-    ];
+    // Effet sur le graphe des taux de remplacement (D1, D5, D10) : même variation relative
+    compSimTR = [0, 4, 9].map((d, j) =>
+        Math.round(TR_REF[j] * facteurPensionDecile('1980', d, p) / facteurPensionDecile('1980', d, DEFAULTS) * multArr[d]));
 
     const costMds = totalDelta / 1e9; // peut être négatif : effort de D10 = recette pour le système
     compCostPctPIB = costMds / COMP_PIB * 100;
 
 
     const costEl = document.getElementById('comp-cost');
-    costEl.textContent = (costMds >= 0 ? '+' : '') + costMds.toFixed(1) + ' Mds€/an';
+    costEl.textContent = snf(costMds, 1) + ' Md€/an';
     costEl.style.color = costMds > 1 ? '#ef4444' : costMds < -1 ? '#10b981' : '#e2e8f0';
 
     document.getElementById('comp-impossible').style.display = impossible ? '' : 'none';
@@ -2296,17 +2465,21 @@ function onCompSlider() {
 
 const SLIDERS = [
     { id:'sl-age',       bub:'bub-age',       refVal:64,
-      fmt: v => { const n=parseFloat(v); return (n%1===0?n:n.toFixed(1))+' ans'; } },
+      fmt: v => { const n=parseFloat(v); return (n%1===0?n:nf(n, 1))+' ans'; } },
+    { id:'sl-rythme',    bub:'bub-rythme',    refVal:0,
+      fmt: v => { const n=parseInt(v); return n===0 ? 'Immédiate' : n+' ans'; } },
+    { id:'sl-duree',     bub:'bub-duree',     refVal:43,
+      fmt: v => { const n=parseFloat(v); return (n%1===0?n:n.toFixed(2).replace('.',','))+' ans'; } },
     { id:'sl-cotis-sal', bub:'bub-cotis-sal', refVal:0,
-      fmt: v => (parseFloat(v)>=0?'+':'')+parseFloat(v).toFixed(1)+' pt' },
+      fmt: v => snf(parseFloat(v), 1)+' pt' },
     { id:'sl-cotis-emp', bub:'bub-cotis-emp', refVal:0,
-      fmt: v => (parseFloat(v)>=0?'+':'')+parseFloat(v).toFixed(1)+' pt' },
+      fmt: v => snf(parseFloat(v), 1)+' pt' },
     { id:'sl-index', bub:'bub-index', refVal:0,
       fmt: v => { const n=parseFloat(v);
-        if (n<=-0.95) return 'Gel total';
-        if (n>=0.95)  return 'Salaires';
+        if (n<=-1.95) return 'Gel';
+        if (n>=0.65)  return '≈ Salaires';
         if (Math.abs(n)<0.05) return 'Prix';
-        return (n>0?'+':'')+n.toFixed(1); } },
+        return (n>0?'+':'−')+Math.abs(n).toFixed(1).replace('.',',')+' pt'; } },
     { id:'sl-fec',   bub:'bub-fec',   refVal:1.45,
       fmt: v => parseFloat(v).toFixed(2).replace('.',',')+' enf/f' },
     { id:'sl-mig',   bub:'bub-mig',   refVal:150000,
@@ -2334,6 +2507,8 @@ SLIDERS.forEach(cfg => {
 });
 function resetAll() {
     document.getElementById('sl-age').value       = DEFAULTS.age;
+    document.getElementById('sl-duree').value     = DEFAULTS.duree;
+    document.getElementById('sl-rythme').value    = DEFAULTS.rythme;
     document.getElementById('sl-cotis-sal').value = DEFAULTS.cotis_sal;
     document.getElementById('sl-cotis-emp').value = DEFAULTS.cotis_emp;
     document.getElementById('sl-index').value     = DEFAULTS.index;
@@ -2346,8 +2521,8 @@ function resetAll() {
     if (compActive) compActive.checked = false;
     const compBody = document.getElementById('comp-body');
     if (compBody) compBody.classList.add('disabled');
-    document.getElementById('comp-d1').value  = 1.1;
-    document.getElementById('comp-d10').value = 1.1;
+    document.getElementById('comp-d1').value  = 0.12;
+    document.getElementById('comp-d10').value = 0.12;
     refreshAllBubbles();
     update();
 }
